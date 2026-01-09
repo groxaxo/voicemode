@@ -29,8 +29,9 @@ class TestProviderTypeDetection:
         assert detect_provider_type("http://127.0.0.1/api") == "local"
     
     def test_detect_unknown(self):
-        assert detect_provider_type("https://example.com/api") == "unknown"
-        assert detect_provider_type("http://external-server.com:8080/v1") == "unknown"
+        # Any unknown endpoint is treated as OpenAI-compatible
+        assert detect_provider_type("https://example.com/api") == "openai-compatible"
+        assert detect_provider_type("http://external-server.com:8080/v1") == "openai-compatible"
 
 
 class TestVoiceFirstSelection:

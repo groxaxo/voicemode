@@ -93,7 +93,8 @@ async def get_tts_client_and_voice(
                 selected_voice = voice
                 selected_model = _select_model_for_endpoint(endpoint_info, model)
 
-                api_key = OPENAI_API_KEY if endpoint_info.provider_type == "openai" else (OPENAI_API_KEY or "dummy-key-for-local")
+                # Use OPENAI_API_KEY if set, otherwise use dummy key (for local/testing endpoints)
+                api_key = OPENAI_API_KEY or "dummy-key-for-local"
                 # Disable retries for local endpoints - they either work or don't
                 max_retries = 0 if is_local_provider(url) else 2
                 client = AsyncOpenAI(api_key=api_key, base_url=url, max_retries=max_retries)
@@ -120,7 +121,8 @@ async def get_tts_client_and_voice(
                 selected_voice = preferred_voice
                 selected_model = _select_model_for_endpoint(endpoint_info, model)
 
-                api_key = OPENAI_API_KEY if endpoint_info.provider_type == "openai" else (OPENAI_API_KEY or "dummy-key-for-local")
+                # Use OPENAI_API_KEY if set, otherwise use dummy key (for local/testing endpoints)
+                api_key = OPENAI_API_KEY or "dummy-key-for-local"
                 # Disable retries for local endpoints - they either work or don't
                 max_retries = 0 if is_local_provider(url) else 2
                 client = AsyncOpenAI(api_key=api_key, base_url=url, max_retries=max_retries)
@@ -142,7 +144,8 @@ async def get_tts_client_and_voice(
             selected_voice = endpoint_info.voices[0]
             selected_model = _select_model_for_endpoint(endpoint_info, model)
 
-            api_key = OPENAI_API_KEY if endpoint_info.provider_type == "openai" else (OPENAI_API_KEY or "dummy-key-for-local")
+            # Use OPENAI_API_KEY if set, otherwise use dummy key (for local/testing endpoints)
+            api_key = OPENAI_API_KEY or "dummy-key-for-local"
             # Disable retries for local endpoints - they either work or don't
             max_retries = 0 if is_local_provider(url) else 2
             client = AsyncOpenAI(api_key=api_key, base_url=url, max_retries=max_retries)
@@ -203,7 +206,8 @@ async def get_stt_client(
     endpoint_info = endpoints[0]
     selected_model = model or "whisper-1"
     
-    api_key = OPENAI_API_KEY if endpoint_info.provider_type == "openai" else (OPENAI_API_KEY or "dummy-key-for-local")
+    # Use OPENAI_API_KEY if set, otherwise use dummy key (for local/testing endpoints)
+    api_key = OPENAI_API_KEY or "dummy-key-for-local"
     # Disable retries for local endpoints - they either work or don't
     max_retries = 0 if is_local_provider(endpoint_info.base_url) else 2
     client = AsyncOpenAI(
