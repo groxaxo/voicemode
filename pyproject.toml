@@ -5,14 +5,15 @@ build-backend = "hatchling.build"
 [project]
 name = "voice-mode"
 dynamic = ["version"]
-description = "VoiceMode - Voice interaction capabilities for AI assistants (formerly voice-mcp)"
+description = "Real-OpenVoice - Voice interaction for OpenCode, Claude Code, and other AI assistants (fork of VoiceMode)"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
-    {name = "Mike Bailey", email = "mike@failmode.com"},
+    {name = "groxaxo (fork maintainer)", email = "blackstoreonline@gmail.com"},
+    {name = "Mike Bailey (original author)", email = "mike@failmode.com"},
 ]
-keywords = ["mcp", "voice", "livekit", "speech", "tts", "stt", "ai", "llm"]
+keywords = ["mcp", "voice", "opencode", "claude", "speech", "tts", "stt", "ai", "llm", "coding-assistant"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -95,9 +96,11 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://getvoicemode.com/"
-Repository = "https://github.com/mbailey/voicemode"
-Issues = "https://github.com/mbailey/voicemode/issues"
+Homepage = "https://github.com/groxaxo/voicemode"
+Repository = "https://github.com/groxaxo/voicemode"
+Issues = "https://github.com/groxaxo/voicemode/issues"
+"Original Project" = "https://github.com/mbailey/voicemode"
+"OpenCode" = "https://github.com/opencode-ai/opencode"
 
 [project.scripts]
 voice-mode = "voice_mode.cli:voice_mode"
