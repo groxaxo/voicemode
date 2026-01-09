@@ -1,10 +1,10 @@
-site_name: Voice Mode
+site_name: Real-OpenVoice
 site_url: https://voice-mode.readthedocs.io
-site_description: Natural voice conversations for AI assistants
-site_author: Voice Mode Team
+site_description: Voice interaction for OpenCode, Claude Code, and other AI assistants
+site_author: Real-OpenVoice Team (fork of VoiceMode by Mike Bailey)
 
-repo_name: mbailey/voicemode
-repo_url: https://github.com/mbailey/voicemode
+repo_name: groxaxo/voicemode
+repo_url: https://github.com/groxaxo/voicemode
 edit_uri: edit/main/docs/
 
 theme:
@@ -79,11 +79,13 @@ nav:
     - Installation: tutorials/getting-started.md
     - Configuration: guides/configuration.md
   - Guides:
+    - OpenCode Integration: guides/opencode-setup.md
+    - Claude Code Plugin: guides/claude-code-plugin.md
     - Selecting Voices: guides/selecting-voices.md
     - Pronunciation: guides/pronunciation.md
     - MacBook Portable Mode: guides/macbook-portable.md
-    - Claude Code Plugin: guides/claude-code-plugin.md
     - Selective Tool Loading: guides/selective-tool-loading.md
+    - Custom Endpoints: guides/custom-endpoints.md
   - Local Services:
     - Whisper STT: guides/whisper-setup.md
     - Kokoro TTS: guides/kokoro-setup.md
@@ -101,12 +103,13 @@ nav:
 extra:
   social:
     - icon: fontawesome/brands/github
+      link: https://github.com/groxaxo/voicemode
+      name: Real-OpenVoice (This Fork)
+    - icon: fontawesome/brands/github
       link: https://github.com/mbailey/voicemode
-    - icon: fontawesome/brands/x-twitter
-      link: https://twitter.com/getvoicemode
-    - icon: fontawesome/brands/discord
-      link: https://discord.gg/Hm7dF3uCfG
-    - icon: fontawesome/brands/youtube
-      link: https://youtube.com/@getvoicemode
+      name: Original VoiceMode Project
+    - icon: fontawesome/brands/github
+      link: https://github.com/opencode-ai/opencode
+      name: OpenCode AI
 
-copyright: Copyright &copy; 2025 Voice Mode - A Failmode Project
+copyright: Copyright &copy; 2025 Real-OpenVoice (fork of VoiceMode by Mike Bailey / Failmode)

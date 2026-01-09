@@ -205,6 +205,8 @@ Real-OpenVoice integrates with OpenCode through the Model Context Protocol (MCP)
 3. **Provider Flexibility**: Works with any OpenAI-compatible voice API (OpenAI, local Whisper, local Kokoro)
 4. **Seamless Experience**: Voice input/output works just like typing in OpenCode
 
+**See the [complete OpenCode Integration Guide](docs/guides/opencode-setup.md) for detailed setup instructions, troubleshooting, and advanced configuration.**
+
 #### Troubleshooting OpenCode Integration
 
 | Problem | Solution |
@@ -391,6 +393,7 @@ export VOICEMODE_SAVE_AUDIO=true
 ## Documentation
 
 - [Getting Started](docs/tutorials/getting-started.md) - Full setup guide
+- **[OpenCode Integration](docs/guides/opencode-setup.md)** - Complete guide for OpenCode setup
 - [Configuration](docs/guides/configuration.md) - All environment variables
 - [Whisper Setup](docs/guides/whisper-setup.md) - Local speech-to-text
 - [Kokoro Setup](docs/guides/kokoro-setup.md) - Local text-to-speech
