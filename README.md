@@ -95,14 +95,26 @@ voicemode config edit
 
 See the [Configuration Guide](docs/guides/configuration.md) for all options.
 
-## Local Voice Services
+## Voice Services
 
+VoiceMode works with **any OpenAI-compatible voice API endpoint**:
+
+### Cloud Services
+- **OpenAI TTS/Whisper** - Official OpenAI API (requires API key)
+- **Any OpenAI-compatible endpoint** - Custom TTS/STT services
+
+### Local Services
 For privacy or offline use, install local speech services:
 
 - **[Whisper.cpp](docs/guides/whisper-setup.md)** - Local speech-to-text
 - **[Kokoro](docs/guides/kokoro-setup.md)** - Local text-to-speech with multiple voices
 
-These provide the same API as OpenAI, so VoiceMode switches seamlessly between them.
+All services use the OpenAI API format, so VoiceMode switches seamlessly between them.
+
+**Setup Guide:** [Using Custom OpenAI-Compatible Endpoints](docs/guides/custom-endpoints.md)
+
+Configure endpoints via `VOICEMODE_TTS_BASE_URLS` and `VOICEMODE_STT_BASE_URLS`.
+
 
 ## Installation Details
 
