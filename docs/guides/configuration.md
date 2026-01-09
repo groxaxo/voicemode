@@ -29,6 +29,16 @@ export OPENAI_API_KEY="your-api-key"  # Fallback
 # Local services auto-detected when running
 ```
 
+### With Custom OpenAI-Compatible Endpoints
+```bash
+# Use any OpenAI-compatible TTS/STT service
+export VOICEMODE_TTS_BASE_URLS="https://my-tts.example.com/v1"
+export VOICEMODE_STT_BASE_URLS="https://my-stt.example.com/v1"
+# If your endpoint requires authentication:
+export OPENAI_API_KEY="your-endpoint-api-key"
+```
+
+
 ## Configuration System
 
 ### Configuration Precedence
@@ -109,6 +119,30 @@ VOICEMODE_TTS_MODEL=tts-1-hd
 VOICEMODE_TTS_SPEED=1.0
 ```
 
+##### Using Custom OpenAI-Compatible TTS Endpoints
+
+VoiceMode works with any OpenAI-compatible TTS endpoint. Simply add your endpoint to `VOICEMODE_TTS_BASE_URLS`:
+
+```bash
+# Example: Using a custom TTS service
+VOICEMODE_TTS_BASE_URLS=https://my-tts-service.example.com/v1,https://api.openai.com/v1
+
+# Example: Using multiple custom endpoints with fallback
+VOICEMODE_TTS_BASE_URLS=http://localhost:8080/v1,https://tts.example.com/v1,https://api.openai.com/v1
+
+# VoiceMode will automatically discover:
+# - Available models via /v1/models endpoint
+# - Available voices via /v1/audio/voices or /v1/voices endpoint
+# - If discovery fails, it uses configured defaults (tts-1 model)
+```
+
+Your custom endpoint should implement the OpenAI TTS API:
+- `POST /v1/audio/speech` - Generate speech from text
+- `GET /v1/models` (optional) - List available models
+- `GET /v1/audio/voices` or `/v1/voices` (optional) - List available voices
+
+If your endpoint doesn't expose model/voice discovery endpoints, VoiceMode will use the configured defaults from `VOICEMODE_TTS_MODELS` and `VOICEMODE_VOICES`.
+
 #### Speech-to-Text (STT)
 
 ```bash
@@ -120,6 +154,25 @@ VOICEMODE_WHISPER_MODEL=large-v2    # Model size
 VOICEMODE_WHISPER_LANGUAGE=auto     # Language detection
 VOICEMODE_WHISPER_PORT=2022         # Server port
 ```
+
+##### Using Custom OpenAI-Compatible STT Endpoints
+
+VoiceMode works with any OpenAI-compatible STT (Whisper) endpoint:
+
+```bash
+# Example: Using a custom STT service
+VOICEMODE_STT_BASE_URLS=https://my-stt-service.example.com/v1,https://api.openai.com/v1
+
+# Example: Multiple STT endpoints with fallback
+VOICEMODE_STT_BASE_URLS=http://localhost:9000/v1,https://whisper.example.com/v1,https://api.openai.com/v1
+```
+
+Your custom endpoint should implement the OpenAI Whisper API:
+- `POST /v1/audio/transcriptions` - Transcribe audio to text
+- `GET /v1/models` (optional) - List available models
+
+Supported audio formats: mp3, wav, opus, flac, m4a, webm
+
 
 ### Audio Configuration
 
