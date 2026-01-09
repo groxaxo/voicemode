@@ -109,7 +109,11 @@ For privacy or offline use, install local speech services:
 - **[Whisper.cpp](docs/guides/whisper-setup.md)** - Local speech-to-text
 - **[Kokoro](docs/guides/kokoro-setup.md)** - Local text-to-speech with multiple voices
 
-All services use the OpenAI API format, so VoiceMode switches seamlessly between them. Simply configure endpoints via `VOICEMODE_TTS_BASE_URLS` and `VOICEMODE_STT_BASE_URLS`.
+All services use the OpenAI API format, so VoiceMode switches seamlessly between them.
+
+**Setup Guide:** [Using Custom OpenAI-Compatible Endpoints](docs/guides/custom-endpoints.md)
+
+Configure endpoints via `VOICEMODE_TTS_BASE_URLS` and `VOICEMODE_STT_BASE_URLS`.
 
 
 ## Installation Details

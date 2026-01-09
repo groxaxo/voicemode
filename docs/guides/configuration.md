@@ -4,6 +4,11 @@ VoiceMode provides flexible configuration through environment variables and conf
 
 *Note: The Python package is called `voice-mode` but the preferred command is `voicemode`.*
 
+**See Also:**
+- [Custom OpenAI-Compatible Endpoints Guide](custom-endpoints.md) - How to use any OpenAI-compatible voice API
+- [Whisper Setup Guide](whisper-setup.md) - Local speech-to-text
+- [Kokoro Setup Guide](kokoro-setup.md) - Local text-to-speech
+
 ## Quick Start
 
 VoiceMode works out of the box with minimal configuration:
