@@ -34,7 +34,33 @@ Real-OpenVoice enables natural voice conversations with AI coding assistants. Vo
 
 [OpenCode](https://github.com/opencode-ai/opencode) is an open-source AI coding agent that works with multiple LLM providers and supports MCP (Model Context Protocol). Real-OpenVoice integrates seamlessly with OpenCode to provide voice interaction.
 
-#### Installation Steps
+#### Option A: Native Integration Patch (Best Experience)
+
+**NEW!** Install VoiceMode as native OpenCode commands - no MCP server needed!
+
+```bash
+# Clone this repository
+git clone https://github.com/groxaxo/voicemode.git
+cd voicemode
+
+# Run the OpenCode integration patch
+chmod +x patch/install-opencode-patch.sh
+./patch/install-opencode-patch.sh
+```
+
+This integrates VoiceMode directly into OpenCode:
+- ✅ Voice commands work like built-in features (`/voice/converse`, `/voice/status`)
+- ✅ Zero latency - no MCP server overhead
+- ✅ Seamless user experience
+- ✅ Works exactly like official OpenCode functionality
+
+**See [OPENCODE_PATCH.md](OPENCODE_PATCH.md) for complete documentation.**
+
+#### Option B: Traditional MCP Server
+
+Use VoiceMode as an MCP server (original approach):
+
+**Installation Steps**
 
 **1. Install OpenCode**
 
