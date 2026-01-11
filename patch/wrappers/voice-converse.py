@@ -68,7 +68,8 @@ def main():
     
     try:
         # Import converse function
-        from voice_mode.tools.converse import converse_impl
+        import asyncio
+        from voice_mode.tools.converse import converse
         
         # Prepare parameters
         kwargs = {
@@ -79,22 +80,17 @@ def main():
             kwargs["voice"] = args.voice
         
         if args.duration:
-            kwargs["listen_duration"] = args.duration
+            kwargs["listen_duration_max"] = args.duration
         
-        # Call converse
-        result = converse_impl(
+        # Call converse (it's async, so we need to run it)
+        result = asyncio.run(converse(
             message=initial_message or "Hello! How can I help you?",
             **kwargs
-        )
+        ))
         
-        # Print result
-        if result.get("error"):
-            print(f"Error: {result['error']}", file=sys.stderr)
-            sys.exit(1)
-        
-        # Success - print user's transcribed response
-        if result.get("user_response"):
-            print(result["user_response"])
+        # Print result - the function returns a string directly
+        if result:
+            print(result)
         
     except Exception as e:
         logger.error(f"Voice conversation failed: {e}", exc_info=True)

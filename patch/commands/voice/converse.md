@@ -15,6 +15,21 @@ Start an interactive voice conversation using VoiceMode. This command provides n
 /voice/converse Hello, what can you help me with?
 ```
 
+## Implementation
+
+Use the VoiceMode CLI to start a conversation:
+
+```bash
+# Start a voice conversation
+voicemode converse
+```
+
+Or pass an initial message:
+
+```bash
+voicemode converse "$ARGUMENTS"
+```
+
 ## How It Works
 
 This command integrates VoiceMode directly into OpenCode without requiring a separate MCP server. It:
@@ -23,21 +38,6 @@ This command integrates VoiceMode directly into OpenCode without requiring a sep
 2. Transcribes speech to text using Whisper (local) or OpenAI API
 3. Processes your request
 4. Responds with synthesized speech using Kokoro (local) or OpenAI TTS
-
-## Implementation
-
-The command uses VoiceMode's Python package directly:
-
-```bash
-# Start a voice conversation
-voicemode converse
-```
-
-Or if you want to pass an initial message:
-
-```bash
-voicemode converse "$ARGUMENTS"
-```
 
 ## First-Time Setup
 
