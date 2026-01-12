@@ -162,19 +162,20 @@ voicemode service install kokoro
 
 **7. Start Using Voice**
 
-Launch OpenCode and enable voice interaction:
+Launch OpenCode and start voice conversation:
 
 ```bash
 # Start OpenCode terminal UI
 opencode
 
-# In OpenCode, trigger voice conversation
-# (The exact command may vary based on your OpenCode configuration)
+# In OpenCode, start voice conversation with:
+/voicemode:converse
+
+# Or use natural language:
+# "Start a voice conversation"
 ```
 
-If OpenCode exposes MCP tools directly, you can use:
-- `/voicemode:converse` - Start a voice conversation
-- `/voicemode:status` - Check voice service status
+See **[Starting Voice Conversation in OpenCode](#starting-voice-conversation-in-opencode)** below for detailed instructions and troubleshooting.
 
 #### OpenCode Configuration Options
 
@@ -241,6 +242,47 @@ Real-OpenVoice integrates with OpenCode through the Model Context Protocol (MCP)
 | Voice tools not available | Run `uvx --refresh voice-mode` to update the package |
 | Audio device errors | Check microphone permissions for OpenCode/terminal |
 | API key errors | Verify environment variables in OpenCode config |
+
+#### Starting Voice Conversation in OpenCode
+
+Once configured, start a voice conversation in OpenCode using either **slash commands** or **natural language**:
+
+**Method 1: Slash Commands (Recommended)**
+In the OpenCode terminal UI, type:
+```bash
+/voicemode:converse
+```
+This starts a voice conversation. You'll hear a chime and can start speaking.
+
+**Method 2: Natural Language**
+Simply ask OpenCode to start a voice conversation:
+```
+Start a voice conversation
+Check voice mode status
+Install voice services
+```
+OpenCode will recognize these requests and invoke the appropriate MCP tools.
+
+**Verifying Connection**
+Check if VoiceMode MCP server is connected:
+```bash
+opencode mcp list
+```
+You should see `✓ voicemode connected` in the output.
+
+**If you can't find voice tools:**
+1. **Check MCP connection**: Run `opencode mcp list` to verify voicemode is connected
+2. **Restart OpenCode**: Exit and restart OpenCode after configuration changes
+3. **Check configuration**: Verify `~/.opencode.json` has correct voicemode MCP server settings
+4. **Update voice-mode**: Run `uvx --refresh voice-mode` to ensure latest version
+5. **Check environment variables**: Ensure `OPENAI_API_KEY` is set (even if empty for custom endpoints)
+
+**Voice Conversation Workflow:**
+1. Start OpenCode: `opencode`
+2. Invoke voice mode: Type `/voicemode:converse` or ask "start voice conversation"
+3. Speak naturally: VoiceMode transcribes your speech to text
+4. Hear responses: OpenCode's responses are spoken aloud
+5. End conversation: Press `Ctrl+C` or say "exit"
 
 ### Option 2: Claude Code Plugin
 
@@ -332,6 +374,29 @@ For privacy or offline use, install local speech services:
 - **[Kokoro](docs/guides/kokoro-setup.md)** - Local text-to-speech with multiple voices
 
 All services use the OpenAI API format, so VoiceMode switches seamlessly between them.
+
+**Using Custom Endpoints without API Keys**: VoiceMode can work with custom OpenAI-compatible endpoints that don't require authentication. Set `OPENAI_API_KEY` to an empty string and configure your endpoints:
+
+```bash
+export VOICEMODE_TTS_BASE_URLS="http://your-tts-endpoint.com/v1"
+export VOICEMODE_STT_BASE_URLS="http://your-stt-endpoint.com/v1"
+export OPENAI_API_KEY=""
+```
+
+Or edit `~/.voicemode/voicemode.env`:
+
+```bash
+VOICEMODE_TTS_BASE_URLS=http://your-tts-endpoint.com/v1
+VOICEMODE_STT_BASE_URLS=http://your-stt-endpoint.com/v1
+OPENAI_API_KEY=
+```
+
+Use `voice-mode config set` to manage configuration:
+
+```bash
+voice-mode config set VOICEMODE_TTS_BASE_URLS "http://your-tts-endpoint.com/v1"
+voice-mode config set VOICEMODE_VOICES "your-preferred-voice"
+```
 
 **Setup Guide:** [Using Custom OpenAI-Compatible Endpoints](docs/guides/custom-endpoints.md)
 
