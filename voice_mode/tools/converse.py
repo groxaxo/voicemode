@@ -25,6 +25,7 @@ except ImportError as e:
     VAD_AVAILABLE = False
 
 from voice_mode.server import mcp
+from voice_mode.conch import Conch
 from voice_mode.conversation_logger import get_conversation_logger
 from voice_mode.config import (
     audio_operation_lock,
@@ -59,7 +60,10 @@ from voice_mode.config import (
     METRICS_LEVEL,
     STT_AUDIO_FORMAT,
     STT_SAVE_FORMAT,
-    MP3_BITRATE
+    MP3_BITRATE,
+    CONCH_ENABLED,
+    CONCH_TIMEOUT,
+    CONCH_CHECK_INTERVAL
 )
 import voice_mode.config
 from voice_mode.provider_discovery import provider_registry
@@ -91,6 +95,104 @@ logger = logging.getLogger("voicemode")
 
 # Log silence detection config at module load time
 logger.info(f"Module loaded with DISABLE_SILENCE_DETECTION={DISABLE_SILENCE_DETECTION}")
+
+
+# DJ Ducking Configuration
+DJ_SOCKET_PATH = "/tmp/voicemode-mpv.sock"
+DJ_VOLUME_DUCK_AMOUNT = int(os.environ.get("VOICEMODE_DJ_DUCK_AMOUNT", "20"))  # Volume reduction during TTS
+
+
+def _dj_command(cmd: str) -> Optional[str]:
+    """Send a command to mpv-dj via IPC socket.
+
+    Args:
+        cmd: JSON command to send (e.g., '{ "command": ["get_property", "volume"] }')
+
+    Returns:
+        Response string from mpv, or None if DJ not running
+    """
+    import subprocess
+    import json
+
+    if not os.path.exists(DJ_SOCKET_PATH):
+        return None
+
+    try:
+        result = subprocess.run(
+            ["socat", "-", DJ_SOCKET_PATH],
+            input=cmd + "\n",
+            capture_output=True,
+            text=True,
+            timeout=2
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            return result.stdout.strip()
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        pass
+    return None
+
+
+def get_dj_volume() -> Optional[float]:
+    """Get current DJ volume level.
+
+    Returns:
+        Current volume (0-100) or None if DJ not running
+    """
+    import json
+    response = _dj_command('{ "command": ["get_property", "volume"] }')
+    if response:
+        try:
+            data = json.loads(response)
+            if "data" in data:
+                return float(data["data"])
+        except (json.JSONDecodeError, ValueError, KeyError):
+            pass
+    return None
+
+
+def set_dj_volume(volume: float) -> bool:
+    """Set DJ volume level.
+
+    Args:
+        volume: Volume level (0-100)
+
+    Returns:
+        True if successful, False otherwise
+    """
+    import json
+    volume = max(0, min(100, volume))  # Clamp to valid range
+    response = _dj_command(f'{{ "command": ["set_property", "volume", {volume}] }}')
+    if response:
+        try:
+            data = json.loads(response)
+            return data.get("error") == "success"
+        except json.JSONDecodeError:
+            pass
+    return False
+
+
+class DJDucker:
+    """Context manager for ducking DJ volume during TTS playback."""
+
+    def __init__(self, duck_amount: int = None):
+        self.duck_amount = duck_amount if duck_amount is not None else DJ_VOLUME_DUCK_AMOUNT
+        self.original_volume: Optional[float] = None
+        self.ducked = False
+
+    def __enter__(self):
+        self.original_volume = get_dj_volume()
+        if self.original_volume is not None:
+            ducked_volume = max(0, self.original_volume - self.duck_amount)
+            if set_dj_volume(ducked_volume):
+                self.ducked = True
+                logger.debug(f"DJ ducked: {self.original_volume:.0f}% -> {ducked_volume:.0f}%")
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.ducked and self.original_volume is not None:
+            if set_dj_volume(self.original_volume):
+                logger.debug(f"DJ restored: {self.original_volume:.0f}%")
+        return False  # Don't suppress exceptions
 
 
 def should_repeat(text: str) -> bool:
@@ -475,32 +577,46 @@ async def speech_to_text(
         logger.info(f"STT audio saved to: {save_file_path} (format: {STT_SAVE_FORMAT})")
 
         # Use compressed audio for upload (temporary file)
-        with tempfile.NamedTemporaryFile(suffix=f'.{file_extension}', delete=False) as tmp_file:
+        # Windows fix: close temp file before reopening (Issue #135)
+        tmp_file = tempfile.NamedTemporaryFile(suffix=f'.{file_extension}', delete=False)
+        tmp_path = tmp_file.name
+        try:
             tmp_file.write(compressed_audio)
             tmp_file.flush()
+            tmp_file.close()  # Close before reopening on Windows
 
-            with open(tmp_file.name, 'rb') as audio_file:
+            with open(tmp_path, 'rb') as audio_file:
                 result = await simple_stt_failover(
                     audio_file=audio_file,
                     model="whisper-1"
                 )
-
+        finally:
             # Clean up temp file (we keep the WAV)
-            os.unlink(tmp_file.name)
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
     else:
         # Use temporary file that will be deleted
-        with tempfile.NamedTemporaryFile(suffix=f'.{file_extension}', delete=False) as tmp_file:
+        # Windows fix: close temp file before reopening (Issue #135)
+        tmp_file = tempfile.NamedTemporaryFile(suffix=f'.{file_extension}', delete=False)
+        tmp_path = tmp_file.name
+        try:
             tmp_file.write(compressed_audio)
             tmp_file.flush()
+            tmp_file.close()  # Close before reopening on Windows
 
-            with open(tmp_file.name, 'rb') as audio_file:
+            with open(tmp_path, 'rb') as audio_file:
                 result = await simple_stt_failover(
                     audio_file=audio_file,
                     model="whisper-1"
                 )
-
+        finally:
             # Clean up temp file
-            os.unlink(tmp_file.name)
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
 
     return result
 
@@ -971,7 +1087,8 @@ async def converse(
     skip_tts: Optional[Union[bool, str]] = None,
     chime_leading_silence: Optional[float] = None,
     chime_trailing_silence: Optional[float] = None,
-    metrics_level: Optional[Literal["minimal", "summary", "verbose"]] = None
+    metrics_level: Optional[Literal["minimal", "summary", "verbose"]] = None,
+    wait_for_conch: Union[bool, str] = False
 ) -> str:
     """Have an ongoing voice conversation - speak a message and optionally listen for response.
 
@@ -1014,6 +1131,9 @@ KEY PARAMETERS:
   - minimal: Just response text (saves tokens)
   - summary: Response + compact timing (default)
   - verbose: Response + detailed metrics breakdown
+• wait_for_conch (bool, default: false): Multi-agent coordination
+  - false: If another agent is speaking, return status immediately
+  - true: Wait until the other agent finishes, then speak
 
 PRIVACY: Microphone access required when wait_for_response=true.
          Audio processed via STT service, not stored.
@@ -1030,7 +1150,9 @@ consult the MCP resources listed above.
         chime_enabled = chime_enabled.lower() in ('true', '1', 'yes', 'on')
     if skip_tts is not None and isinstance(skip_tts, str):
         skip_tts = skip_tts.lower() in ('true', '1', 'yes', 'on')
-    
+    if isinstance(wait_for_conch, str):
+        wait_for_conch = wait_for_conch.lower() in ('true', '1', 'yes', 'on')
+
     # Convert vad_aggressiveness to integer if provided as string
     if vad_aggressiveness is not None and isinstance(vad_aggressiveness, str):
         try:
@@ -1146,8 +1268,32 @@ consult the MCP resources listed above.
     
     result = None
     success = False
-    
+    conch = Conch()
+
     try:
+        # Check if conch is currently held by another agent
+        if CONCH_ENABLED and Conch.is_active():
+            holder = Conch.get_holder()
+            holder_agent = holder.get('agent', 'unknown') if holder else 'unknown'
+
+            if not wait_for_conch:
+                # Default: return immediately with status info
+                return (f"User is currently speaking with {holder_agent}. "
+                        "Use wait_for_conch=true to queue, or try again later.")
+            else:
+                # Polling wait mode
+                waited = 0.0
+                while Conch.is_active() and waited < CONCH_TIMEOUT:
+                    await asyncio.sleep(CONCH_CHECK_INTERVAL)
+                    waited += CONCH_CHECK_INTERVAL
+
+                if Conch.is_active():  # Still busy after timeout
+                    return f"Timed out waiting for conch ({CONCH_TIMEOUT}s). {holder_agent} is still speaking."
+
+        # Acquire conch to signal voice conversation is active
+        # This allows sound effect hooks to check and mute themselves
+        conch.acquire()
+
         # Local microphone approach with timing
         transport = "local"
         timings = {}
@@ -1166,15 +1312,17 @@ consult the MCP resources listed above.
                     }
                     tts_config = {'provider': 'no-op', 'voice': 'none'}
                 else:
-                    tts_success, tts_metrics, tts_config = await text_to_speech_with_failover(
-                        message=message,
-                        voice=voice,
-                        model=tts_model,
-                        instructions=tts_instructions,
-                        audio_format=audio_format,
-                        initial_provider=tts_provider,
-                        speed=speed
-                    )
+                    # Duck DJ volume during TTS playback
+                    with DJDucker():
+                        tts_success, tts_metrics, tts_config = await text_to_speech_with_failover(
+                            message=message,
+                            voice=voice,
+                            model=tts_model,
+                            instructions=tts_instructions,
+                            audio_format=audio_format,
+                            initial_provider=tts_provider,
+                            speed=speed
+                        )
                 
                 # Add TTS sub-metrics
                 if tts_metrics:
@@ -1454,6 +1602,22 @@ consult the MCP resources listed above.
                             except Exception as e:
                                 logger.warning(f"Failed to replay cached audio: {e}. Regenerating...")
                                 # Fall back to regenerating TTS
+                                with DJDucker():
+                                    tts_success, new_tts_metrics, _ = await text_to_speech_with_failover(
+                                        message=message,
+                                        voice=voice,
+                                        model=tts_model,
+                                        instructions=tts_instructions,
+                                        audio_format=audio_format,
+                                        initial_provider=tts_provider,
+                                        speed=speed
+                                    )
+                                if not tts_success:
+                                    logger.error("Failed to replay audio via TTS regeneration")
+                        else:
+                            # No cached audio, regenerate TTS
+                            logger.info("No cached audio available, regenerating...")
+                            with DJDucker():
                                 tts_success, new_tts_metrics, _ = await text_to_speech_with_failover(
                                     message=message,
                                     voice=voice,
@@ -1463,20 +1627,6 @@ consult the MCP resources listed above.
                                     initial_provider=tts_provider,
                                     speed=speed
                                 )
-                                if not tts_success:
-                                    logger.error("Failed to replay audio via TTS regeneration")
-                        else:
-                            # No cached audio, regenerate TTS
-                            logger.info("No cached audio available, regenerating...")
-                            tts_success, new_tts_metrics, _ = await text_to_speech_with_failover(
-                                message=message,
-                                voice=voice,
-                                model=tts_model,
-                                instructions=tts_instructions,
-                                audio_format=audio_format,
-                                initial_provider=tts_provider,
-                                speed=speed
-                            )
                             if not tts_success:
                                 logger.error("Failed to replay audio via TTS regeneration")
 
@@ -1761,6 +1911,9 @@ consult the MCP resources listed above.
         return result
         
     finally:
+        # Release the conch to signal voice conversation has ended
+        conch.release()
+
         # Log tool request end
         if event_logger:
             log_tool_request_end("converse", success=success)
