@@ -6,6 +6,21 @@ from unittest.mock import patch, MagicMock
 import pytest
 
 
+@pytest.fixture(autouse=True)
+def patch_audio_dir(isolate_home_directory):
+    """Ensure AUDIO_DIR is patched to use the isolated home directory.
+
+    AUDIO_DIR is computed at import time in voice_mode.config, so it
+    won't pick up the isolate_home_directory monkeypatch. We need to
+    explicitly patch it in both config and symlinks modules.
+    """
+    audio_dir = isolate_home_directory / ".voicemode" / "audio"
+    audio_dir.mkdir(parents=True, exist_ok=True)
+    with patch("voice_mode.config.AUDIO_DIR", audio_dir), \
+         patch("voice_mode.utils.symlinks.AUDIO_DIR", audio_dir):
+        yield audio_dir
+
+
 class TestUpdateLatestSymlinks:
     """Tests for update_latest_symlinks function."""
 
