@@ -1047,14 +1047,20 @@ class TestStandbyCLI:
 
         # Mock get_valid_credentials to return credentials
         # Mock websockets import to raise ImportError (stops early for testing)
+        import builtins
+        real_import = builtins.__import__
+
+        def mock_import(name, *args, **kwargs):
+            if name == "websockets" or name.startswith("websockets."):
+                raise ImportError("mocked for testing")
+            return real_import(name, *args, **kwargs)
+
         with patch("voice_mode.auth.get_valid_credentials", return_value=mock_credentials):
-            # We expect it to get past auth and fail on websockets import
-            result = runner.invoke(connect, ["standby"])
+            with patch("builtins.__import__", side_effect=mock_import):
+                result = runner.invoke(connect, ["standby"])
 
             # Should show that credentials were loaded
             assert "Using stored credentials for: test@example.com" in result.output
-            # Will fail on websockets import (or connection), but that's after auth
-            # The key assertion is that we got past the auth check
 
     def test_standby_auth_refresh_failure(self):
         """Test standby shows appropriate error when auth refresh fails."""
@@ -1087,9 +1093,19 @@ class TestStandbyCLI:
 
         runner = CliRunner()
 
+        # Mock websockets import to raise ImportError (stops early for testing)
+        import builtins
+        real_import = builtins.__import__
+
+        def mock_import(name, *args, **kwargs):
+            if name == "websockets" or name.startswith("websockets."):
+                raise ImportError("mocked for testing")
+            return real_import(name, *args, **kwargs)
+
         # Provide explicit token - should not call get_valid_credentials
         with patch("voice_mode.auth.get_valid_credentials") as mock_get_creds:
-            result = runner.invoke(connect, ["standby", "--token", "explicit_token"])
+            with patch("builtins.__import__", side_effect=mock_import):
+                result = runner.invoke(connect, ["standby", "--token", "explicit_token"])
 
             # get_valid_credentials should NOT be called when --token is provided
             mock_get_creds.assert_not_called()
@@ -1103,13 +1119,23 @@ class TestStandbyCLI:
 
         runner = CliRunner()
 
+        # Mock websockets import to raise ImportError (stops early for testing)
+        import builtins
+        real_import = builtins.__import__
+
+        def mock_import(name, *args, **kwargs):
+            if name == "websockets" or name.startswith("websockets."):
+                raise ImportError("mocked for testing")
+            return real_import(name, *args, **kwargs)
+
         # Set environment variable
         with patch("voice_mode.auth.get_valid_credentials") as mock_get_creds:
-            result = runner.invoke(
-                connect,
-                ["standby"],
-                env={"VOICEMODE_DEV_TOKEN": "env_token"},
-            )
+            with patch("builtins.__import__", side_effect=mock_import):
+                result = runner.invoke(
+                    connect,
+                    ["standby"],
+                    env={"VOICEMODE_DEV_TOKEN": "env_token"},
+                )
 
             # get_valid_credentials should NOT be called when env var is set
             mock_get_creds.assert_not_called()

@@ -29,7 +29,7 @@ class TestProviderResilience:
         assert detect_provider_type("http://127.0.0.1:2022/v1") == "whisper"
         assert detect_provider_type("http://localhost:8880/v1") == "kokoro"
         assert detect_provider_type("http://127.0.0.1:9999/v1") == "local"
-        assert detect_provider_type("https://api.example.com/v1") == "unknown"
+        assert detect_provider_type("https://api.example.com/v1") == "openai-compatible"
 
     @pytest.mark.asyncio
     async def test_mark_failed_records_error(self):
