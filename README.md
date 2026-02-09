@@ -2,9 +2,9 @@
 
 > Natural voice conversations with Claude Code (and other MCP capable agents)
 
-## Acknowledgment
+## About This Fork
 
-This project is a fork of [VoiceMode](https://github.com/mbailey/voicemode) by Mike Bailey. We are grateful for his original work in creating this excellent voice interaction system for AI assistants.
+This is a custom fork of [VoiceMode](https://github.com/mbailey/voicemode) by Mike Bailey. We extend our sincere thanks to Mike Bailey for creating the original VoiceMode project - an excellent voice interaction system for AI assistants. This fork builds upon his foundational work to provide additional features and integrations for the community.
 
 [![PyPI Downloads](https://static.pepy.tech/badge/voice-mode)](https://pepy.tech/project/voice-mode)
 [![PyPI Downloads](https://static.pepy.tech/badge/voice-mode/month)](https://pepy.tech/project/voice-mode)
