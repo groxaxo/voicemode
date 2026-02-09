@@ -8,7 +8,7 @@
 
 ## What Is This?
 
-This patch integrates [VoiceMode](https://github.com/mbailey/voicemode) directly into [OpenCode](https://github.com/anomalyco/opencode) as native slash commands. After installation, voice features work like they're built into OpenCode itself.
+This patch integrates [Real-OpenVoice](https://github.com/groxaxo/voicemode) (fork of [VoiceMode](https://github.com/mbailey/voicemode)) directly into [OpenCode](https://github.com/anomalyco/opencode) as native slash commands. After installation, voice features work like they're built into OpenCode itself.
 
 **Before**: VoiceMode runs as a separate MCP server  
 **After**: Voice commands are native OpenCode features

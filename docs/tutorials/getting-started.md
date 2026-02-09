@@ -80,7 +80,7 @@ If you want to use VoiceMode from the command line:
 uv tool install voice-mode
 
 # Or install from source in editable mode
-git clone https://github.com/mbailey/voicemode
+git clone https://github.com/groxaxo/voicemode
 cd voicemode
 uv tool install -e .
 ```
@@ -215,7 +215,8 @@ voicemode logs --tail 50
 
 ## Getting Help
 
-- **GitHub Issues**: [github.com/mbailey/voicemode/issues](https://github.com/mbailey/voicemode/issues)
+- **GitHub Issues**: [github.com/groxaxo/voicemode/issues](https://github.com/groxaxo/voicemode/issues)
+- **Original Project**: [github.com/mbailey/voicemode](https://github.com/mbailey/voicemode)
 - **Discord**: Join our community for support
 
 Welcome to voice-enabled AI coding! 🎙️

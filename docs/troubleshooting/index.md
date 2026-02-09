@@ -134,7 +134,7 @@ When reporting issues, include:
 
 If you can't resolve your issue:
 
-1. Check the [GitHub Issues](https://github.com/mbailey/voicemode/issues) for similar problems
+1. Check the [GitHub Issues](https://github.com/groxaxo/voicemode/issues) for similar problems
 2. Review the [documentation](https://voicemode.dev)
 3. File a new issue with diagnostic information
 

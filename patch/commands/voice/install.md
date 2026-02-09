@@ -172,9 +172,9 @@ voicemode diag devices
 
 ### NixOS
 ```bash
-nix develop github:mbailey/voicemode
+nix develop github:groxaxo/voicemode
 # Or
-nix profile install github:mbailey/voicemode
+nix profile install github:groxaxo/voicemode
 ```
 
 ## Next Steps

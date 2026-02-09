@@ -23,7 +23,7 @@ Pick a unique topic name (e.g., `voicemode-stars-mike-bailey-xyz123`). This will
 
 ### 3. Configure GitHub Secret
 
-1. Go to your repository: https://github.com/mbailey/voicemode
+1. Go to your repository: https://github.com/groxaxo/voicemode
 2. Navigate to **Settings** → **Secrets and variables** → **Actions**
 3. Click **New repository secret**
 4. Name: `NTFY_TOPIC`
