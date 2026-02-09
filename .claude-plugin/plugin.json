@@ -1,9 +1,18 @@
 {
   "name": "voicemode",
   "description": "Voice conversations with Claude Code using local speech-to-text and text-to-speech",
-  "version": "7.4.0p3",
+  "version": "8.1.0p1",
   "author": {
     "name": "Mike Bailey",
     "email": "mike@failmode.com"
-  }
+  },
+  "commands": "./.claude/commands/",
+  "skills": "./.claude/skills/",
+  "hooks": [
+    "./voice_mode/data/hooks/pre-tool-use.json",
+    "./voice_mode/data/hooks/post-tool-use.json",
+    "./voice_mode/data/hooks/notification.json",
+    "./voice_mode/data/hooks/stop.json",
+    "./voice_mode/data/hooks/pre-compact.json"
+  ]
 }

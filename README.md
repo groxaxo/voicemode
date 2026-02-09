@@ -1,10 +1,10 @@
 # Real-OpenVoice
 
-> Voice interaction for AI coding assistants - OpenCode, Claude Code, and more.
+> Natural voice conversations with Claude Code (and other MCP capable agents)
 
 ## Acknowledgment
 
-This project is a fork of [VoiceMode](https://github.com/mbailey/voicemode) by Mike Bailey. We are grateful for his original work in creating this excellent voice interaction system for AI assistants. This fork focuses on expanding compatibility to work seamlessly with OpenCode and other open-source AI coding tools while maintaining full backward compatibility with Claude Code.
+This project is a fork of [VoiceMode](https://github.com/mbailey/voicemode) by Mike Bailey. We are grateful for his original work in creating this excellent voice interaction system for AI assistants.
 
 [![PyPI Downloads](https://static.pepy.tech/badge/voice-mode)](https://pepy.tech/project/voice-mode)
 [![PyPI Downloads](https://static.pepy.tech/badge/voice-mode/month)](https://pepy.tech/project/voice-mode)
@@ -24,287 +24,32 @@ Real-OpenVoice enables natural voice conversations with AI coding assistants. Vo
 
 [![VoiceMode Demo](https://img.youtube.com/vi/cYdwOD_-dQc/maxresdefault.jpg)](https://www.youtube.com/watch?v=cYdwOD_-dQc)
 
-*Demo video from the original VoiceMode project by Mike Bailey*
-
 ## Quick Start
 
 **Requirements:** Computer with microphone and speakers
 
-### Option 1: OpenCode (Recommended)
+### Option 1: Claude Code Plugin (Recommended)
 
-[OpenCode](https://github.com/opencode-ai/opencode) is an open-source AI coding agent that works with multiple LLM providers and supports MCP (Model Context Protocol). Real-OpenVoice integrates seamlessly with OpenCode to provide voice interaction.
-
-#### Option A: Native Integration Patch (Best Experience)
-
-**NEW!** Install VoiceMode as native OpenCode commands - no MCP server needed!
+The fastest way for Claude Code users to get started:
 
 ```bash
-# Clone this repository
-git clone https://github.com/groxaxo/voicemode.git
-cd voicemode
-
-# Run the OpenCode integration patch
-chmod +x patch/install-opencode-patch.sh
-./patch/install-opencode-patch.sh
-```
-
-This integrates VoiceMode directly into OpenCode:
-- ✅ Voice commands work like built-in features (`/voice/converse`, `/voice/status`)
-- ✅ Zero latency - no MCP server overhead
-- ✅ Seamless user experience
-- ✅ Works exactly like official OpenCode functionality
-
-**See [OPENCODE_PATCH.md](OPENCODE_PATCH.md) for complete documentation.**
-
-#### Option B: Traditional MCP Server
-
-Use VoiceMode as an MCP server (original approach):
-
-**Installation Steps**
-
-**1. Install OpenCode**
-
-Choose your preferred installation method:
-
-```bash
-# Quick install script (Recommended)
-curl -fsSL https://opencode.ai/install | bash
-
-# Or using Homebrew (macOS/Linux)
-brew install opencode-ai/tap/opencode
-
-# Or using npm
-npm install -g opencode-ai
-
-# Or using Arch Linux
-yay -S opencode-ai-bin
-```
-
-**2. Install UV Package Manager** (if not already installed)
-
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-**3. Install Real-OpenVoice**
-
-```bash
-# Run the installer (sets up dependencies and local voice services)
-uvx voice-mode-install
-
-# Or install from this repository
-git clone https://github.com/groxaxo/voicemode.git
-cd voicemode
-uv tool install -e .
-```
-
-**4. Configure OpenCode with MCP**
-
-Add Real-OpenVoice as an MCP server to OpenCode. Create or edit your OpenCode configuration file:
-
-**Location:** `~/.opencode.json` or `.opencode.json` in your project directory
-
-```json
-{
-  "mcpServers": {
-    "voicemode": {
-      "command": "uvx",
-      "args": ["--refresh", "voice-mode"],
-      "env": {
-        "OPENAI_API_KEY": "your-openai-key-here"
-      }
-    }
-  }
-}
-```
-
-**5. Set Up Your AI Provider**
-
-OpenCode supports multiple providers. Configure at least one:
-
-```bash
-# For OpenAI
-export OPENAI_API_KEY="your-openai-key"
-
-# For Anthropic Claude
-export ANTHROPIC_API_KEY="your-anthropic-key"
-
-# For Google Gemini
-export GEMINI_API_KEY="your-gemini-key"
-```
-
-Add these to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.) to make them permanent.
-
-**6. Install Voice Services** (Optional but Recommended)
-
-For local, privacy-focused voice processing:
-
-```bash
-# Start OpenCode
-opencode
-
-# In the OpenCode interface, you can now access voice tools
-# Install local voice services for offline use
-/voicemode:install
-
-# Or use the MCP tool directly if available
-```
-
-Alternatively, install voice services separately:
-
-```bash
-# Install Whisper.cpp (local speech-to-text)
-voicemode service install whisper
-
-# Install Kokoro (local text-to-speech)
-voicemode service install kokoro
-```
-
-**7. Start Using Voice**
-
-Launch OpenCode and start voice conversation:
-
-```bash
-# Start OpenCode terminal UI
-opencode
-
-# In OpenCode, start voice conversation with:
-/voicemode:converse
-
-# Or use natural language:
-# "Start a voice conversation"
-```
-
-See **[Starting Voice Conversation in OpenCode](#starting-voice-conversation-in-opencode)** below for detailed instructions and troubleshooting.
-
-#### OpenCode Configuration Options
-
-**Basic Configuration** (`~/.opencode.json`):
-
-```json
-{
-  "providers": {
-    "openai": {"apiKey": "YOUR_OPENAI_API_KEY"},
-    "anthropic": {"apiKey": "YOUR_ANTHROPIC_API_KEY"}
-  },
-  "agents": {
-    "primary": {"model": "claude-3.7-sonnet"}
-  },
-  "mcpServers": {
-    "voicemode": {
-      "command": "uvx",
-      "args": ["--refresh", "voice-mode"],
-      "env": {
-        "OPENAI_API_KEY": "your-openai-key",
-        "VOICEMODE_TTS_VOICE": "alloy",
-        "VOICEMODE_STT_MODEL": "whisper-1"
-      }
-    }
-  }
-}
-```
-
-**Advanced Configuration with Local Services**:
-
-```json
-{
-  "mcpServers": {
-    "voicemode": {
-      "command": "uvx",
-      "args": ["--refresh", "voice-mode"],
-      "env": {
-        "VOICEMODE_TTS_BASE_URLS": "http://localhost:8080/v1,https://api.openai.com/v1",
-        "VOICEMODE_STT_BASE_URLS": "http://localhost:8081/v1,https://api.openai.com/v1",
-        "VOICEMODE_TTS_VOICE": "af_sarah",
-        "VOICEMODE_SAVE_AUDIO": "true"
-      }
-    }
-  }
-}
-```
-
-#### How OpenCode Integration Works
-
-Real-OpenVoice integrates with OpenCode through the Model Context Protocol (MCP):
-
-1. **MCP Server**: Real-OpenVoice runs as an MCP server that OpenCode connects to
-2. **Voice Tools**: OpenCode can invoke voice tools like `converse`, `install`, and `status`
-3. **Provider Flexibility**: Works with any OpenAI-compatible voice API (OpenAI, local Whisper, local Kokoro)
-4. **Seamless Experience**: Voice input/output works just like typing in OpenCode
-
-**See the [complete OpenCode Integration Guide](docs/guides/opencode-setup.md) for detailed setup instructions, troubleshooting, and advanced configuration.**
-
-#### Troubleshooting OpenCode Integration
-
-| Problem | Solution |
-|---------|----------|
-| OpenCode can't find MCP server | Verify `~/.opencode.json` path and JSON syntax |
-| Voice tools not available | Run `uvx --refresh voice-mode` to update the package |
-| Audio device errors | Check microphone permissions for OpenCode/terminal |
-| API key errors | Verify environment variables in OpenCode config |
-
-#### Starting Voice Conversation in OpenCode
-
-Once configured, start a voice conversation in OpenCode using either **slash commands** or **natural language**:
-
-**Method 1: Slash Commands (Recommended)**
-In the OpenCode terminal UI, type:
-```bash
-/voicemode:converse
-```
-This starts a voice conversation. You'll hear a chime and can start speaking.
-
-**Method 2: Natural Language**
-Simply ask OpenCode to start a voice conversation:
-```
-Start a voice conversation
-Check voice mode status
-Install voice services
-```
-OpenCode will recognize these requests and invoke the appropriate MCP tools.
-
-**Verifying Connection**
-Check if VoiceMode MCP server is connected:
-```bash
-opencode mcp list
-```
-You should see `✓ voicemode connected` in the output.
-
-**If you can't find voice tools:**
-1. **Check MCP connection**: Run `opencode mcp list` to verify voicemode is connected
-2. **Restart OpenCode**: Exit and restart OpenCode after configuration changes
-3. **Check configuration**: Verify `~/.opencode.json` has correct voicemode MCP server settings
-4. **Update voice-mode**: Run `uvx --refresh voice-mode` to ensure latest version
-5. **Check environment variables**: Ensure `OPENAI_API_KEY` is set (even if empty for custom endpoints)
-
-**Voice Conversation Workflow:**
-1. Start OpenCode: `opencode`
-2. Invoke voice mode: Type `/voicemode:converse` or ask "start voice conversation"
-3. Speak naturally: VoiceMode transcribes your speech to text
-4. Hear responses: OpenCode's responses are spoken aloud
-5. End conversation: Press `Ctrl+C` or say "exit"
-
-### Option 2: Claude Code Plugin
-
-For users of Claude Code, the plugin method is also fully supported:
-
-```bash
-# Add the plugin marketplace (using original VoiceMode marketplace)
-claude plugin marketplace add https://github.com/mbailey/claude-plugins
+# Add the plugin marketplace
+claude plugin marketplace add mbailey/plugins
 
 # Install VoiceMode plugin
 claude plugin install voicemode@mbailey
 
-# Install dependencies (CLI, Local Voice Services)
+## Install dependencies (CLI, Local Voice Services)
+
 /voicemode:install
 
 # Start talking!
 /voicemode:converse
 ```
 
-### Option 3: MCP Server (Universal)
+### Option 2: Python installer package
 
-Add Real-OpenVoice as an MCP server for maximum compatibility with any MCP-compatible AI assistant:
+Installs dependencies and the VoiceMode Python package.
 
 ```bash
 # Install UV package manager (if needed)
@@ -327,20 +72,13 @@ For manual setup, see the [Getting Started Guide](docs/tutorials/getting-started
 
 ## Features
 
-- **Universal AI Assistant Support** - Works with OpenCode, Claude Code, and any MCP-compatible AI assistant
 - **Natural conversations** - speak naturally, hear responses immediately
 - **Works offline** - optional local voice services (Whisper STT, Kokoro TTS)
 - **Low latency** - fast enough to feel like a real conversation
 - **Smart silence detection** - stops recording when you stop speaking
 - **Privacy options** - run entirely locally or use cloud services
-- **Multiple LLM providers** - OpenAI, Anthropic, Google, and more through OpenCode
 
 ## Compatibility
-
-**AI Assistants:** 
-- OpenCode (recommended - open-source, multi-provider support)
-- Claude Code (full compatibility with original VoiceMode)
-- Any MCP-compatible AI assistant
 
 **Platforms:** Linux, macOS, Windows (WSL), NixOS
 **Python:** 3.10-3.14
@@ -359,49 +97,86 @@ voicemode config edit
 
 See the [Configuration Guide](docs/guides/configuration.md) for all options.
 
-## Voice Services
+## Remote Agent (Operator)
 
-VoiceMode works with **any OpenAI-compatible voice API endpoint**:
+VoiceMode includes agent management for running headless Claude Code instances that can be woken remotely from the iOS app or web interface.
 
-### Cloud Services
-- **OpenAI TTS/Whisper** - Official OpenAI API (requires API key)
-- **Any OpenAI-compatible endpoint** - Custom TTS/STT services
+### Quick Start
 
-### Local Services
+```bash
+# Start the operator agent in a tmux session
+voicemode agent start
+
+# Check if it's running
+voicemode agent status
+
+# Send a message to the operator
+voicemode agent send "Hello, please check my calendar"
+
+# Stop the operator
+voicemode agent stop
+```
+
+### The Operator Concept
+
+The **operator** is a headless Claude Code instance running in tmux that:
+- Listens for remote connections from voicemode.dev
+- Can be woken by the iOS app or web interface
+- Responds via voice using VoiceMode's TTS/STT capabilities
+
+Think of it like a phone operator - always there to help when called.
+
+### Agent Commands
+
+| Command | Description |
+|---------|-------------|
+| `voicemode agent start` | Start operator in tmux session |
+| `voicemode agent stop` | Send Ctrl-C to stop Claude gracefully |
+| `voicemode agent stop --kill` | Kill the tmux window |
+| `voicemode agent status` | Show running/stopped status |
+| `voicemode agent send "msg"` | Send message (auto-starts if needed) |
+| `voicemode agent send --no-start "msg"` | Send message (fail if not running) |
+
+### Agent Directory Structure
+
+Agent configuration lives in `~/.voicemode/agents/`:
+
+```
+~/.voicemode/agents/
+├── voicemode.env       # Shared settings for all agents
+├── AGENT.md            # AI entry point
+├── CLAUDE.md           # Claude-specific instructions
+├── SKILL.md            # Shared behavior
+└── operator/           # Default agent
+    ├── voicemode.env   # Operator-specific settings
+    ├── AGENT.md
+    ├── CLAUDE.md
+    └── SKILL.md        # Operator behavior
+```
+
+### Configuration (voicemode.env)
+
+Agent-specific settings override base settings. Available options:
+
+```bash
+# Base settings (~/.voicemode/agents/voicemode.env)
+VOICEMODE_VOICE=nova           # Default TTS voice
+VOICEMODE_SPEED=1.0            # Speech rate
+
+# Operator settings (~/.voicemode/agents/operator/voicemode.env)
+VOICEMODE_AGENT_REMOTE=true    # Enable remote connections
+VOICEMODE_AGENT_STARTUP_MESSAGE=  # Message sent on startup
+VOICEMODE_AGENT_CLAUDE_ARGS=   # Extra args for Claude Code
+```
+
+## Local Voice Services
+
 For privacy or offline use, install local speech services:
 
 - **[Whisper.cpp](docs/guides/whisper-setup.md)** - Local speech-to-text
 - **[Kokoro](docs/guides/kokoro-setup.md)** - Local text-to-speech with multiple voices
 
-All services use the OpenAI API format, so VoiceMode switches seamlessly between them.
-
-**Using Custom Endpoints without API Keys**: VoiceMode can work with custom OpenAI-compatible endpoints that don't require authentication. Set `OPENAI_API_KEY` to an empty string and configure your endpoints:
-
-```bash
-export VOICEMODE_TTS_BASE_URLS="http://your-tts-endpoint.com/v1"
-export VOICEMODE_STT_BASE_URLS="http://your-stt-endpoint.com/v1"
-export OPENAI_API_KEY=""
-```
-
-Or edit `~/.voicemode/voicemode.env`:
-
-```bash
-VOICEMODE_TTS_BASE_URLS=http://your-tts-endpoint.com/v1
-VOICEMODE_STT_BASE_URLS=http://your-stt-endpoint.com/v1
-OPENAI_API_KEY=
-```
-
-Use `voice-mode config set` to manage configuration:
-
-```bash
-voice-mode config set VOICEMODE_TTS_BASE_URLS "http://your-tts-endpoint.com/v1"
-voice-mode config set VOICEMODE_VOICES "your-preferred-voice"
-```
-
-**Setup Guide:** [Using Custom OpenAI-Compatible Endpoints](docs/guides/custom-endpoints.md)
-
-Configure endpoints via `VOICEMODE_TTS_BASE_URLS` and `VOICEMODE_STT_BASE_URLS`.
-
+These provide the same API as OpenAI, so VoiceMode switches seamlessly between them.
 
 ## Installation Details
 
@@ -433,10 +208,10 @@ brew install ffmpeg node portaudio
 
 ```bash
 # Use development shell
-nix develop github:groxaxo/voicemode
+nix develop github:mbailey/voicemode
 
 # Or install system-wide
-nix profile install github:groxaxo/voicemode
+nix profile install github:mbailey/voicemode
 ```
 
 </details>
@@ -447,7 +222,7 @@ nix profile install github:groxaxo/voicemode
 #### From source
 
 ```bash
-git clone https://github.com/groxaxo/voicemode.git
+git clone https://github.com/mbailey/voicemode.git
 cd voicemode
 uv tool install -e .
 ```
@@ -457,7 +232,7 @@ uv tool install -e .
 ```nix
 # In /etc/nixos/configuration.nix
 environment.systemPackages = [
-  (builtins.getFlake "github:groxaxo/voicemode").packages.${pkgs.system}.default
+  (builtins.getFlake "github:mbailey/voicemode").packages.${pkgs.system}.default
 ];
 ```
 
@@ -484,7 +259,6 @@ export VOICEMODE_SAVE_AUDIO=true
 ## Documentation
 
 - [Getting Started](docs/tutorials/getting-started.md) - Full setup guide
-- **[OpenCode Integration](docs/guides/opencode-setup.md)** - Complete guide for OpenCode setup
 - [Configuration](docs/guides/configuration.md) - All environment variables
 - [Whisper Setup](docs/guides/whisper-setup.md) - Local speech-to-text
 - [Kokoro Setup](docs/guides/kokoro-setup.md) - Local text-to-speech
@@ -494,22 +268,13 @@ Full documentation: [voice-mode.readthedocs.io](https://voice-mode.readthedocs.i
 
 ## Links
 
+- **Website**: [getvoicemode.com](https://getvoicemode.com)
 - **Original Project**: [VoiceMode by Mike Bailey](https://github.com/mbailey/voicemode) - Thank you for creating this amazing tool!
 - **This Fork**: [github.com/groxaxo/voicemode](https://github.com/groxaxo/voicemode)
 - **PyPI**: [pypi.org/project/voice-mode](https://pypi.org/project/voice-mode/)
-- **OpenCode**: [github.com/opencode-ai/opencode](https://github.com/opencode-ai/opencode)
-- **MCP Protocol**: [modelcontextprotocol.io](https://modelcontextprotocol.io)
-
-## Credits & Attribution
-
-**Original Author:** Mike Bailey ([@mbailey](https://github.com/mbailey))
-- Original Repository: [mbailey/voicemode](https://github.com/mbailey/voicemode)
-- Website: [getvoicemode.com](https://getvoicemode.com)
-- YouTube: [@getvoicemode](https://youtube.com/@getvoicemode)
-- Twitter/X: [@getvoicemode](https://twitter.com/getvoicemode)
-
-**This Fork Maintained By:** groxaxo
-- Focus: Enhanced OpenCode compatibility and open-source AI assistant support
+- **YouTube**: [@getvoicemode](https://youtube.com/@getvoicemode)
+- **Twitter/X**: [@getvoicemode](https://twitter.com/getvoicemode)
+- **Newsletter**: [![Subscribe](https://img.shields.io/badge/Subscribe-Newsletter-orange?style=flat-square)](https://buttondown.com/voicemode)
 
 ## License
 

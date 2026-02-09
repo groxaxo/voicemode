@@ -21,7 +21,6 @@ import click
 from voice_mode.config import (
     WHISPER_PORT,
     KOKORO_PORT,
-    LIVEKIT_PORT,
     TTS_VOICES,
     OPENAI_API_KEY,
     env_bool,
@@ -112,10 +111,15 @@ def check_portaudio() -> DependencyInfo:
         return DependencyInfo(name="portaudio", installed=False)
 
     # On Linux, check for the library
+    # Include versioned .so.2 names since Debian/Ubuntu only install
+    # the unversioned symlink with -dev packages
     lib_paths = [
         "/usr/lib/libportaudio.so",
+        "/usr/lib/libportaudio.so.2",
         "/usr/lib/x86_64-linux-gnu/libportaudio.so",
+        "/usr/lib/x86_64-linux-gnu/libportaudio.so.2",
         "/usr/lib/aarch64-linux-gnu/libportaudio.so",
+        "/usr/lib/aarch64-linux-gnu/libportaudio.so.2",
     ]
     for path in lib_paths:
         if Path(path).exists():
