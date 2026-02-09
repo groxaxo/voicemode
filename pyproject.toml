@@ -30,7 +30,7 @@ classifiers = [
 
 dependencies = [
     "uv>=0.4.0",
-    "fastmcp>=2.0.0",
+    "fastmcp>=2.3.2",  # Requires http_app(transport="sse") API
     "numpy",
     "sounddevice",
     "scipy",
@@ -39,6 +39,7 @@ dependencies = [
     "audioop-lts; python_version >= '3.13'",
     "simpleaudio",
     "httpx",
+    "websockets>=12.0",  # Required for voicemode connect command
     "aiohttp",  # Required for Whisper and Kokoro service installers
     "psutil>=5.9.0",
     "setuptools",  # Required for pkg_resources used by webrtcvad
@@ -116,6 +117,9 @@ include = [
   "voice_mode/templates/**/*",
   "voice_mode/data/**/*.yaml",
   "voice_mode/data/**/*.json",
+  "voice_mode/data/**/*.cue",
+  "voice_mode/data/**/*.ffmeta",
+  "voice_mode/data/**/*.sha256",
 ]
 # artifacts overrides .gitignore for VCS-ignored files that should be packaged
 artifacts = [
@@ -143,6 +147,11 @@ include = [
   "/LICENSE",
   "/pyproject.toml",
   "/CHANGELOG.md",
+]
+# artifacts overrides .gitignore for VCS-ignored files that should be packaged
+artifacts = [
+  "voice_mode/data/**/*.mp3",
+  "voice_mode/data/**/*.wav",
 ]
 exclude = [
   "**/__pycache__",

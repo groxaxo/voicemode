@@ -7,14 +7,167 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [8.1.0] - 2026-02-02
+
 ### Added
 
-- **Reliable mpv-dj Startup** (VM-372)
-  - Added socket wait/retry pattern to handle race condition between mpv start and socket availability
-  - Commands now wait for the IPC socket to be ready before reporting success
-  - Configurable timeout via `MPV_SOCKET_TIMEOUT` (default: 10 seconds)
-  - Configurable retry delay via `MPV_SOCKET_DELAY` (default: 0.1 seconds)
-  - Clear error message if socket doesn't become available: "Error: mpv socket not ready after Xs"
+- **VoiceMode Connect** (VM-549, VM-561)
+  - Remote voice control via voicemode.dev mobile and web apps
+  - `voicemode connect login` - OAuth authentication with PKCE flow
+  - `voicemode connect logout` - Clear stored credentials
+  - `voicemode connect status` - Check connection and auth status
+  - `voicemode connect standby` - Wait for remote wake commands
+  - Connect service for launchd - run at startup with `voicemode service connect enable`
+  - Heartbeat thread keeps connection alive during standby
+
+- **Agent Management** (VM-559, VM-589)
+  - Multi-agent support with dedicated config directories per agent
+  - `voicemode agent start <name>` - Start a named agent in tmux
+  - `voicemode agent stop <name>` - Gracefully stop an agent
+  - `voicemode agent status <name>` - Check agent state
+  - `voicemode agent send <name> <message>` - Send message with auto-start
+  - `--agent` option for standby to target specific agent on wake
+  - `--wake-message` option for custom initial messages
+
+### Fixed
+
+- **Agent Reliability**
+  - Send multiple Ctrl-C signals to reliably stop Claude Code
+  - Poll for readiness before sending messages
+  - Pass initial message directly to claude command
+
+## [8.0.8] - 2026-01-29
+
+### Changed
+
+- **System Audio Converted to MP3**
+  - Converted system message audio files from WAV to MP3
+  - Reduced package size (~200KB to ~36KB for system audio)
+
+## [8.0.7] - 2026-01-29
+
+### Fixed
+
+- **Soundfonts Not in PyPI Package** (GH-223)
+  - Added `artifacts` setting to sdist build target in pyproject.toml
+  - MP3/WAV files were being excluded from sdist due to .gitignore
+  - PyPI wheels built from sdist now include all soundfont audio files
+
+## [8.0.6] - 2026-01-29
+
+_Note: Fix not committed - use 8.0.7_
+
+## [8.0.5] - 2026-01-29
+
+### Fixed
+
+- **Soundfonts Package Structure** (GH-223)
+  - Added `__init__.py` files to data directories for `importlib.resources` discovery
+
+_Note: Audio files missing from PyPI due to sdist build issue - use 8.0.6_
+
+## [8.0.4] - 2026-01-29
+
+_Note: Fix files not committed - use 8.0.6_
+
+## [8.0.3] - 2026-01-29
+
+### Changed
+
+- **Soundfonts Directory Renamed** (GH-223, GH-224)
+  - Package-managed soundfonts directory renamed from `default` to `voicemode`
+  - Soundfonts now sync from package on every init (auto-updates with new releases)
+  - Migration from old `default` directory handled automatically
+  - User customizations via `current` symlink are preserved
+
+### Fixed
+
+- **Plugin Hook Path**
+  - Fixed path to hook receiver for PreCompact in claude-plugin
+
+## [8.0.2] - 2026-01-25
+
+### Added
+
+- **DJ Status Line Output** (VM-219)
+  - `voicemode dj status --line` (or `-l`) for compact tmux status bar format
+  - Shows track/chapter, position, and remaining time with color warnings
+  - Replaces need for external tmux-mpv-status script
+  - [Documentation](docs/reference/dj/tmux-status.md)
+
+### Fixed
+
+- **DJ Chapter Titles Not Displaying**
+  - Fixed uppercase metadata key handling (mpv returns `TITLE` not `title`)
+  - Chapter titles from FFmetadata files now display correctly in status output
+
+## [8.0.1] - 2026-01-25
+
+### Fixed
+
+- **CLI Import Error** (GH-217)
+  - Fixed broken import in status.py that prevented CLI commands from running
+  - Removed unused LIVEKIT_PORT reference that was leftover from LiveKit removal
+
+## [8.0.0] - 2026-01-25
+
+### Added
+
+- **VoiceMode DJ** (VM-406, VM-457, VM-377)
+  - Background music playback for voice sessions with track-level control
+  - `voicemode dj play/stop/pause/resume/status` for core playback
+  - `voicemode dj next/prev/volume` for navigation and volume control
+  - `voicemode dj find` and `voicemode dj library scan/stats` for music library
+  - Automatic audio ducking during TTS - lowers music volume when speaking
+  - Configurable default volume via `VOICEMODE_DJ_VOLUME` environment variable
+  - Configurable duck amount via `VOICEMODE_DJ_DUCK_AMOUNT` (default: 20%)
+
+- **Music For Programming Playback** (VM-369, VM-386, VM-400, VM-480, VM-481)
+  - [Music For Programming](https://musicforprogramming.net) is a curated series of mixes for coding
+  - `voicemode dj mfp list` shows available episodes with local chapter status
+  - `voicemode dj mfp play <episode>` plays an episode with chapter navigation
+  - `voicemode dj next/prev` skips between tracks within an episode
+  - Chapter files bundled in package with automatic distribution on first play
+  - Three-tier chapter lookup: local cache → bundled package → GitHub repository
+  - `voicemode dj mfp sync` for checksum-based sync (preserves user modifications)
+
+- **Support for All Claude Products** (VM-434, VM-458, VM-462)
+  - VoiceMode now works with Claude.ai, Claude Desktop, Claude Cowork, and Claude Mobile
+  - New `voicemode serve` command exposes VoiceMode as HTTP MCP server
+  - **Transport options:**
+    - `--transport` / `-t` to select protocol: `streamable-http` (default) or `sse`
+    - `streamable-http` uses `/mcp` endpoint (recommended)
+    - `sse` uses `/sse` endpoint (deprecated, shows warning)
+  - **Security options:**
+    - `--allow-anthropic` to allow Anthropic's outbound IP ranges (160.79.104.0/21)
+    - `--allow-tailscale` to allow Tailscale network ranges (100.64.0.0/10)
+    - `--allow-ip` to add custom CIDR ranges to allowlist (repeatable)
+    - `--allow-local/--no-allow-local` to control localhost access (default: true)
+    - `--secret` for URL path authentication (endpoint becomes `/{base}/{secret}`)
+    - `--token` for Bearer token authentication
+    - Defense in depth: IP allowlist and token auth can be combined
+  - **Operational features:**
+    - Access logging with X-Forwarded-For header support for proxy deployments
+    - Environment variable configuration via `voicemode.env`
+    - `VOICEMODE_SERVE_TRANSPORT`, `VOICEMODE_ALLOW_TAILSCALE` env vars
+
+- **Multi-Agent Voice Coordination** (VM-399, VM-404, VM-405)
+  - Conch lock file at `~/.voicemode/conch` signals when voice conversation is active
+  - `wait_for_conch` parameter allows agents to wait for their turn to speak
+  - Sound effect hooks automatically mute during voice exchanges
+  - Atomic try_acquire with stale lock detection for crash recovery
+  - Prevents notification sounds from disrupting voice recordings
+
+- **Auto-Install Voice Services**
+  - Whisper and Kokoro services automatically installed during `voice-mode-install`
+  - New `install.sh` curl|bash script for quick setup
+  - Streamlined first-time setup experience
+
+### Fixed
+
+- **MFP Episode References** (VM-376)
+  - Removed invalid episode 76 reference from documentation
+  - Updated all docs to use episode 49 as the default example
 
 ### Removed
 
@@ -26,6 +179,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Removed service templates for LiveKit and frontend services
   - Local microphone transport remains the default and only transport option
   - **Impact**: Users who set up LiveKit integration will need to use local microphone instead
+
+## [7.4.1] - 2026-01-17
+
+### Fixed
+
+- **Kokoro Install on Fresh Systems** (VM-411, GH-145, GH-188)
+  - Fixed installation failing on fresh systems (Linux and macOS) due to missing venv
+  - Installer now creates virtual environment automatically before running uv install
+  - Resolves "No virtual environment found" error on PopOS/Ubuntu 24, Arch Linux, and macOS
 
 ## [7.4.0] - 2026-01-06
 
@@ -71,8 +233,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - **Deprecated Install Script** (VM-329)
-  - Removed deprecated curl bash install script
-  - Use `uvx voicemode install` instead
+  - Use `uvx voice-mode-install` instead
 
 ### Documentation
 

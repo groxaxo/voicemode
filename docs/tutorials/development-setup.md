@@ -26,6 +26,8 @@ pip install uv
 
 ## Cloning the Repository
 
+**For contributors:** Fork the repo first at https://github.com/mbailey/voicemode, then clone your fork:
+
 ```bash
 # Clone the repository
 git clone https://github.com/groxaxo/voicemode
@@ -50,7 +52,7 @@ uv build
 # dist/voice_mode-X.Y.Z.tar.gz
 
 # Test the built package
-uvx --from dist/voice_mode-*.whl voice-mode
+uvx --from dist/voice_mode-*.whl voicemode
 ```
 
 ### Running Tests
@@ -183,13 +185,10 @@ pytest tests/integration/test_whisper.py
 
 ```bash
 # Test voice conversation
-voice-mode converse --debug
-
-# Test specific tool
-voice-mode test-tool converse
+voicemode converse --debug
 
 # Test with different providers
-VOICEMODE_TTS_BASE_URLS=http://localhost:8880/v1 voice-mode converse
+VOICEMODE_TTS_BASE_URLS=http://localhost:8880/v1 voicemode converse
 ```
 
 ## Contributing
