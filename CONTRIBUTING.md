@@ -16,7 +16,7 @@ Thank you for your interest in contributing to voice-mode! This guide will help 
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/mbailey/voicemode.git
+   git clone https://github.com/groxaxo/voicemode.git
    cd voicemode
    ```
 

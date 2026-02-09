@@ -28,7 +28,7 @@ pip install uv
 
 ```bash
 # Clone the repository
-git clone https://github.com/mbailey/voicemode
+git clone https://github.com/groxaxo/voicemode
 cd voicemode
 
 # Install in development mode

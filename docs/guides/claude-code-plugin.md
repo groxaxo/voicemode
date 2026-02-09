@@ -156,8 +156,8 @@ voicemode config edit
 ## Resources
 
 - [VoiceMode Documentation](https://voicemode.ai/docs)
-- [GitHub Repository](https://github.com/mbailey/voicemode)
-- [Plugin Source](https://github.com/mbailey/voicemode)
+- [GitHub Repository](https://github.com/groxaxo/voicemode)
+- [Original Project](https://github.com/mbailey/voicemode)
 
 ## Development
 

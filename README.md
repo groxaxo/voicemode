@@ -433,10 +433,10 @@ brew install ffmpeg node portaudio
 
 ```bash
 # Use development shell
-nix develop github:mbailey/voicemode
+nix develop github:groxaxo/voicemode
 
 # Or install system-wide
-nix profile install github:mbailey/voicemode
+nix profile install github:groxaxo/voicemode
 ```
 
 </details>
@@ -447,7 +447,7 @@ nix profile install github:mbailey/voicemode
 #### From source
 
 ```bash
-git clone https://github.com/mbailey/voicemode.git
+git clone https://github.com/groxaxo/voicemode.git
 cd voicemode
 uv tool install -e .
 ```
@@ -457,7 +457,7 @@ uv tool install -e .
 ```nix
 # In /etc/nixos/configuration.nix
 environment.systemPackages = [
-  (builtins.getFlake "github:mbailey/voicemode").packages.${pkgs.system}.default
+  (builtins.getFlake "github:groxaxo/voicemode").packages.${pkgs.system}.default
 ];
 ```
 
