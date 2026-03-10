@@ -691,6 +691,32 @@ CLONE_MODEL = _get_env_with_deprecation(
     "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-4bit",
 )
 
+# ==================== LOCAL SERVICE CONFIGURATION ====================
+
+# Local TTS Service (Supertonic Express) - OpenAI compatible.
+LOCAL_TTS_PORT = int(os.getenv("VOICEMODE_LOCAL_TTS_PORT", str(KOKORO_PORT)))
+LOCAL_TTS_SERVICE_DIR = expand_path(
+    os.getenv(
+        "VOICEMODE_LOCAL_TTS_DIR", str(BASE_DIR / "services" / "supertonic-express")
+    )
+)
+
+# Local STT Service (Parakeet TDT) - OpenAI compatible.
+LOCAL_STT_PORT = int(os.getenv("VOICEMODE_LOCAL_STT_PORT", "2022"))
+LOCAL_STT_SERVICE_DIR = expand_path(
+    os.getenv("VOICEMODE_LOCAL_STT_DIR", str(BASE_DIR / "services" / "parakeet-tdt"))
+)
+
+# Default voice for local TTS (F1 is the default for Supertonic Express)
+DEFAULT_LOCAL_VOICE = os.getenv("VOICEMODE_DEFAULT_LOCAL_VOICE", "F1")
+
+# Preferred input device (partial name match, e.g. "USB", "Headset")
+# If not set, system default is used
+VOICEMODE_INPUT_DEVICE = os.getenv("VOICEMODE_INPUT_DEVICE", "")
+
+# Legacy service port aliases for backward compatibility.
+SUPERTONIC_PORT = LOCAL_TTS_PORT  # Alias for compatibility
+
 # ==================== SERVICE MANAGEMENT CONFIGURATION ====================
 
 # Auto-enable services after installation

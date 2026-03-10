@@ -122,6 +122,60 @@ For privacy or offline use, install local speech services:
 
 These provide the same API as OpenAI, so VoiceMode switches seamlessly between them.
 
+## Custom Adapters
+
+This fork includes custom OpenAI-compatible adapters for third-party voice services:
+
+### Inworld TTS Adapter
+
+High-quality text-to-speech using Inworld's TTS API:
+
+```bash
+# Start the adapter (default port 8888)
+cd /home/op/voicemode
+python3 adapters/inworld_adapter.py
+
+# Configure environment
+export INWORLD_API_KEY="your-api-key"
+export INWORLD_ADAPTER_PORT="8888"
+export INWORLD_DEFAULT_VOICE="Blake"
+```
+
+Available voices: `Blake`, `Sarah`, `Ethan`, `Luna`, `Marcus`, `Zoe`, `James`, `Emma`, `David`, `Sophie`
+
+### Canary STT Adapter
+
+Fast speech-to-text using NVIDIA's Canary 180M Flash model via ONNX:
+
+```bash
+# Install dependencies
+pip install "onnx-asr[cpu,hub]"
+
+# Start the adapter (default port 5092)
+cd /home/op/voicemode
+python3 adapters/canary_adapter.py
+
+# Configure environment
+export CANARY_ADAPTER_PORT="5092"
+export CANARY_DEFAULT_LANGUAGE="en"
+```
+
+Features:
+- Auto-detects Spanish vs English based on text content
+- Supports translation mode (Spanish → English)
+- Runs entirely locally with ONNX runtime
+
+### Configuration
+
+Add the adapters to your VoiceMode configuration:
+
+```bash
+# In ~/.voicemode/voicemode.env
+VOICEMODE_TTS_BASE_URLS=http://100.85.200.50:8888/v1,http://127.0.0.1:8880/v1,https://api.openai.com/v1
+VOICEMODE_STT_BASE_URLS=http://100.85.200.50:5092/v1,http://127.0.0.1:2022/v1,https://api.openai.com/v1
+VOICEMODE_VOICES=Blake,Sarah,F1,af_sky,alloy
+```
+
 ## Installation Details
 
 <details>
