@@ -88,7 +88,7 @@ async def simple_tts_failover(
                 selected_voice = voice_mapping.get(voice, "alloy")  # Default to alloy
                 logger.info(f"Mapped voice {voice} to {selected_voice} for OpenAI")
         else:
-            selected_voice = voice  # Use original voice for Kokoro
+            selected_voice = voice  # Use original voice for local TTS
 
         # Disable retries for local endpoints - they either work or don't
         max_retries = 0 if is_local_provider(base_url) else 2

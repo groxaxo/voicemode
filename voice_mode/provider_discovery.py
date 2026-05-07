@@ -29,22 +29,32 @@ def detect_provider_type(base_url: str) -> str:
     """Detect provider type from base URL."""
     if not base_url:
         return "unknown"
+    parsed = urlparse(base_url)
+    parsed_port = parsed.port
+    local_tts_port = getattr(config, "LOCAL_TTS_PORT", None)
+    local_tts_dir = str(getattr(config, "LOCAL_TTS_SERVICE_DIR", "")).lower()
     if "openai.com" in base_url:
         return "openai"
+    elif parsed_port == local_tts_port and "supertonic" in local_tts_dir:
+        return "supertonic-express"
     elif ":8880" in base_url:
-        return "kokoro"
+        return "supertonic-express" if "supertonic" in local_tts_dir else "kokoro"
     elif ":2022" in base_url:
         return "whisper"
-    elif urlparse(base_url).port == 8890 or "mlx_audio" in base_url or "mlx-audio" in base_url:
+    elif parsed_port == getattr(config, "LOCAL_STT_PORT", None) and "parakeet" in getattr(config, "STT_MODEL", ""):
+        return "parakeet"
+    elif parsed_port == 8890 or "mlx_audio" in base_url or "mlx-audio" in base_url:
         return "mlx-audio"
     elif "127.0.0.1" in base_url or "localhost" in base_url:
         # Try to infer from port if not already detected
         if base_url.endswith("/v1"):
             port_part = base_url[:-3].split(":")[-1]
             if port_part == "8880":
-                return "kokoro"
+                return "supertonic-express" if "supertonic" in local_tts_dir else "kokoro"
             elif port_part == "2022":
                 return "whisper"
+            elif port_part == str(getattr(config, "LOCAL_STT_PORT", "")) and "parakeet" in getattr(config, "STT_MODEL", ""):
+                return "parakeet"
         return "local"  # Generic local provider
     else:
         return "unknown"
@@ -55,7 +65,7 @@ def is_local_provider(base_url: str) -> bool:
     if not base_url:
         return False
     provider_type = detect_provider_type(base_url)
-    return provider_type in ["kokoro", "whisper", "mlx-audio", "local"] or \
+    return provider_type in ["kokoro", "supertonic-express", "whisper", "parakeet", "mlx-audio", "local"] or \
            "127.0.0.1" in base_url or \
            "localhost" in base_url
 

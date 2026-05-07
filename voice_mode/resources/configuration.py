@@ -281,9 +281,9 @@ async def environment_variables() -> str:
         ("VOICEMODE_STT_AUDIO_FORMAT", "Audio format for STT input"),
         ("VOICEMODE_TTS_TRAILING_SILENCE", "Trailing silence (s) appended to opus TTS output to prevent tail clipping"),
         # STT Prompt for vocabulary biasing
-        ("VOICEMODE_STT_PROMPT", "Vocabulary hints for Whisper (names, technical terms)"),
+        ("VOICEMODE_STT_PROMPT", "Vocabulary hints for STT (names, technical terms)"),
         # STT Models
-        ("VOICEMODE_STT_MODEL", "Default STT model (e.g. whisper-1)"),
+        ("VOICEMODE_STT_MODEL", "Default STT model (e.g. parakeet-tdt-0.6b-v3)"),
         ("VOICEMODE_STT_MODELS", "Comma-separated list of STT models for failover"),
         # Whisper Configuration
         ("VOICEMODE_WHISPER_MODEL", "Whisper model to use (e.g., large-v2)"),

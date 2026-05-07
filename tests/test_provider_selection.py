@@ -19,10 +19,13 @@ class TestProviderTypeDetection:
         assert detect_provider_type("https://api.openai.com/v1") == "openai"
         assert detect_provider_type("https://api.openai.com/v1/") == "openai"
     
-    def test_detect_kokoro(self):
-        assert detect_provider_type("http://127.0.0.1:8880/v1") == "kokoro"
-        assert detect_provider_type("http://127.0.0.1:8880/v1") == "kokoro"
-        assert detect_provider_type("http://192.168.1.100:8880/v1") == "kokoro"
+    def test_detect_supertonic(self):
+        assert detect_provider_type("http://127.0.0.1:8880/v1") == "supertonic-express"
+        assert detect_provider_type("http://127.0.0.1:8880/v1") == "supertonic-express"
+        assert detect_provider_type("http://192.168.1.100:8880/v1") == "supertonic-express"
+
+    def test_detect_parakeet(self):
+        assert detect_provider_type("http://127.0.0.1:5092/v1") == "parakeet"
     
     def test_detect_whisper(self):
         assert detect_provider_type("http://127.0.0.1:2022/v1") == "whisper"

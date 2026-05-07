@@ -5,6 +5,7 @@ import os
 import shutil
 import subprocess
 import sys
+import urllib.request
 from pathlib import Path
 
 import click
@@ -209,8 +210,8 @@ Examples:
   # Skip agent integration autodetection
   voice-mode-install --no-integrations
 
-  # Install with specific Whisper model
-  voice-mode-install --yes --model large-v2
+  # Run without prompts
+  voice-mode-install --yes
 """
 
 
@@ -223,7 +224,7 @@ Examples:
 @click.option('--no-integrations', is_flag=True, help='Do not autodetect or configure agent CLI integrations')
 @click.option('-y', '--yes', 'non_interactive', is_flag=True, help='Run without prompts (auto-accept all)')
 @click.option('-n', '--non-interactive', is_flag=True, help='Run without prompts (deprecated: use --yes/-y)')
-@click.option('-m', '--model', default='base', help='Whisper model to use (base, small, medium, large-v2)')
+@click.option('-m', '--model', default='base', help='Legacy option retained for compatibility')
 @click.version_option(__version__, '-V', '--version')
 def main(dry_run, voice_mode_version, skip_services, integrations, integrations_only, no_integrations, non_interactive, model):
     """VoiceMode Installer - Install VoiceMode and its system dependencies.
@@ -475,55 +476,27 @@ def main(dry_run, voice_mode_version, skip_services, integrations, integrations_
             click.echo(f"Estimated download size: {hardware.get_download_estimate()}")
             click.echo()
 
-            if hardware.should_recommend_local_services():
-                if non_interactive or click.confirm("Install local voice services now?", default=True):
-                    model_flag = f" --model {model}" if model != 'base' else ''
+            click.echo("This fork defaults to external OpenAI-compatible local services:")
+            click.echo("  TTS: Supertonic Express at http://127.0.0.1:8880/v1")
+            click.echo("  STT: Parakeet TDT at http://127.0.0.1:5092/v1")
+            click.echo()
 
-                    # Install Whisper
-                    click.echo()
-                    print_step(f"Installing Whisper STT service (model: {model})...")
-                    whisper_cmd = ['voicemode', 'service', 'install', 'whisper']
-                    if model != 'base':
-                        whisper_cmd.extend(['--model', model])
-                    try:
-                        result = subprocess.run(whisper_cmd, check=True)
-                        if result.returncode == 0:
-                            print_success("Whisper STT service installed")
-                            logger.log_install('whisper', ['whisper'], True)
+            service_checks = (
+                ("Supertonic Express", "http://127.0.0.1:8880/health"),
+                ("Parakeet TDT", "http://127.0.0.1:5092/health"),
+            )
+            for service_name, health_url in service_checks:
+                try:
+                    with urllib.request.urlopen(health_url, timeout=2) as response:
+                        if response.status == 200:
+                            print_success(f"{service_name} is reachable: {health_url}")
                         else:
-                            print_warning("Whisper installation may not have completed successfully")
-                            logger.log_install('whisper', ['whisper'], False)
-                    except subprocess.CalledProcessError as e:
-                        print_error(f"Whisper installation failed: {e}")
-                        logger.log_install('whisper', ['whisper'], False)
-                    except FileNotFoundError:
-                        print_error("VoiceMode command not found. Cannot install Whisper.")
-                        logger.log_install('whisper', ['whisper'], False)
+                            print_warning(f"{service_name} returned HTTP {response.status}: {health_url}")
+                except Exception:
+                    print_warning(f"{service_name} is not reachable yet: {health_url}")
 
-                    # Install Kokoro
-                    click.echo()
-                    print_step("Installing Kokoro TTS service...")
-                    kokoro_cmd = ['voicemode', 'service', 'install', 'kokoro']
-                    try:
-                        result = subprocess.run(kokoro_cmd, check=True)
-                        if result.returncode == 0:
-                            print_success("Kokoro TTS service installed")
-                            logger.log_install('kokoro', ['kokoro'], True)
-                        else:
-                            print_warning("Kokoro installation may not have completed successfully")
-                            logger.log_install('kokoro', ['kokoro'], False)
-                    except subprocess.CalledProcessError as e:
-                        print_error(f"Kokoro installation failed: {e}")
-                        logger.log_install('kokoro', ['kokoro'], False)
-                    except FileNotFoundError:
-                        print_error("VoiceMode command not found. Cannot install Kokoro.")
-                        logger.log_install('kokoro', ['kokoro'], False)
-            else:
-                click.echo("Cloud services recommended for your system configuration.")
-                click.echo("Local services can still be installed if desired:")
-                model_flag = f" --model {model}" if model != 'base' else ''
-                click.echo(f"  voicemode whisper install{model_flag}")
-                click.echo("  voicemode kokoro install")
+            click.echo()
+            click.echo("The installer no longer installs Whisper/Kokoro by default for this local stack.")
 
         integration_results = []
         if integration_targets:

@@ -36,7 +36,7 @@ The installer will:
 
 - Install missing system dependencies (FFmpeg, PortAudio, etc.)
 - Set up your environment for VoiceMode
-- Offer to install local voice services (Whisper STT and Kokoro TTS)
+- Configure local voice endpoints for Supertonic Express TTS and Parakeet STT
 - Optionally configure Codex, OpenCode, Qwen CLI, or Gemini CLI MCP settings
 
 For Claude Code, add VoiceMode separately:
@@ -122,65 +122,33 @@ export OPENAI_API_KEY="sk-your-api-key-here"
 voicemode converse
 ```
 
-## Setting Up Local Services (Optional)
+## Local Services
 
-For complete privacy, you can run voice services locally instead of using OpenAI.
+This fork defaults to local OpenAI-compatible endpoints instead of OpenAI cloud fallback:
 
-### Quick Setup
+- **TTS:** Supertonic Express at `http://127.0.0.1:8880/v1`
+- **STT:** Parakeet TDT at `http://127.0.0.1:5092/v1`
 
 ```bash
-# Install local services
-voicemode service install whisper   # Speech-to-text
-voicemode service install kokoro    # Text-to-speech
-
-# Start services
-voicemode service start whisper
-voicemode service start kokoro
-
 # Check status of all services
-voicemode service status
+voicemode status
 ```
-
-VoiceMode will automatically detect and use these local services when available.
-
-### Enable Auto-Start (Recommended)
-
-To have services start automatically at login:
-
-```bash
-# Enable services to start at boot/login
-voicemode service enable whisper
-voicemode service enable kokoro
-```
-
-On macOS, this creates launchd agents. On Linux, it creates systemd user services.
-
-### Download Sizes and Requirements
-
-| Service | Download Size | Disk Space | First Start Time |
-|---------|---------------|------------|------------------|
-| Whisper (tiny) | ~75MB | ~150MB | 30 seconds |
-| Whisper (base) | ~150MB | ~300MB | 1-2 minutes |
-| Whisper (small) | ~460MB | ~1GB | 2-3 minutes |
-| Kokoro TTS | ~350MB | ~700MB | 2-3 minutes |
-
-**Recommended**: Whisper base + Kokoro = ~500MB download, ~1GB disk space.
 
 ### Waiting for Services
 
-After installation, services download models on first start. Wait for them to be ready:
+Wait for both local endpoints to be ready:
 
 ```bash
-# Wait for Whisper (port 2022)
-while ! nc -z localhost 2022 2>/dev/null; do sleep 2; done
-echo "Whisper ready"
+# Wait for Parakeet (port 5092)
+while ! nc -z localhost 5092 2>/dev/null; do sleep 2; done
+echo "Parakeet ready"
 
-# Wait for Kokoro (port 8880)
+# Wait for Supertonic Express (port 8880)
 while ! nc -z localhost 8880 2>/dev/null; do sleep 2; done
-echo "Kokoro ready"
+echo "Supertonic Express ready"
 ```
 
-Learn more: [Whisper Setup Guide](../guides/whisper-setup.md) | [Kokoro Setup Guide](../guides/kokoro-setup.md)
+Learn more: [Custom Endpoints](../guides/custom-endpoints.md) | [Supertonic Express Setup](../guides/supertonic-setup.md)
 
 ## Configuration
 
@@ -189,14 +157,11 @@ VoiceMode works out of the box with sensible defaults. To customize:
 ### Select Your Voice
 
 ```bash
-# OpenAI voices
-export VOICEMODE_VOICES="nova,shimmer"
-
-# Or Kokoro voices (if using local TTS)
-export VOICEMODE_VOICES="af_sky,am_adam"
+# Supertonic Express voices
+export VOICEMODE_VOICES="F1,F2,M1"
 ```
 
-Available OpenAI voices: alloy, echo, fable, onyx, nova, shimmer
+Configured local voices: F1-F5 and M1-M5.
 
 ### Project-Specific Settings
 
@@ -241,16 +206,11 @@ voicemode converse
 
 ```bash
 # Check service status
-voicemode service status           # All services
-voicemode service status whisper   # Specific service
-
-# View logs
-voicemode service logs whisper -n 50
-voicemode service logs kokoro -n 50
+voicemode status
 
 # Check if service is responding
-voicemode service health whisper
-voicemode service health kokoro
+curl http://127.0.0.1:5092/health
+curl http://127.0.0.1:8880/health
 ```
 
 ## Running VoiceMode as a Service (Advanced)
@@ -276,7 +236,7 @@ For security best practices when running remotely, see the [Configuration Guide]
 
 - **[Configuration Guide](../guides/configuration.md)** - Customize VoiceMode
 - **[Development Setup](development-setup.md)** - Contribute to VoiceMode
-- **[Service Guides](../guides/)** - Set up Whisper, Kokoro, or LiveKit
+- **[Custom Endpoints](../guides/custom-endpoints.md)** - Configure local TTS/STT endpoints
 - **[CLI Reference](../reference/cli.md)** - All available commands
 
 ## Getting Help

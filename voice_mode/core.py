@@ -220,11 +220,10 @@ async def text_to_speech(
             STREAMING_ENABLED, STREAM_CHUNK_SIZE, SAMPLE_RATE
         )
         
-        # Determine provider from base URL (simple heuristic)
-        if "openai" in tts_base_url:
-            provider = "openai"
-        else:
-            provider = "kokoro"
+        # Determine provider from base URL.
+        from .provider_discovery import detect_provider_type
+        detected_provider = detect_provider_type(tts_base_url)
+        provider = detected_provider if detected_provider in {"openai", "kokoro", "supertonic-express"} else "kokoro"
         
         logger.info(f"  • Detected Provider: {provider} (based on URL: {tts_base_url})")
         
@@ -554,11 +553,11 @@ async def text_to_speech(
             if hasattr(e.response, 'status_code') and e.response.status_code == 401:
                 if 'openai.com' in tts_base_url:
                     logger.error("⚠️  Authentication failed with OpenAI. Please set OPENAI_API_KEY environment variable.")
-                    logger.error("   Alternatively, you can use local services (Kokoro) without an API key.")
+                    logger.error("   Alternatively, use the local Supertonic Express endpoint without an API key.")
         elif 'api key' in error_message or 'unauthorized' in error_message or 'authentication' in error_message:
             if 'openai.com' in tts_base_url:
                 logger.error("⚠️  Authentication issue detected. Please check your OPENAI_API_KEY.")
-                logger.error("   For local-only usage, ensure Kokoro is running and configured.")
+                logger.error("   For local-only usage, ensure Supertonic Express is running and configured.")
 
         # Re-raise API errors so simple_tts_failover can parse them properly
         # This allows proper error messages to be shown to users

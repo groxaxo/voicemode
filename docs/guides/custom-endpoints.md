@@ -3,12 +3,12 @@
 VoiceMode accepts comma-separated endpoint chains for TTS and STT.
 
 ```bash
-VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1,https://api.openai.com/v1
-VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1,https://api.openai.com/v1
-VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3,whisper-1
+VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1
+VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1
+VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3
 ```
 
-Endpoints are tried in order. Local endpoints use a dummy key when no OpenAI key is needed; OpenAI uses `OPENAI_API_KEY`.
+Endpoints are tried in order. Local endpoints use a dummy key when no OpenAI key is needed.
 
 Common local endpoints:
 

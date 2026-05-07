@@ -4,7 +4,7 @@ VoiceMode is an MCP voice interface for Codex, Claude Code, OpenCode, Qwen Code,
 
 - **TTS:** Supertonic Express on `http://127.0.0.1:8880/v1`
 - **STT:** Parakeet TDT 0.6B v3 on `http://127.0.0.1:5092/v1`
-- **Fallback:** OpenAI-compatible cloud endpoints when local services are unavailable
+- **Fallback:** none configured for Codex MCP by default
 - **MCP tools:** `converse` and `service`
 
 The goal is simple: talk to your coding agent with local speech generation and local transcription by default.
@@ -14,13 +14,14 @@ The goal is simple: talk to your coding agent with local speech generation and l
 On this machine the working setup is:
 
 ```bash
-VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1,https://api.openai.com/v1
-VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1,https://api.openai.com/v1
+VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1
+VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1
 VOICEMODE_TTS_MODELS=tts-1,tts-1-hd,gpt-4o-mini-tts
-VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3,whisper-1
+VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3
 VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3
 VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy
 VOICEMODE_DEFAULT_LOCAL_VOICE=F1
+VOICEMODE_LOCAL_STT_PORT=5092
 VOICEMODE_PREFER_LOCAL=true
 VOICEMODE_ALWAYS_TRY_LOCAL=true
 ```
@@ -38,26 +39,17 @@ curl http://127.0.0.1:8880/health
 curl http://127.0.0.1:8880/v1/audio/voices
 ```
 
-Configured voices are `F1`-`F5` and `M1`-`M5`, with OpenAI voices available as fallback.
+Configured local voices are `F1`-`F5` and `M1`-`M5`.
 
 ### Parakeet TDT STT
 
 Parakeet provides OpenAI-compatible local speech-to-text on port `5092`.
 
 ```bash
-systemctl --user status parakeet-tdt.service
 curl http://127.0.0.1:5092/health
 ```
 
-Manual start:
-
-```bash
-conda activate parakeet-onnx
-cd /home/op/parakeet-tdt-0.6b-v3-fastapi-openai
-python app.py
-```
-
-The active model is `parakeet-tdt-0.6b-v3`. VoiceMode sends this model to the local endpoint and uses `whisper-1` for OpenAI fallback.
+The active model sent by VoiceMode is `parakeet-tdt-0.6b-v3`.
 
 ## Install
 
@@ -79,15 +71,16 @@ Register with Codex:
 
 ```bash
 codex mcp add voicemode \
-  --env VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1,https://api.openai.com/v1 \
-  --env VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1,https://api.openai.com/v1 \
-  --env VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3,whisper-1 \
+  --env VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1 \
+  --env VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1 \
+  --env VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3 \
   --env VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3 \
   --env VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy \
   --env VOICEMODE_TTS_MODELS=tts-1,tts-1-hd,gpt-4o-mini-tts \
   --env VOICEMODE_DEFAULT_LOCAL_VOICE=F1 \
   --env VOICEMODE_LOCAL_TTS_PORT=8880 \
   --env VOICEMODE_LOCAL_TTS_DIR=/home/op/supertonic-express \
+  --env VOICEMODE_LOCAL_STT_PORT=5092 \
   --env VOICEMODE_PREFER_LOCAL=true \
   --env VOICEMODE_ALWAYS_TRY_LOCAL=true \
   -- voicemode
@@ -109,7 +102,6 @@ Useful commands:
 ```bash
 voicemode status
 voicemode config edit
-systemctl --user restart parakeet-tdt.service
 ```
 
 ## Fork Additions

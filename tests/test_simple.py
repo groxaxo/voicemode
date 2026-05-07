@@ -93,8 +93,8 @@ class TestConfiguration:
         default_tts_model = os.getenv('TTS_MODEL', 'tts-1')
         assert default_tts_model in ['tts-1', 'tts-1-hd']
         
-        default_stt_model = os.getenv('STT_MODEL', 'whisper-1')
-        assert default_stt_model == 'whisper-1'
+        default_stt_model = os.getenv('STT_MODEL', 'parakeet-tdt-0.6b-v3')
+        assert default_stt_model == 'parakeet-tdt-0.6b-v3'
 
 
 class TestUtilities:

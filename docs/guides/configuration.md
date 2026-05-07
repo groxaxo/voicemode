@@ -8,30 +8,20 @@ VoiceMode provides flexible configuration through environment variables and conf
 
 VoiceMode works out of the box with minimal configuration:
 
-### With Cloud Voice Services
-```bash
-# Just need an OpenAI API key
-export OPENAI_API_KEY="your-api-key"
-```
-
 ### With Local Voice Services
 ```bash
-# Install local services
-voicemode service install kokoro
-voicemode service install whisper
-
-# Enable auto-start at boot/login
-voicemode service enable kokoro
-voicemode service enable whisper
-
-# VoiceMode auto-detects them!
+# Supertonic Express for TTS and Parakeet for STT
+export VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1
+export VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1
+export VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3
+export VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3
+export VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy
 ```
 
 ### Hybrid Setup (Recommended)
 ```bash
-# Use local services with cloud fallback
-export OPENAI_API_KEY="your-api-key"  # Fallback
-# Local services auto-detected when running
+# Use the local services configured by the installer.
+uvx voice-mode-install --integrations codex,opencode,qwen,gemini
 ```
 
 ## Configuration System
@@ -53,8 +43,9 @@ VoiceMode automatically creates `~/.voicemode/voicemode.env` on first run with b
 
 ```bash
 # ~/.voicemode/voicemode.env example
-export OPENAI_API_KEY="sk-..."
-export VOICEMODE_VOICES="af_sky,nova"
+export VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1
+export VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1
+export VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy
 export VOICEMODE_DEBUG=false
 ```
 
@@ -69,7 +60,9 @@ When used as an MCP server, add to your Claude or other MCP client configuration
       "command": "uvx",
       "args": ["--refresh", "voice-mode"],
       "env": {
-        "OPENAI_API_KEY": "your-key-here"
+        "VOICEMODE_TTS_BASE_URLS": "http://127.0.0.1:8880/v1",
+        "VOICEMODE_STT_BASE_URLS": "http://127.0.0.1:5092/v1",
+        "VOICEMODE_STT_MODEL": "parakeet-tdt-0.6b-v3"
       }
     }
   }
@@ -95,12 +88,12 @@ LIVEKIT_API_SECRET=secret        # Default for local dev
 
 ```bash
 # TTS Service URLs (comma-separated, tried in order)
-VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1,https://api.openai.com/v1
+VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1
 
 # Voice preferences (comma-separated)
 # OpenAI: alloy, echo, fable, onyx, nova, shimmer
-# Kokoro: af_sky, af_sarah, am_adam, bf_emma, etc.
-VOICEMODE_VOICES=af_sky,nova,alloy
+# Supertonic Express: F1-F5, M1-M5
+VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy
 
 # TTS Models (comma-separated)
 # OpenAI: tts-1, tts-1-hd, gpt-4o-mini-tts
@@ -118,12 +111,12 @@ VOICEMODE_TTS_SPEED=1.0
 
 ```bash
 # STT Service URLs
-VOICEMODE_STT_BASE_URLS=http://127.0.0.1:2022/v1,https://api.openai.com/v1
+VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1
 
-# Whisper configuration
-VOICEMODE_WHISPER_MODEL=large-v2    # Model size
-VOICEMODE_WHISPER_LANGUAGE=auto     # Language detection
-VOICEMODE_WHISPER_PORT=2022         # Server port
+# Parakeet configuration
+VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3
+VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3
+VOICEMODE_LOCAL_STT_PORT=5092
 ```
 
 ### Audio Configuration
@@ -301,8 +294,8 @@ This allows different projects to have different voice settings without changing
 
 VoiceMode automatically discovers running local services:
 
-1. **Whisper STT**: Checks `http://127.0.0.1:2022/v1`
-2. **Kokoro TTS**: Checks `http://127.0.0.1:8880/v1`
+1. **Parakeet STT**: Checks `http://127.0.0.1:5092/v1`
+2. **Supertonic Express TTS**: Checks `http://127.0.0.1:8880/v1`
 3. **LiveKit**: Checks `ws://127.0.0.1:7880`
 
 No configuration needed when services run on default ports!
@@ -322,8 +315,9 @@ VoiceMode balances MCP compliance with user convenience:
 ```bash
 # No cloud services, everything local
 export VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1
-export VOICEMODE_STT_BASE_URLS=http://127.0.0.1:2022/v1
-export VOICEMODE_VOICES=af_sky
+export VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1
+export VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3
+export VOICEMODE_VOICES=F1
 ```
 
 ### High-Quality Cloud Setup

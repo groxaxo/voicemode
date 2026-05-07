@@ -33,8 +33,8 @@ The installer adds this shape under `mcp.voicemode`:
       "enabled": true,
       "command": ["voicemode"],
       "environment": {
-        "VOICEMODE_TTS_BASE_URLS": "http://127.0.0.1:8880/v1,https://api.openai.com/v1",
-        "VOICEMODE_STT_BASE_URLS": "http://127.0.0.1:5092/v1,https://api.openai.com/v1"
+        "VOICEMODE_TTS_BASE_URLS": "http://127.0.0.1:8880/v1",
+        "VOICEMODE_STT_BASE_URLS": "http://127.0.0.1:5092/v1"
       }
     }
   }
@@ -56,15 +56,16 @@ Create or edit `~/.config/opencode/opencode.json`:
       "enabled": true,
       "command": ["voicemode"],
       "environment": {
-        "VOICEMODE_TTS_BASE_URLS": "http://127.0.0.1:8880/v1,https://api.openai.com/v1",
-        "VOICEMODE_STT_BASE_URLS": "http://127.0.0.1:5092/v1,https://api.openai.com/v1",
+        "VOICEMODE_TTS_BASE_URLS": "http://127.0.0.1:8880/v1",
+        "VOICEMODE_STT_BASE_URLS": "http://127.0.0.1:5092/v1",
         "VOICEMODE_TTS_MODELS": "tts-1,tts-1-hd,gpt-4o-mini-tts",
-        "VOICEMODE_STT_MODELS": "parakeet-tdt-0.6b-v3,whisper-1",
+        "VOICEMODE_STT_MODELS": "parakeet-tdt-0.6b-v3",
         "VOICEMODE_STT_MODEL": "parakeet-tdt-0.6b-v3",
         "VOICEMODE_VOICES": "F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy",
         "VOICEMODE_DEFAULT_LOCAL_VOICE": "F1",
         "VOICEMODE_LOCAL_TTS_PORT": "8880",
         "VOICEMODE_LOCAL_TTS_DIR": "/home/your-user/supertonic-express",
+        "VOICEMODE_LOCAL_STT_PORT": "5092",
         "VOICEMODE_PREFER_LOCAL": "true",
         "VOICEMODE_ALWAYS_TRY_LOCAL": "true"
       }

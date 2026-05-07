@@ -53,7 +53,7 @@ class HardwareInfo:
         if self.is_apple_silicon():
             return (
                 f"Your Apple Silicon Mac with {self.total_ram_gb:.1f}GB RAM is great for local services.\n"
-                f"Whisper and Kokoro will run fast and privately on your hardware."
+                f"Supertonic Express and Parakeet can run fast and privately on your hardware."
             )
         elif self.is_arm64():
             if self.total_ram_gb >= 8:
@@ -85,8 +85,4 @@ class HardwareInfo:
 
     def get_download_estimate(self) -> str:
         """Estimate download size for local services."""
-        # Rough estimates:
-        # Whisper: ~150MB (base model) to ~3GB (large model)
-        # Kokoro: ~500MB
-        # Total: ~2-4GB for full setup
-        return "~2-4GB total (Whisper models + Kokoro)"
+        return "No built-in service download by default (uses Supertonic Express + Parakeet endpoints)"

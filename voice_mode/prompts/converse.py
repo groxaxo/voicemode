@@ -11,6 +11,6 @@ def converse() -> str:
 - If continuing an existing conversation, acknowledge and continue from where you left off
 - Use tools from voice-mode to converse
 - Prefer the configured local TTS endpoint first; on this machine Supertonic Express is expected at http://127.0.0.1:8880/v1 with voices F1-F5 and M1-M5
-- For speech-to-text, use the configured STT chain; Parakeet TDT is OpenAI-compatible on http://127.0.0.1:5092/v1 when running, otherwise OpenAI is the fallback
+- For speech-to-text, use the configured Parakeet OpenAI-compatible endpoint at http://127.0.0.1:5092/v1 with model parakeet-tdt-0.6b-v3
 - End the chat when the user indicates they want to end it
 - Keep your utterances brief unless a longer response is requested or necessary"""

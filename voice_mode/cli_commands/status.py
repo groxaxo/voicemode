@@ -356,8 +356,9 @@ def check_kokoro_service() -> ServiceInfo:
         except Exception:
             pass
 
+        service_name = (health_details or {}).get("service") or "Kokoro/Supertonic"
         return ServiceInfo(
-            name="Kokoro",
+            name=service_name,
             type="tts",
             status=ServiceStatus.RUNNING,
             port=KOKORO_PORT,
@@ -367,7 +368,7 @@ def check_kokoro_service() -> ServiceInfo:
         )
     elif status == "forwarded":
         return ServiceInfo(
-            name="Kokoro/Supertonic",
+            name=(health_details or {}).get("service") or "Kokoro/Supertonic",
             type="tts",
             status=ServiceStatus.FORWARDED,
             port=KOKORO_PORT,
@@ -421,16 +422,22 @@ def check_openai_compatible_stt_service() -> ServiceInfo:
         )
 
     status, proc = check_service_status(port)
+    configured_model = STT_MODELS[0] if STT_MODELS else STT_MODEL
     details = {
-        "model": STT_MODELS[0] if STT_MODELS else STT_MODEL,
+        "model": configured_model,
+        "service": "parakeet-tdt" if "parakeet" in configured_model else ("local-whisper" if configured_model.startswith("whisper") else "openai-compatible-stt"),
     }
 
     try:
         with urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=2) as response:
             if response.status == 200:
                 payload = json.loads(response.read().decode("utf-8"))
+                default_model = payload.get("default_model")
+                service = payload.get("service")
+                if not service:
+                    service = "parakeet-tdt" if default_model and "parakeet" in default_model else details["service"]
                 details.update({
-                    "service": "parakeet-tdt" if "default_model" in payload else "openai-compatible-stt",
+                    "service": service,
                     "default_model": payload.get("default_model"),
                     "models": payload.get("models"),
                     "speedup": payload.get("speedup"),
@@ -441,6 +448,7 @@ def check_openai_compatible_stt_service() -> ServiceInfo:
         pass
 
     if status == "local":
+        display_name = "Parakeet" if "parakeet" in details.get("service", "") else "Local Whisper"
         try:
             with proc.oneshot():
                 details["memory"] = format_memory(proc.memory_info().rss)
@@ -448,7 +456,7 @@ def check_openai_compatible_stt_service() -> ServiceInfo:
         except Exception:
             pass
         return ServiceInfo(
-            name="Parakeet",
+            name=display_name,
             type="stt",
             status=ServiceStatus.RUNNING,
             port=port,
@@ -457,7 +465,7 @@ def check_openai_compatible_stt_service() -> ServiceInfo:
         )
     if status == "forwarded":
         return ServiceInfo(
-            name="Parakeet",
+            name="Local Whisper",
             type="stt",
             status=ServiceStatus.FORWARDED,
             port=port,
@@ -466,7 +474,7 @@ def check_openai_compatible_stt_service() -> ServiceInfo:
         )
     if status == "initializing":
         return ServiceInfo(
-            name="Parakeet",
+            name="Local Whisper",
             type="stt",
             status=ServiceStatus.INITIALIZING,
             port=port,
@@ -474,7 +482,7 @@ def check_openai_compatible_stt_service() -> ServiceInfo:
             health="initializing",
         )
     return ServiceInfo(
-        name="Parakeet",
+        name="Local Whisper",
         type="stt",
         status=ServiceStatus.NOT_RUNNING,
         port=port,
@@ -498,14 +506,14 @@ def get_active_providers(whisper: ServiceInfo, parakeet: ServiceInfo, kokoro: Se
     # Determine active TTS
     tts_active = "none"
     if kokoro.status == ServiceStatus.RUNNING or kokoro.status == ServiceStatus.FORWARDED:
-        tts_active = "kokoro"
+        tts_active = (kokoro.details or {}).get("service") or kokoro.name.lower()
     elif openai["status"] == "available":
         tts_active = "openai"
 
     # Determine active STT
     stt_active = "none"
     if parakeet.status == ServiceStatus.RUNNING or parakeet.status == ServiceStatus.FORWARDED:
-        stt_active = "parakeet"
+        stt_active = (parakeet.details or {}).get("service") or parakeet.name.lower()
     elif whisper.status == ServiceStatus.RUNNING or whisper.status == ServiceStatus.FORWARDED:
         stt_active = "whisper"
     elif openai["status"] == "available":
@@ -562,6 +570,7 @@ def collect_status_data() -> Dict[str, Any]:
             "active": active["tts"],
             "providers": {
                 "kokoro": {
+                    "name": kokoro.name,
                     "status": kokoro.status.value,
                     "port": kokoro.port,
                     "voice": kokoro.details.get("voice") if kokoro.details else None,
@@ -593,6 +602,8 @@ def collect_status_data() -> Dict[str, Any]:
                     "health": whisper.health
                 },
                 "parakeet": {
+                    "name": parakeet.name,
+                    "service": parakeet.details.get("service") if parakeet.details else None,
                     "status": parakeet.status.value,
                     "port": parakeet.port,
                     "model": parakeet.details.get("model") if parakeet.details else None,
@@ -666,7 +677,8 @@ def format_terminal_output(data: Dict[str, Any], use_colors: bool = True) -> str
 
     # Whisper (STT)
     parakeet = data["stt"]["providers"]["parakeet"]
-    lines.append("── Parakeet (STT) " + "─" * 27)
+    parakeet_name = parakeet.get("name") or "Local STT"
+    lines.append(f"── {parakeet_name} (STT) " + "─" * max(1, 34 - len(parakeet_name)))
     sym = status_symbol(parakeet["status"])
     lines.append(f"  Status:     {sym} {format_status_text(parakeet['status'])}" + (f" (port {parakeet['port']})" if parakeet["status"] == "running" else ""))
     if parakeet.get("model"):
@@ -695,7 +707,8 @@ def format_terminal_output(data: Dict[str, Any], use_colors: bool = True) -> str
 
     # Kokoro (TTS)
     kokoro = data["tts"]["providers"]["kokoro"]
-    lines.append("── Kokoro (TTS) " + "─" * 29)
+    kokoro_name = kokoro.get("name") or "Kokoro/Supertonic"
+    lines.append(f"── {kokoro_name} (TTS) " + "─" * max(1, 34 - len(kokoro_name)))
     sym = status_symbol(kokoro["status"])
     lines.append(f"  Status:     {sym} {format_status_text(kokoro['status'])}" + (f" (port {kokoro['port']})" if kokoro["status"] == "running" else ""))
     if kokoro.get("voice"):
@@ -725,9 +738,9 @@ def format_terminal_output(data: Dict[str, Any], use_colors: bool = True) -> str
     tts_text = tts_active.title() if tts_active != "none" else "None available"
     stt_text = stt_active.title() if stt_active != "none" else "None available"
 
-    if tts_active == "kokoro":
+    if tts_active in {"kokoro", "kokoro/supertonic", "supertonic-express", "openai-compatible-tts"}:
         tts_text += " (local preferred)"
-    if stt_active in {"parakeet", "whisper"}:
+    if stt_active in {"parakeet", "parakeet-tdt", "local-whisper", "openai-compatible-stt", "whisper"}:
         stt_text += " (local preferred)"
 
     lines.append(f"  TTS: {tts_text}")
@@ -778,7 +791,8 @@ def format_markdown_output(data: Dict[str, Any]) -> str:
         kokoro_details.append(f"Port {kokoro['port']}")
     if kokoro.get("voice"):
         kokoro_details.append(f"Voice: {kokoro['voice']}")
-    lines.append(f"| Kokoro | TTS | {'✓' if kokoro['status'] in ['running', 'forwarded'] else '✗'} {kokoro['status'].replace('_', ' ').title()} | {', '.join(kokoro_details) if kokoro_details else '-'} |")
+    kokoro_name = kokoro.get("name") or "Kokoro/Supertonic"
+    lines.append(f"| {kokoro_name} | TTS | {'✓' if kokoro['status'] in ['running', 'forwarded'] else '✗'} {kokoro['status'].replace('_', ' ').title()} | {', '.join(kokoro_details) if kokoro_details else '-'} |")
 
     # OpenAI TTS
     openai = data["tts"]["providers"]["openai"]
@@ -797,7 +811,8 @@ def format_markdown_output(data: Dict[str, Any]) -> str:
         parakeet_details.append(f"Model: {parakeet['model']}")
     if parakeet.get("speedup"):
         parakeet_details.append(f"Speed: {parakeet['speedup']}")
-    lines.append(f"| Parakeet | STT | {'✓' if parakeet['status'] in ['running', 'forwarded'] else '✗'} {parakeet['status'].replace('_', ' ').title()} | {', '.join(parakeet_details) if parakeet_details else '-'} |")
+    parakeet_name = parakeet.get("name") or "Local STT"
+    lines.append(f"| {parakeet_name} | STT | {'✓' if parakeet['status'] in ['running', 'forwarded'] else '✗'} {parakeet['status'].replace('_', ' ').title()} | {', '.join(parakeet_details) if parakeet_details else '-'} |")
 
     whisper = data["stt"]["providers"]["whisper"]
     whisper_details = []
@@ -816,7 +831,7 @@ def format_markdown_output(data: Dict[str, Any]) -> str:
 
     lines.append("")
     lines.append(f"Active: TTS={data['tts']['active'].title()}, STT={data['stt']['active'].title()}" +
-                 (" (local preferred)" if data['tts']['active'] in ['kokoro'] or data['stt']['active'] in ['parakeet', 'whisper'] else ""))
+                 (" (local preferred)" if data['tts']['active'] in ['kokoro', 'kokoro/supertonic', 'supertonic-express', 'openai-compatible-tts'] or data['stt']['active'] in ['parakeet', 'parakeet-tdt', 'local-whisper', 'openai-compatible-stt', 'whisper'] else ""))
     lines.append("")
 
     lines.append("## Configuration")
@@ -854,7 +869,7 @@ def status(output_format: Optional[str], no_color: bool):
     """Show unified VoiceMode status.
 
     Displays the complete state of VoiceMode including:
-    - Service status (Whisper STT, Kokoro TTS)
+    - Service status (Parakeet STT, Supertonic TTS)
     - OpenAI API availability
     - Active providers
     - System dependencies

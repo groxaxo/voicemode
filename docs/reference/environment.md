@@ -26,8 +26,8 @@ Environment variables are processed in this order (highest to lowest priority):
 
 | Variable | Description | Default | Example |
 |----------|-------------|---------|---------|
-| `VOICEMODE_TTS_BASE_URLS` | Comma-separated TTS service URLs | `http://127.0.0.1:8880/v1,https://api.openai.com/v1` | `http://localhost:8880/v1` |
-| `VOICEMODE_VOICES` | Comma-separated voice preferences | `af_sky,alloy` | `nova,shimmer` |
+| `VOICEMODE_TTS_BASE_URLS` | Comma-separated TTS service URLs | `http://127.0.0.1:8880/v1` | `http://localhost:8880/v1` |
+| `VOICEMODE_VOICES` | Comma-separated voice preferences | `F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy` | `F1,M1` |
 | `VOICEMODE_TTS_VOICE` | Default TTS voice | First from VOICES | `nova` |
 | `VOICEMODE_TTS_MODELS` | Comma-separated TTS models | `tts-1-hd,tts-1` | `gpt-4o-mini-tts,tts-1` |
 | `VOICEMODE_TTS_MODEL` | Default TTS model | First from MODELS | `tts-1-hd` |
@@ -37,9 +37,9 @@ Environment variables are processed in this order (highest to lowest priority):
 
 | Variable | Description | Default | Example |
 |----------|-------------|---------|---------|
-| `VOICEMODE_STT_BASE_URLS` | Comma-separated STT service URLs | `https://api.openai.com/v1` | `http://localhost:2022/v1` |
-| `VOICEMODE_STT_MODEL` | STT model | `whisper-1` | `whisper-1` |
-| `VOICEMODE_STT_PROMPT` | Vocabulary biasing for Whisper (names, terms) | None | `tmux, Tali, kubectl` |
+| `VOICEMODE_STT_BASE_URLS` | Comma-separated STT service URLs | `http://127.0.0.1:5092/v1` | `http://localhost:5092/v1` |
+| `VOICEMODE_STT_MODEL` | STT model | `parakeet-tdt-0.6b-v3` | `parakeet-tdt-0.6b-v3` |
+| `VOICEMODE_STT_PROMPT` | Vocabulary biasing for STT (names, terms) | None | `tmux, Tali, kubectl` |
 
 ### Whisper Configuration
 

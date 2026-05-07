@@ -142,11 +142,11 @@ def load_voicemode_env():
 #############
 
 # Comma-separated list of TTS endpoints
-# VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1,https://api.openai.com/v1
+# VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1
 
 # Comma-separated list of STT endpoints
-# VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1,https://api.openai.com/v1
-# VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3,whisper-1
+# VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1
+# VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3
 
 # STT prompt for vocabulary biasing - helps Whisper recognize names and technical terms
 # Use when specific words are consistently misrecognized
@@ -154,7 +154,7 @@ def load_voicemode_env():
 # VOICEMODE_STT_PROMPT=
 
 # Comma-separated list of preferred voices
-# VOICEMODE_VOICES=af_sky,alloy
+# VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy
 
 # Comma-separated list of preferred models
 # VOICEMODE_TTS_MODELS=tts-1,tts-1-hd,gpt-4o-mini-tts
@@ -571,12 +571,12 @@ def parse_comma_list(env_var: str, fallback: str) -> list:
     return [item.strip() for item in value.split(",") if item.strip()]
 
 # New provider endpoint lists configuration
-TTS_BASE_URLS = parse_comma_list("VOICEMODE_TTS_BASE_URLS", "http://127.0.0.1:8880/v1,https://api.openai.com/v1")
-STT_BASE_URLS = parse_comma_list("VOICEMODE_STT_BASE_URLS", "http://127.0.0.1:5092/v1,https://api.openai.com/v1")
-TTS_VOICES = parse_comma_list("VOICEMODE_VOICES", "af_sky,alloy")
+TTS_BASE_URLS = parse_comma_list("VOICEMODE_TTS_BASE_URLS", "http://127.0.0.1:8880/v1")
+STT_BASE_URLS = parse_comma_list("VOICEMODE_STT_BASE_URLS", "http://127.0.0.1:5092/v1")
+TTS_VOICES = parse_comma_list("VOICEMODE_VOICES", "F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy")
 TTS_MODELS = parse_comma_list("VOICEMODE_TTS_MODELS", "tts-1,tts-1-hd,gpt-4o-mini-tts")
-STT_MODEL = os.getenv("VOICEMODE_STT_MODEL", "whisper-1")
-STT_MODELS = parse_comma_list("VOICEMODE_STT_MODELS", "parakeet-tdt-0.6b-v3,whisper-1")
+STT_MODEL = os.getenv("VOICEMODE_STT_MODEL", "parakeet-tdt-0.6b-v3")
+STT_MODELS = parse_comma_list("VOICEMODE_STT_MODELS", "parakeet-tdt-0.6b-v3")
 
 # STT prompt for vocabulary biasing (helps with specialized terminology)
 # See: https://platform.openai.com/docs/guides/speech-to-text#prompting
@@ -630,12 +630,12 @@ def reload_configuration():
     
     # Update global configuration variables
     global TTS_VOICES, TTS_MODELS, TTS_BASE_URLS, STT_BASE_URLS, STT_MODEL, STT_MODELS
-    TTS_BASE_URLS = parse_comma_list("VOICEMODE_TTS_BASE_URLS", "http://127.0.0.1:8880/v1,https://api.openai.com/v1")
-    STT_BASE_URLS = parse_comma_list("VOICEMODE_STT_BASE_URLS", "http://127.0.0.1:5092/v1,https://api.openai.com/v1")
-    TTS_VOICES = parse_comma_list("VOICEMODE_VOICES", "af_sky,alloy")
+    TTS_BASE_URLS = parse_comma_list("VOICEMODE_TTS_BASE_URLS", "http://127.0.0.1:8880/v1")
+    STT_BASE_URLS = parse_comma_list("VOICEMODE_STT_BASE_URLS", "http://127.0.0.1:5092/v1")
+    TTS_VOICES = parse_comma_list("VOICEMODE_VOICES", "F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy")
     TTS_MODELS = parse_comma_list("VOICEMODE_TTS_MODELS", "tts-1,tts-1-hd,gpt-4o-mini-tts")
-    STT_MODEL = os.getenv("VOICEMODE_STT_MODEL", "whisper-1")
-    STT_MODELS = parse_comma_list("VOICEMODE_STT_MODELS", "parakeet-tdt-0.6b-v3,whisper-1")
+    STT_MODEL = os.getenv("VOICEMODE_STT_MODEL", "parakeet-tdt-0.6b-v3")
+    STT_MODELS = parse_comma_list("VOICEMODE_STT_MODELS", "parakeet-tdt-0.6b-v3")
 
     logger.info("Configuration reloaded successfully")
 
@@ -703,7 +703,7 @@ LOCAL_TTS_SERVICE_DIR = expand_path(
 )
 
 # Local STT Service (Parakeet TDT) - OpenAI compatible.
-LOCAL_STT_PORT = int(os.getenv("VOICEMODE_LOCAL_STT_PORT", "2022"))
+LOCAL_STT_PORT = int(os.getenv("VOICEMODE_LOCAL_STT_PORT", "5092"))
 LOCAL_STT_SERVICE_DIR = expand_path(
     os.getenv("VOICEMODE_LOCAL_STT_DIR", str(BASE_DIR / "services" / "parakeet-tdt"))
 )
@@ -1290,6 +1290,10 @@ def get_provider_supported_formats(provider: str, operation: str = "tts") -> lis
         "kokoro": {
             "tts": ["mp3", "opus", "flac", "wav", "pcm"],  # AAC is not currently supported
             "stt": []  # Kokoro is TTS only
+        },
+        "supertonic-express": {
+            "tts": ["mp3", "opus", "flac", "wav", "pcm"],
+            "stt": []
         },
         # STT providers
         "whisper-local": {

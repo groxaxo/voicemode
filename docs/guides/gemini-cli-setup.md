@@ -27,15 +27,16 @@ Gemini CLI supports MCP management from the command line:
 ```bash
 gemini mcp add voicemode voicemode \
   --scope user \
-  --env VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1,https://api.openai.com/v1 \
-  --env VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1,https://api.openai.com/v1 \
+  --env VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1 \
+  --env VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1 \
   --env VOICEMODE_TTS_MODELS=tts-1,tts-1-hd,gpt-4o-mini-tts \
-  --env VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3,whisper-1 \
+  --env VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3 \
   --env VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3 \
   --env VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy \
   --env VOICEMODE_DEFAULT_LOCAL_VOICE=F1 \
   --env VOICEMODE_LOCAL_TTS_PORT=8880 \
   --env VOICEMODE_LOCAL_TTS_DIR=$HOME/supertonic-express \
+  --env VOICEMODE_LOCAL_STT_PORT=5092 \
   --env VOICEMODE_PREFER_LOCAL=true \
   --env VOICEMODE_ALWAYS_TRY_LOCAL=true
 ```

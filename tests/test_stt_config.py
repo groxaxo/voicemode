@@ -70,12 +70,12 @@ def test_reload_picks_up_stt_models_comma_list(isolated_reload, monkeypatch):
 
 
 def test_defaults_when_env_unset(isolated_reload):
-    """With VOICEMODE_STT_MODEL[S] absent, defaults are 'whisper-1' and []."""
+    """With VOICEMODE_STT_MODEL[S] absent, defaults target local Parakeet."""
     cfg = isolated_reload
 
     assert "VOICEMODE_STT_MODEL" not in os.environ
     assert "VOICEMODE_STT_MODELS" not in os.environ
 
     cfg.reload_configuration()
-    assert cfg.STT_MODEL == "whisper-1"
-    assert cfg.STT_MODELS == []
+    assert cfg.STT_MODEL == "parakeet-tdt-0.6b-v3"
+    assert cfg.STT_MODELS == ["parakeet-tdt-0.6b-v3"]

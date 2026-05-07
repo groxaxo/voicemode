@@ -12,7 +12,8 @@ class TestDetectProviderType:
         "url,expected",
         [
             ("https://api.openai.com/v1", "openai"),
-            ("http://127.0.0.1:8880/v1", "kokoro"),
+            ("http://127.0.0.1:8880/v1", "supertonic-express"),
+            ("http://127.0.0.1:5092/v1", "parakeet"),
             ("http://127.0.0.1:2022/v1", "whisper"),
             ("http://127.0.0.1:8890/v1", "mlx-audio"),
             ("http://localhost:8890", "mlx-audio"),
