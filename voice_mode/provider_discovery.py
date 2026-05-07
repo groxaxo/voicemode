@@ -107,8 +107,8 @@ class ProviderRegistry:
                 provider_type = detect_provider_type(url)
                 self.registry["tts"][url] = EndpointInfo(
                     base_url=url,
-                    models=["gpt4o-mini-tts", "tts-1", "tts-1-hd"] if provider_type == "openai" else ["tts-1"],
-                    voices=["alloy", "echo", "fable", "nova", "onyx", "shimmer"] if provider_type == "openai" else ["af_alloy", "af_aoede", "af_bella", "af_heart", "af_jadzia", "af_jessica", "af_kore", "af_nicole", "af_nova", "af_river", "af_sarah", "af_sky", "af_v0", "af_v0bella", "af_v0irulan", "af_v0nicole", "af_v0sarah", "af_v0sky", "am_adam", "am_echo", "am_eric", "am_fenrir", "am_liam", "am_michael", "am_onyx", "am_puck", "am_santa", "am_v0adam", "am_v0gurney", "am_v0michael", "bf_alice", "bf_emma", "bf_lily", "bf_v0emma", "bf_v0isabella", "bm_daniel", "bm_fable", "bm_george", "bm_lewis", "bm_v0george", "bm_v0lewis", "ef_dora", "em_alex", "em_santa", "ff_siwis", "hf_alpha", "hf_beta", "hm_omega", "hm_psi", "if_sara", "im_nicola", "jf_alpha", "jf_gongitsune", "jf_nezumi", "jf_tebukuro", "jm_kumo", "pf_dora", "pm_alex", "pm_santa", "zf_xiaobei", "zf_xiaoni", "zf_xiaoxiao", "zf_xiaoyi", "zm_yunjian", "zm_yunxi", "zm_yunxia", "zm_yunyang"],
+                    models=["gpt4o-mini-tts", "tts-1", "tts-1-hd"] if provider_type == "openai" else (config.TTS_MODELS or ["tts-1"]),
+                    voices=["alloy", "echo", "fable", "nova", "onyx", "shimmer"] if provider_type == "openai" else _configured_or_default_local_voices(),
                     provider_type=provider_type
                 )
             
@@ -242,9 +242,9 @@ class ProviderRegistry:
                 if response.status_code == 200:
                     data = response.json()
                     if isinstance(data, dict) and "voices" in data:
-                        return [v["id"] if isinstance(v, dict) else v for v in data["voices"]]
+                        return [_voice_identifier(v) for v in data["voices"] if _voice_identifier(v)]
                     elif isinstance(data, list):
-                        return [v["id"] if isinstance(v, dict) else v for v in data]
+                        return [_voice_identifier(v) for v in data if _voice_identifier(v)]
         except Exception as e:
             logger.debug(f"Could not fetch voices from {base_url}/audio/voices: {e}")
         
@@ -324,3 +324,28 @@ class ProviderRegistry:
 
 # Global registry instance
 provider_registry = ProviderRegistry()
+
+
+def _voice_identifier(voice: Any) -> Optional[str]:
+    """Return a voice id from common OpenAI-compatible voice shapes."""
+    if isinstance(voice, str):
+        return voice
+    if isinstance(voice, dict):
+        for key in ("id", "name", "voice", "voice_id"):
+            value = voice.get(key)
+            if isinstance(value, str) and value:
+                return value
+    return None
+
+
+def _configured_or_default_local_voices() -> List[str]:
+    """Return configured local voices, falling back to Kokoro defaults."""
+    if config.TTS_VOICES:
+        return list(dict.fromkeys(config.TTS_VOICES))
+    return [
+        "af_alloy", "af_aoede", "af_bella", "af_heart", "af_jadzia",
+        "af_jessica", "af_kore", "af_nicole", "af_nova", "af_river",
+        "af_sarah", "af_sky", "am_adam", "am_echo", "am_eric",
+        "am_fenrir", "am_liam", "am_michael", "am_onyx", "am_puck",
+        "bm_fable",
+    ]

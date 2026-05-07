@@ -83,6 +83,8 @@ nav:
     - Pronunciation: guides/pronunciation.md
     - MacBook Portable Mode: guides/macbook-portable.md
     - Claude Code Plugin: guides/claude-code-plugin.md
+    - OpenCode/Codex Setup: guides/opencode-setup.md
+    - Custom Endpoints: guides/custom-endpoints.md
     - Selective Tool Loading: guides/selective-tool-loading.md
     - Remote Access (serve): guides/serve-configuration.md
   - VoiceMode Connect:
@@ -95,6 +97,7 @@ nav:
   - Local Services:
     - Whisper STT: guides/whisper-setup.md
     - Kokoro TTS: guides/kokoro-setup.md
+    - Supertonic Express TTS: guides/supertonic-setup.md
   - Reference:
     - CLI Commands: reference/cli.md
     - Service Commands: reference/cli/service-commands.md

@@ -11,6 +11,7 @@ import platform
 import shutil
 import subprocess
 import time
+import urllib.request
 from dataclasses import dataclass, asdict
 from enum import Enum
 from pathlib import Path
@@ -296,7 +297,7 @@ def check_whisper_service() -> ServiceInfo:
 
 
 def check_kokoro_service() -> ServiceInfo:
-    """Check Kokoro (TTS) service status."""
+    """Check the OpenAI-compatible TTS service on the Kokoro/Supertonic port."""
     status, proc = check_service_status(KOKORO_PORT)
 
     # Check if installed
@@ -313,9 +314,11 @@ def check_kokoro_service() -> ServiceInfo:
         service_path = Path.home() / ".config" / "systemd" / "user" / "voicemode-kokoro.service"
         auto_start = service_path.exists()
 
-    if not is_installed:
+    health_details = check_openai_compatible_tts_health(KOKORO_PORT)
+
+    if not is_installed and status not in ("local", "forwarded") and not health_details:
         return ServiceInfo(
-            name="Kokoro",
+            name="Kokoro/Supertonic",
             type="tts",
             status=ServiceStatus.NOT_INSTALLED,
             port=KOKORO_PORT,
@@ -324,6 +327,8 @@ def check_kokoro_service() -> ServiceInfo:
 
     if status == "local":
         details = {"voice": TTS_VOICES[0] if TTS_VOICES else "af_sky"}
+        if health_details:
+            details.update(health_details)
 
         try:
             # Get memory and uptime
@@ -358,10 +363,11 @@ def check_kokoro_service() -> ServiceInfo:
         )
     elif status == "forwarded":
         return ServiceInfo(
-            name="Kokoro",
+            name="Kokoro/Supertonic",
             type="tts",
             status=ServiceStatus.FORWARDED,
             port=KOKORO_PORT,
+            details=health_details,
             auto_start=auto_start,
             health="healthy"
         )
@@ -373,6 +379,22 @@ def check_kokoro_service() -> ServiceInfo:
             port=KOKORO_PORT,
             auto_start=auto_start
         )
+
+
+def check_openai_compatible_tts_health(port: int) -> Optional[Dict[str, Any]]:
+    """Check health for local OpenAI-compatible TTS services."""
+    try:
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=2) as response:
+            if response.status != 200:
+                return None
+            payload = json.loads(response.read().decode("utf-8"))
+            return {
+                "service": payload.get("service") or ("supertonic-express" if "model_loaded" in payload else "openai-compatible-tts"),
+                "version": payload.get("version"),
+                "model_loaded": payload.get("model_loaded"),
+            }
+    except Exception:
+        return None
 
 
 def check_openai_api() -> Dict[str, Any]:

@@ -119,6 +119,8 @@ For privacy or offline use, install local speech services:
 
 - **[Whisper.cpp](docs/guides/whisper-setup.md)** - Local speech-to-text
 - **[Kokoro](docs/guides/kokoro-setup.md)** - Local text-to-speech with multiple voices
+- **[Supertonic Express](docs/guides/supertonic-setup.md)** - OpenAI-compatible local text-to-speech on port 8880
+- **Canary STT Adapter** - Optional OpenAI-compatible local speech-to-text on port 5092
 
 These provide the same API as OpenAI, so VoiceMode switches seamlessly between them.
 
@@ -132,8 +134,7 @@ High-quality text-to-speech using Inworld's TTS API:
 
 ```bash
 # Start the adapter (default port 8888)
-cd /home/op/voicemode
-python3 adapters/inworld_adapter.py
+voicemode-inworld-adapter
 
 # Configure environment
 export INWORLD_API_KEY="your-api-key"
@@ -148,12 +149,11 @@ Available voices: `Blake`, `Sarah`, `Ethan`, `Luna`, `Marcus`, `Zoe`, `James`, `
 Fast speech-to-text using NVIDIA's Canary 180M Flash model via ONNX:
 
 ```bash
-# Install dependencies
-pip install "onnx-asr[cpu,hub]"
+# Install VoiceMode with Canary dependencies
+uv tool install "git+https://github.com/groxaxo/voicemode.git[canary,adapters]" --force
 
 # Start the adapter (default port 5092)
-cd /home/op/voicemode
-python3 adapters/canary_adapter.py
+voicemode-canary-adapter
 
 # Configure environment
 export CANARY_ADAPTER_PORT="5092"
@@ -171,9 +171,9 @@ Add the adapters to your VoiceMode configuration:
 
 ```bash
 # In ~/.voicemode/voicemode.env
-VOICEMODE_TTS_BASE_URLS=http://100.85.200.50:8888/v1,http://127.0.0.1:8880/v1,https://api.openai.com/v1
-VOICEMODE_STT_BASE_URLS=http://100.85.200.50:5092/v1,http://127.0.0.1:2022/v1,https://api.openai.com/v1
-VOICEMODE_VOICES=Blake,Sarah,F1,af_sky,alloy
+VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1,https://api.openai.com/v1
+VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1,https://api.openai.com/v1
+VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy
 ```
 
 ## Installation Details

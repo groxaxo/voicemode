@@ -23,15 +23,14 @@ If the MCP server isn't connected or the tool isn't available:
 
 2. **Or install manually via CLI:**
    ```bash
-   uvx voice-mode-install --yes
-   voicemode whisper service install
-   voicemode kokoro install
+   uv tool install "git+https://github.com/groxaxo/voicemode.git[adapters]" --force
+   voicemode status
    ```
 
 3. **Check service status:**
    ```bash
-   voicemode whisper service status
-   voicemode kokoro status
+   curl http://127.0.0.1:8880/health
+   voicemode status
    ```
 
 4. **Reconnect MCP server after install:**

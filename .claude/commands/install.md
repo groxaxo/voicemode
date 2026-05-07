@@ -9,12 +9,11 @@ Install VoiceMode and all dependencies needed for voice conversations.
 
 ## Quick Install (Non-Interactive)
 
-For a fast, fully automated install on Apple Silicon:
+For this fork with OpenCode/Codex and Supertonic Express:
 
 ```bash
-uvx voice-mode-install --yes
-voicemode service install whisper
-voicemode service install kokoro
+uv tool install "git+https://github.com/groxaxo/voicemode.git[adapters]" --force
+voicemode status
 ```
 
 ## What Gets Installed
@@ -23,8 +22,8 @@ voicemode service install kokoro
 |-----------|------|---------|
 | FFmpeg | ~50MB | Audio processing (via Homebrew) |
 | VoiceMode CLI | ~10MB | Command-line tools |
-| Whisper (base) | ~150MB | Speech-to-text |
-| Kokoro | ~350MB | Text-to-speech |
+| Supertonic Express | existing local service | Text-to-speech on `:8880` |
+| OpenAI or Canary | API or optional local adapter | Speech-to-text |
 
 ## Implementation
 
@@ -38,18 +37,14 @@ voicemode service install kokoro
 
 3. **Install missing components:**
    ```bash
-   # Full install (installs ffmpeg, voicemode, and checks dependencies)
-   uvx voice-mode-install --yes
-
-   # Install local services
-   voicemode service install whisper
-   voicemode service install kokoro
+   uv tool install "git+https://github.com/groxaxo/voicemode.git[adapters]" --force
+   voicemode status
    ```
 
 4. **Verify services are running:**
    ```bash
-   voicemode service status whisper
-   voicemode service status kokoro
+   curl http://127.0.0.1:8880/health
+   voicemode status
    ```
 
 5. **Reconnect MCP server:**
@@ -81,4 +76,4 @@ This install process assumes:
 
 The VoiceMode installer will install Homebrew if missing on macOS.
 
-For complete documentation, load the `voicemode` skill.
+For local ASR, install the Canary extra and run `voicemode-canary-adapter` on port `5092`.

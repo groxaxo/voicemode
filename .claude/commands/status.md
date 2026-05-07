@@ -14,7 +14,7 @@ Check the status of VoiceMode services.
 
 ## Description
 
-Shows the current status of VoiceMode services including Whisper (STT), Kokoro (TTS), and LiveKit (if used).
+Shows the current status of VoiceMode plus local OpenAI-compatible endpoints such as Supertonic Express and optional Canary STT.
 
 ## Implementation
 
@@ -33,11 +33,11 @@ Check all services:
 # Check Whisper (STT)
 mcp__voicemode__service service_name=whisper action=status
 
-# Check Kokoro (TTS)
+# Check Kokoro/Supertonic-compatible TTS on port 8880
 mcp__voicemode__service service_name=kokoro action=status
 
-# Check LiveKit (optional)
-mcp__voicemode__service service_name=livekit action=status
+# Check the Supertonic Express HTTP service directly
+curl http://127.0.0.1:8880/health
 ```
 
 ## Output

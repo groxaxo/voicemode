@@ -202,7 +202,11 @@ async def health():
     return {"status": "healthy", "service": "inworld-tts-adapter"}
 
 
-if __name__ == "__main__":
+def main():
     import uvicorn
 
     uvicorn.run(app, host=ADAPTER_HOST, port=ADAPTER_PORT)
+
+
+if __name__ == "__main__":
+    main()
