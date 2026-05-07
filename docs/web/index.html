@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VoiceMode MCP - Voice Mode for Claude Code</title>
-    <meta name="description" content="VoiceMode MCP enables natural voice conversations with Claude Code and other AI coding assistants. Simple setup, powerful features.">
+    <title>VoiceMode MCP - Voice for Codex, OpenCode, Qwen CLI, Gemini CLI, and Claude</title>
+    <meta name="description" content="VoiceMode MCP adds natural voice conversations to Codex, OpenCode, Qwen CLI, Gemini CLI, Claude Code, and other MCP-capable coding agents with an autodetecting installer.">
     <style>
         :root {
             /* Enhanced color palette */
@@ -402,6 +402,31 @@
             margin-top: var(--space-3);
         }
 
+        .hero-note {
+            max-width: 42rem;
+            margin: 0 auto var(--space-5) auto;
+            color: var(--text-secondary);
+            font-size: var(--text-base);
+        }
+
+        .agent-strip {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-3);
+            flex-wrap: wrap;
+            margin-bottom: var(--space-6);
+        }
+
+        .agent-pill {
+            border: 1px solid var(--border);
+            background: linear-gradient(180deg, var(--bg-secondary), var(--bg-tertiary));
+            color: var(--text-primary);
+            border-radius: 999px;
+            padding: 0.45rem 0.8rem;
+            font-size: var(--text-sm);
+            letter-spacing: 0.01em;
+        }
+
         .links {
             display: flex;
             gap: var(--space-6);
@@ -542,7 +567,18 @@
     <div class="container">
         <header>
             <h1>VoiceMode MCP</h1>
-            <p class="tagline">"Voice Mode for Claude Code (and other AI Coding Assistants)"</p>
+            <p class="tagline">voice conversation for coding agents over MCP</p>
+            <p class="hero-note">
+                Install once, let the installer detect the agent CLIs already on your machine, preselect them,
+                and wire VoiceMode into the ones you want.
+            </p>
+            <div class="agent-strip" aria-label="Supported agent CLIs">
+                <span class="agent-pill">Codex</span>
+                <span class="agent-pill">OpenCode</span>
+                <span class="agent-pill">Qwen CLI</span>
+                <span class="agent-pill">Gemini CLI</span>
+                <span class="agent-pill">Claude Code</span>
+            </div>
             <a href="https://github.com/mbailey/voicemode" class="github-cta">
                 <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
@@ -552,15 +588,15 @@
         </header>
 
         <div class="compatibility">
-            <strong>Runs on:</strong> Linux • macOS • Windows (WSL) | <strong>Python:</strong> 3.10+ 
+            <strong>Runs on:</strong> Linux • macOS • Windows (WSL) | <strong>Installer:</strong> autodetects supported local CLIs and offers checkbox-style selection
         </div>
 
         <section>
             <h2>Overview</h2>
             <p>
-                VoiceMode MCP brings natural voice conversations Claude Code and other AI coding assistants. 
-                Built on the Model Context Protocol (MCP), it provides a clean, reliable interface for adding voice capabilities 
-                to your AI workflows.
+                VoiceMode MCP brings natural voice conversations to Codex, OpenCode, Qwen CLI, Gemini CLI, Claude Code,
+                and other MCP-capable coding assistants. It sits on top of the Model Context Protocol and keeps the voice
+                layer separate from the agent, so you can swap clients without rebuilding your speech stack.
             </p>
         </section>
 
@@ -579,26 +615,23 @@
 
         <section>
             <h2>Quick Start<span class="typing-indicator"></span></h2>
-            <h3 style="color: var(--text-secondary); margin-bottom: 0.5rem;">Option 1: Claude Code Plugin (Recommended)</h3>
+            <h3 style="color: var(--text-secondary); margin-bottom: 0.5rem;">Option 1: Autodetect Installed Agent CLIs</h3>
+            <div class="code-block">
+<span class="comment"># Install uv if needed</span><br>
+curl -LsSf https://astral.sh/uv/install.sh | sh<br><br>
+<span class="comment"># Install VoiceMode, detect local CLIs, and choose with prechecked boxes</span><br>
+uvx voice-mode-install<br><br>
+<span class="comment"># Or target everything explicitly</span><br>
+uvx voice-mode-install --integrations codex,opencode,qwen,gemini
+</div>
+            <h3 style="color: var(--text-secondary); margin-top: 1.5rem; margin-bottom: 0.5rem;">Option 2: Claude Code Plugin</h3>
             <div class="code-block">
 <span class="comment"># Add VoiceMode marketplace</span><br>
 claude plugin marketplace add mbailey/voicemode<br><br>
 <span class="comment"># Install VoiceMode plugin</span><br>
-claude plugin install voicemode@voicemode<br><br>
-<span class="comment"># Install dependencies (local voice services)</span><br>
-/voicemode:install<br><br>
-<span class="comment"># Start talking!</span><br>
-/voicemode:converse
-</div>
-            <h3 style="color: var(--text-secondary); margin-top: 1.5rem; margin-bottom: 0.5rem;">Option 2: Python Installer</h3>
-            <div class="code-block">
-<span class="comment"># Install VoiceMode MCP python package and dependencies</span><br>
-curl -LsSf https://astral.sh/uv/install.sh | sh<br>
-uvx voice-mode-install<br><br>
-<span class="comment"># Add VoiceMode to Claude</span><br>
-claude mcp add --scope user voicemode -- uvx --refresh voice-mode<br><br>
-<span class="comment"># Start a voice conversation</span><br>
-claude converse
+claude plugin install voicemode@mbailey<br><br>
+<span class="comment"># Install dependencies and local services</span><br>
+/voicemode:install
 </div>
             <p style="margin-top: 1.5rem; color: var(--text-secondary);">
                 The voice-mode-install command automatically:
@@ -614,7 +647,15 @@ claude converse
                 </li>
                 <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
                     <span style="position: absolute; left: 0; color: var(--accent);">✓</span>
-                    Configures shell completions for the voicemode CLI
+                    Detects `codex`, `opencode`, `qwen`, and `gemini` on your machine
+                </li>
+                <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
+                    <span style="position: absolute; left: 0; color: var(--accent);">✓</span>
+                    Presents preselected checkbox-style choices for the CLIs it found
+                </li>
+                <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
+                    <span style="position: absolute; left: 0; color: var(--accent);">✓</span>
+                    Writes the correct MCP config for each selected CLI
                 </li>
                 <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
                     <span style="position: absolute; left: 0; color: var(--accent);">✓</span>
@@ -651,16 +692,16 @@ voicemode kokoro install
             <h2>Features</h2>
             <div class="features">
                 <div class="feature">
-                    <h3>Voice Conversations</h3>
-                    <p>Natural voice interactions with Claude through your microphone and speakers, airpods, etc</p>
+                    <h3>One Voice Stack, Multiple Agents</h3>
+                    <p>Use the same local speech stack across Codex, OpenCode, Qwen CLI, Gemini CLI, and Claude Code.</p>
                 </div>
                 <div class="feature">
-                    <h3>OpenAI Compatible</h3>
-                    <p>Works with OpenAI's API and compatible services for speech processing</p>
+                    <h3>Autodetecting Installer</h3>
+                    <p>The installer scans your machine for supported CLIs, preselects what it finds, and wires VoiceMode into the ones you confirm.</p>
                 </div>
                 <div class="feature">
-                    <h3>Simple Integration</h3>
-                    <p>Clean MCP protocol implementation that works seamlessly with Claude Desktop</p>
+                    <h3>Local-First Speech Pipeline</h3>
+                    <p>Prefer local STT and TTS endpoints by default, with OpenAI-compatible fallback when the local services are unavailable.</p>
                 </div>
             </div>
         </section>
@@ -669,9 +710,10 @@ voicemode kokoro install
             <div class="requirements">
                 <h3>Requirements</h3>
                 <ul>
-                    <li>OpenAI API key (or self-hosted STT & TTS services)</li>
+                    <li>OpenAI API key or self-hosted STT and TTS services</li>
                     <li>Microphone and speakers for voice I/O</li>
-                    <li>Python 3.8+ (handled by uvx)</li>
+                    <li>Python 3.10+ for the installer workflow</li>
+                    <li>At least one supported agent CLI if you want auto-binding</li>
                 </ul>
             </div>
         </section>

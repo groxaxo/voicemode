@@ -12,6 +12,7 @@ import click
 from . import __version__
 from .checker import DependencyChecker
 from .hardware import HardwareInfo
+from .integrations import detect_installed_integrations, install_integrations, parse_integrations
 from .installer import PackageInstaller
 from .logger import InstallLogger
 from .system import detect_platform, get_system_info, check_command_exists, check_homebrew_installed
@@ -196,6 +197,18 @@ Examples:
   # Skip service installation
   voice-mode-install --skip-services
 
+  # Configure Codex and OpenCode after installation
+  voice-mode-install --integrations codex,opencode
+
+  # Autodetect installed CLIs and choose interactively
+  voice-mode-install
+
+  # Only configure agent integrations
+  voice-mode-install --integrations all --integrations-only
+
+  # Skip agent integration autodetection
+  voice-mode-install --no-integrations
+
   # Install with specific Whisper model
   voice-mode-install --yes --model large-v2
 """
@@ -205,11 +218,14 @@ Examples:
 @click.option('-d', '--dry-run', is_flag=True, help='Show what would be installed without installing')
 @click.option('-v', '--voice-mode-version', default=None, help='Specific VoiceMode version to install')
 @click.option('-s', '--skip-services', is_flag=True, help='Skip local service installation')
+@click.option('--integrations', default='', help='Comma-separated CLIs to configure: codex, opencode, qwen, gemini, all')
+@click.option('--integrations-only', is_flag=True, help='Only configure agent integrations, skip VoiceMode installation')
+@click.option('--no-integrations', is_flag=True, help='Do not autodetect or configure agent CLI integrations')
 @click.option('-y', '--yes', 'non_interactive', is_flag=True, help='Run without prompts (auto-accept all)')
 @click.option('-n', '--non-interactive', is_flag=True, help='Run without prompts (deprecated: use --yes/-y)')
 @click.option('-m', '--model', default='base', help='Whisper model to use (base, small, medium, large-v2)')
 @click.version_option(__version__, '-V', '--version')
-def main(dry_run, voice_mode_version, skip_services, non_interactive, model):
+def main(dry_run, voice_mode_version, skip_services, integrations, integrations_only, no_integrations, non_interactive, model):
     """VoiceMode Installer - Install VoiceMode and its system dependencies.
 
     This installer will:
@@ -229,7 +245,7 @@ def main(dry_run, voice_mode_version, skip_services, non_interactive, model):
       7. Verify the installation
     """
     # Detect non-interactive environment (no TTY)
-    if not sys.stdin.isatty() and not non_interactive and not dry_run:
+    if not sys.stdin.isatty() and not non_interactive and not dry_run and not integrations_only:
         click.echo("Error: Running in non-interactive environment without --yes flag", err=True)
         click.echo("Use --yes or -y to enable automatic installation", err=True)
         click.echo("Example: uvx voice-mode-install --yes", err=True)
@@ -245,9 +261,24 @@ def main(dry_run, voice_mode_version, skip_services, non_interactive, model):
         print_logo()
         click.echo()
 
+        integration_targets = _resolve_integration_targets(
+            integrations=integrations,
+            no_integrations=no_integrations,
+            non_interactive=non_interactive,
+        )
+
         if dry_run:
             click.echo(click.style("DRY RUN MODE - No changes will be made", fg='yellow', bold=True))
             click.echo()
+
+        if integration_targets:
+            click.echo(f"Requested integrations: {', '.join(integration_targets)}")
+            click.echo()
+
+        if integrations_only:
+            _run_integration_phase(integration_targets, dry_run=dry_run)
+            logger.log_complete(success=True, voicemode_installed=check_command_exists('voicemode'))
+            return
 
         # Detect platform
         print_step("Detecting platform...")
@@ -287,29 +318,49 @@ def main(dry_run, voice_mode_version, skip_services, non_interactive, model):
                     if non_interactive:
                         print_step("Upgrading VoiceMode...")
                     elif not click.confirm(f"Upgrade to version {latest_version}?", default=True):
-                        click.echo("\nTo upgrade manually later, run: uv tool install --upgrade voice-mode")
-                        sys.exit(0)
+                        if _finish_with_integrations_or_exit(
+                            integration_targets,
+                            dry_run,
+                            logger,
+                            "\nTo upgrade manually later, run: uv tool install --upgrade voice-mode",
+                        ):
+                            return
                 elif installed_version and latest_version and installed_version == latest_version:
                     click.echo()
                     click.echo(click.style("✓ VoiceMode is up-to-date", fg='green'))
                     if non_interactive:
                         click.echo("Reinstalling...")
                     elif not click.confirm("Reinstall anyway?", default=False):
-                        click.echo("\nInstallation cancelled.")
-                        sys.exit(0)
+                        if _finish_with_integrations_or_exit(
+                            integration_targets,
+                            dry_run,
+                            logger,
+                            "\nInstallation cancelled.",
+                        ):
+                            return
                 else:
                     click.echo()
                     if not non_interactive:
                         if not click.confirm("Reinstall VoiceMode?", default=False):
-                            click.echo("\nTo upgrade manually, run: uv tool install --upgrade voice-mode")
-                            sys.exit(0)
+                            if _finish_with_integrations_or_exit(
+                                integration_targets,
+                                dry_run,
+                                logger,
+                                "\nTo upgrade manually, run: uv tool install --upgrade voice-mode",
+                            ):
+                                return
             else:
                 click.echo("  Latest version:    (unable to check)")
                 click.echo()
                 if not non_interactive:
                     if not click.confirm("Reinstall/upgrade VoiceMode?", default=False):
-                        click.echo("\nTo upgrade manually, run: uv tool install --upgrade voice-mode")
-                        sys.exit(0)
+                        if _finish_with_integrations_or_exit(
+                            integration_targets,
+                            dry_run,
+                            logger,
+                            "\nTo upgrade manually, run: uv tool install --upgrade voice-mode",
+                        ):
+                            return
 
             click.echo()
 
@@ -474,6 +525,15 @@ def main(dry_run, voice_mode_version, skip_services, non_interactive, model):
                 click.echo(f"  voicemode whisper install{model_flag}")
                 click.echo("  voicemode kokoro install")
 
+        integration_results = []
+        if integration_targets:
+            click.echo()
+            click.echo("━" * 70)
+            click.echo(click.style("Agent Integrations", fg='blue', bold=True))
+            click.echo("━" * 70)
+            click.echo()
+            integration_results = _run_integration_phase(integration_targets, dry_run=dry_run)
+
         # Completion summary
         click.echo()
         click.echo("━" * 70)
@@ -491,8 +551,11 @@ def main(dry_run, voice_mode_version, skip_services, non_interactive, model):
             click.echo("Next steps:")
             click.echo("  1. Restart your terminal (or source your shell rc file)")
             click.echo("  2. Run: voicemode --help")
-            click.echo("  3. Configure with Claude Code:")
-            click.echo("     claude mcp add --scope user voicemode -- uvx voice-mode")
+            if integration_results:
+                click.echo("  3. Restart the configured agent CLIs so they reload MCP settings")
+            else:
+                click.echo("  3. Configure an agent integration, for example:")
+                click.echo("     voice-mode-install --integrations codex")
             click.echo()
             click.echo(f"Installation log: {logger.get_log_path()}")
 
@@ -506,6 +569,102 @@ def main(dry_run, voice_mode_version, skip_services, non_interactive, model):
         if not dry_run:
             click.echo(f"\nFor troubleshooting, see: {logger.get_log_path()}")
         sys.exit(1)
+
+
+def _print_integration_results(results):
+    """Display integration changes in a compact format."""
+    if not results:
+        click.echo("No integrations requested.")
+        return
+
+    for result in results:
+        status = "updated" if result.changed else "ok"
+        color = "green" if result.changed else "blue"
+        click.echo(f"  {click.style(status, fg=color)} {result.target}: {result.path}")
+        click.echo(f"     {result.message}")
+
+
+def _resolve_integration_targets(integrations: str, no_integrations: bool, non_interactive: bool) -> list[str]:
+    """Resolve integration targets from flags, autodetection, or the interactive chooser."""
+    if no_integrations and integrations:
+        raise click.ClickException("--integrations and --no-integrations cannot be used together")
+
+    if no_integrations:
+        return []
+
+    explicit_targets = parse_integrations(integrations)
+    if explicit_targets:
+        return explicit_targets
+
+    if non_interactive or not sys.stdin.isatty():
+        return [item.target for item in detect_installed_integrations() if item.detected]
+
+    return _choose_integrations_interactively()
+
+
+def _run_integration_phase(integration_targets: list[str], dry_run: bool):
+    """Configure selected integrations and print a standard summary."""
+    print_step("Configuring agent integrations...")
+    integration_results = install_integrations(integration_targets, dry_run=dry_run)
+    _print_integration_results(integration_results)
+    return integration_results
+
+
+def _finish_with_integrations_or_exit(integration_targets: list[str], dry_run: bool, logger: InstallLogger, exit_message: str) -> bool:
+    """Run selected integrations when the user skips reinstalling VoiceMode."""
+    if not integration_targets:
+        click.echo(exit_message)
+        sys.exit(0)
+
+    click.echo("\nSkipping VoiceMode reinstall; continuing with selected integrations.")
+    click.echo()
+    _run_integration_phase(integration_targets, dry_run=dry_run)
+    logger.log_complete(success=True, voicemode_installed=True)
+    return True
+
+
+def _choose_integrations_interactively() -> list[str]:
+    """Ask the user which detected agent CLIs should be configured."""
+    detections = detect_installed_integrations()
+    selected_defaults = [item.target for item in detections if item.detected]
+
+    click.echo("Detected agent CLIs:")
+    for item in detections:
+        mark = "[x]" if item.detected else "[ ]"
+        status = "detected" if item.detected else "not found"
+        click.echo(f"  {mark} {item.target:<8} {status} ({item.command})")
+
+    click.echo()
+    click.echo("Choose integrations by number or name. Press Enter to accept the preselected boxes.")
+    click.echo("Examples: `1,2`, `codex,qwen`, `none`")
+
+    label_map = {str(index): item.target for index, item in enumerate(detections, start=1)}
+    for item in detections:
+        label_map[item.target] = item.target
+
+    default_display = ",".join(selected_defaults)
+    raw = click.prompt("Integrations", default=default_display, show_default=bool(default_display)).strip()
+    if not raw or raw == default_display:
+        return selected_defaults
+    if raw.lower() in {"none", "skip"}:
+        return []
+
+    chosen: list[str] = []
+    seen: set[str] = set()
+    invalid: list[str] = []
+    for token in [part.strip().lower() for part in raw.split(",") if part.strip()]:
+        resolved = label_map.get(token)
+        if not resolved:
+            invalid.append(token)
+            continue
+        if resolved not in seen:
+            chosen.append(resolved)
+            seen.add(resolved)
+
+    if invalid:
+        raise click.ClickException(f"Unknown integration selection: {', '.join(invalid)}")
+
+    return chosen
 
 
 if __name__ == '__main__':

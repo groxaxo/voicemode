@@ -1,6 +1,6 @@
 # VoiceMode
 
-VoiceMode is an MCP voice interface for Codex, Claude Code, OpenCode, and other MCP-capable agents. This fork is configured for a fast local voice stack:
+VoiceMode is an MCP voice interface for Codex, Claude Code, OpenCode, Qwen Code, Gemini CLI, and other MCP-capable agents. This fork is configured for a fast local voice stack:
 
 - **TTS:** Supertonic Express on `http://127.0.0.1:8880/v1`
 - **STT:** Parakeet TDT 0.6B v3 on `http://127.0.0.1:5092/v1`
@@ -67,6 +67,14 @@ Install this fork with the local adapter entry points:
 uv tool install "git+https://github.com/groxaxo/voicemode.git[adapters,canary]" --force
 ```
 
+Or let the installer set up VoiceMode and one or more agent integrations for you:
+
+```bash
+uvx voice-mode-install --integrations codex,opencode,qwen,gemini
+```
+
+Run `uvx voice-mode-install` interactively to detect installed CLIs and choose from preselected targets. Use `--no-integrations` when you only want to install VoiceMode.
+
 Register with Codex:
 
 ```bash
@@ -112,7 +120,7 @@ This fork adds and configures:
 - OpenAI-compatible Canary adapter entry point: `voicemode-canary-adapter`
 - Supertonic Express local TTS configuration and docs
 - Parakeet TDT local STT defaults, status reporting, prompts, and docs
-- Codex/OpenCode-oriented MCP configuration examples
+- Codex/OpenCode/Qwen/Gemini-oriented MCP configuration examples
 
 ## Upstream VoiceMode
 

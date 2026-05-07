@@ -25,8 +25,11 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 # Install VoiceMode and configure services
 uvx voice-mode-install
 
-# Add to Claude Code MCP
-claude mcp add --scope user voicemode -- uvx --refresh voice-mode
+# Install VoiceMode and configure Codex automatically
+uvx voice-mode-install --integrations codex
+
+# Install VoiceMode without configuring agent CLI integrations
+uvx voice-mode-install --no-integrations
 ```
 
 The installer will:
@@ -34,6 +37,13 @@ The installer will:
 - Install missing system dependencies (FFmpeg, PortAudio, etc.)
 - Set up your environment for VoiceMode
 - Offer to install local voice services (Whisper STT and Kokoro TTS)
+- Optionally configure Codex, OpenCode, Qwen CLI, or Gemini CLI MCP settings
+
+For Claude Code, add VoiceMode separately:
+
+```bash
+claude mcp add --scope user voicemode -- uvx --refresh voice-mode
+```
 
 **Alternative UV installation methods:**
 - **macOS**: `brew install uv`

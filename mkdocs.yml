@@ -83,7 +83,10 @@ nav:
     - Pronunciation: guides/pronunciation.md
     - MacBook Portable Mode: guides/macbook-portable.md
     - Claude Code Plugin: guides/claude-code-plugin.md
-    - OpenCode/Codex Setup: guides/opencode-setup.md
+    - Codex Setup: guides/codex-setup.md
+    - OpenCode Setup: guides/opencode-setup.md
+    - Qwen CLI Setup: guides/qwen-cli-setup.md
+    - Gemini CLI Setup: guides/gemini-cli-setup.md
     - Custom Endpoints: guides/custom-endpoints.md
     - Selective Tool Loading: guides/selective-tool-loading.md
     - Remote Access (serve): guides/serve-configuration.md

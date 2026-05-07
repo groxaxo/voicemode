@@ -11,7 +11,10 @@ A standalone installer package for VoiceMode that handles system dependency dete
 3. **Installing packages** - Uses your system's package manager (apt, dnf, brew)
 4. **Installing VoiceMode** - Runs `uv tool install voice-mode`
 5. **Hardware recommendations** - Suggests optimal configuration for your system
-6. **Logging everything** - Saves installation logs for troubleshooting
+6. **Agent integrations** - Optionally configures Codex, OpenCode, Qwen CLI, and Gemini CLI
+7. **Logging everything** - Saves installation logs for troubleshooting
+
+In interactive mode, the installer detects supported local agent CLIs, preselects the ones it finds, and lets you confirm the targets before writing MCP config. In `--yes` mode, detected CLIs are selected automatically.
 
 ## Quick Start
 
@@ -27,6 +30,18 @@ uvx voice-mode-install --voice-mode-version=5.1.3
 
 # Skip service installation
 uvx voice-mode-install --skip-services
+
+# Configure Codex and OpenCode
+uvx voice-mode-install --integrations codex,opencode
+
+# Detect installed agent CLIs and choose interactively
+uvx voice-mode-install
+
+# Configure all supported CLIs without reinstalling VoiceMode
+uvx voice-mode-install --integrations all --integrations-only
+
+# Install VoiceMode without configuring agent CLI integrations
+uvx voice-mode-install --no-integrations
 
 # Non-interactive mode
 uvx voice-mode-install --non-interactive
@@ -56,6 +71,7 @@ uvx voice-mode-install --non-interactive
 ✅ **Version Pinning** - Install specific VoiceMode versions
 ✅ **Hardware Detection** - Recommends optimal setup for your system
 ✅ **Homebrew Auto-Install** - Offers to install Homebrew on macOS if missing
+✅ **CLI Integration Setup** - Writes MCP config for Codex, OpenCode, Qwen CLI, and Gemini CLI
 
 ### Phase 2 (Future)
 
