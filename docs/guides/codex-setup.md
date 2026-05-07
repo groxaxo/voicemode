@@ -40,7 +40,8 @@ codex mcp add voicemode \
   --env VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3 \
   --env VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3 \
   --env VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy \
-  --env VOICEMODE_TTS_MODELS=tts-1,tts-1-hd,gpt-4o-mini-tts \
+  --env VOICEMODE_TTS_MODELS=tts-1,tts-1-hd \
+  --env VOICEMODE_TTS_AUDIO_FORMAT=mp3 \
   --env VOICEMODE_DEFAULT_LOCAL_VOICE=F1 \
   --env VOICEMODE_LOCAL_TTS_PORT=8880 \
   --env VOICEMODE_LOCAL_TTS_DIR=$HOME/supertonic-express \

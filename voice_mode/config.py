@@ -157,7 +157,7 @@ def load_voicemode_env():
 # VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy
 
 # Comma-separated list of preferred models
-# VOICEMODE_TTS_MODELS=tts-1,tts-1-hd,gpt-4o-mini-tts
+# VOICEMODE_TTS_MODELS=tts-1,tts-1-hd
 
 # Prefer local providers over cloud (true/false)
 # VOICEMODE_PREFER_LOCAL=true
@@ -270,8 +270,8 @@ def load_voicemode_env():
 # Global audio format: pcm, opus, mp3, wav, flac, aac (default: pcm)
 # VOICEMODE_AUDIO_FORMAT=pcm
 
-# TTS-specific format override (default: pcm for optimal streaming)
-# VOICEMODE_TTS_AUDIO_FORMAT=pcm
+# TTS-specific format override (default: mp3 for Supertonic Express)
+# VOICEMODE_TTS_AUDIO_FORMAT=mp3
 
 # STT-specific format override (default: mp3 if global format is pcm, otherwise uses global format)
 # VOICEMODE_STT_AUDIO_FORMAT=mp3
@@ -574,7 +574,7 @@ def parse_comma_list(env_var: str, fallback: str) -> list:
 TTS_BASE_URLS = parse_comma_list("VOICEMODE_TTS_BASE_URLS", "http://127.0.0.1:8880/v1")
 STT_BASE_URLS = parse_comma_list("VOICEMODE_STT_BASE_URLS", "http://127.0.0.1:5092/v1")
 TTS_VOICES = parse_comma_list("VOICEMODE_VOICES", "F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy")
-TTS_MODELS = parse_comma_list("VOICEMODE_TTS_MODELS", "tts-1,tts-1-hd,gpt-4o-mini-tts")
+TTS_MODELS = parse_comma_list("VOICEMODE_TTS_MODELS", "tts-1,tts-1-hd")
 STT_MODEL = os.getenv("VOICEMODE_STT_MODEL", "parakeet-tdt-0.6b-v3")
 STT_MODELS = parse_comma_list("VOICEMODE_STT_MODELS", "parakeet-tdt-0.6b-v3")
 
@@ -633,7 +633,7 @@ def reload_configuration():
     TTS_BASE_URLS = parse_comma_list("VOICEMODE_TTS_BASE_URLS", "http://127.0.0.1:8880/v1")
     STT_BASE_URLS = parse_comma_list("VOICEMODE_STT_BASE_URLS", "http://127.0.0.1:5092/v1")
     TTS_VOICES = parse_comma_list("VOICEMODE_VOICES", "F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy")
-    TTS_MODELS = parse_comma_list("VOICEMODE_TTS_MODELS", "tts-1,tts-1-hd,gpt-4o-mini-tts")
+    TTS_MODELS = parse_comma_list("VOICEMODE_TTS_MODELS", "tts-1,tts-1-hd")
     STT_MODEL = os.getenv("VOICEMODE_STT_MODEL", "parakeet-tdt-0.6b-v3")
     STT_MODELS = parse_comma_list("VOICEMODE_STT_MODELS", "parakeet-tdt-0.6b-v3")
 
@@ -767,7 +767,7 @@ CHIME_TRAILING_SILENCE = float(os.getenv("VOICEMODE_CHIME_TRAILING_SILENCE", "0.
 
 # Audio format configuration
 AUDIO_FORMAT = os.getenv("VOICEMODE_AUDIO_FORMAT", "pcm").lower()
-TTS_AUDIO_FORMAT = os.getenv("VOICEMODE_TTS_AUDIO_FORMAT", "pcm").lower()  # Default to PCM for optimal streaming
+TTS_AUDIO_FORMAT = os.getenv("VOICEMODE_TTS_AUDIO_FORMAT", "mp3").lower()
 
 # STT upload format - compressed for bandwidth efficiency
 # Supported: mp3, wav, flac, m4a, ogg (must be supported by STT provider)

@@ -96,8 +96,8 @@ VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1
 VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy
 
 # TTS Models (comma-separated)
-# OpenAI: tts-1, tts-1-hd, gpt-4o-mini-tts
-VOICEMODE_TTS_MODELS=tts-1-hd,tts-1
+# OpenAI: tts-1, tts-1-hd
+VOICEMODE_TTS_MODELS=tts-1,tts-1-hd
 
 # Default TTS voice and model
 VOICEMODE_TTS_VOICE=nova
@@ -124,7 +124,7 @@ VOICEMODE_LOCAL_STT_PORT=5092
 ```bash
 # Audio formats
 VOICEMODE_AUDIO_FORMAT=pcm          # Global default
-VOICEMODE_TTS_AUDIO_FORMAT=pcm      # TTS-specific
+VOICEMODE_TTS_AUDIO_FORMAT=mp3      # TTS-specific
 VOICEMODE_STT_AUDIO_FORMAT=mp3      # STT-specific
 
 # Supported formats: pcm, opus, mp3, wav, flac, aac

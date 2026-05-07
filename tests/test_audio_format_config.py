@@ -20,7 +20,7 @@ class TestAudioFormatConfiguration:
         from voice_mode.config import AUDIO_FORMAT, TTS_AUDIO_FORMAT, STT_AUDIO_FORMAT
         
         assert AUDIO_FORMAT == "pcm"
-        assert TTS_AUDIO_FORMAT == "pcm"  # Default changed to PCM for optimal streaming
+        assert TTS_AUDIO_FORMAT == "mp3"  # Supertonic Express emits 44.1 kHz audio; avoid raw PCM sample-rate ambiguity
         assert STT_AUDIO_FORMAT == "mp3"  # PCM not supported by OpenAI Whisper, defaults to mp3
     
     @patch.dict(os.environ, {

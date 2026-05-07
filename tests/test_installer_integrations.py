@@ -71,6 +71,8 @@ def test_codex_integration_is_idempotent():
     assert 'command = "voicemode"' in content
     assert 'VOICEMODE_TTS_BASE_URLS = "http://127.0.0.1:8880/v1"' in content
     assert 'VOICEMODE_STT_BASE_URLS = "http://127.0.0.1:5092/v1"' in content
+    assert 'VOICEMODE_TTS_MODELS = "tts-1,tts-1-hd"' in content
+    assert 'VOICEMODE_TTS_AUDIO_FORMAT = "mp3"' in content
     assert 'VOICEMODE_STT_MODELS = "parakeet-tdt-0.6b-v3"' in content
     assert 'VOICEMODE_LOCAL_STT_PORT = "5092"' in content
     assert "https://api.openai.com/v1" not in content
@@ -151,6 +153,8 @@ def test_opencode_integration_merges_existing_jsonc():
     assert data["mcp"]["voicemode"]["command"] == ["voicemode"]
     assert data["mcp"]["voicemode"]["environment"]["VOICEMODE_TTS_BASE_URLS"] == "http://127.0.0.1:8880/v1"
     assert data["mcp"]["voicemode"]["environment"]["VOICEMODE_STT_BASE_URLS"] == "http://127.0.0.1:5092/v1"
+    assert data["mcp"]["voicemode"]["environment"]["VOICEMODE_TTS_MODELS"] == "tts-1,tts-1-hd"
+    assert data["mcp"]["voicemode"]["environment"]["VOICEMODE_TTS_AUDIO_FORMAT"] == "mp3"
     assert data["mcp"]["voicemode"]["environment"]["VOICEMODE_STT_MODELS"] == "parakeet-tdt-0.6b-v3"
     assert data["mcp"]["voicemode"]["environment"]["VOICEMODE_STT_MODEL"] == "parakeet-tdt-0.6b-v3"
     assert data["mcp"]["voicemode"]["environment"]["VOICEMODE_LOCAL_STT_PORT"] == "5092"

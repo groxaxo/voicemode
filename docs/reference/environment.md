@@ -29,7 +29,7 @@ Environment variables are processed in this order (highest to lowest priority):
 | `VOICEMODE_TTS_BASE_URLS` | Comma-separated TTS service URLs | `http://127.0.0.1:8880/v1` | `http://localhost:8880/v1` |
 | `VOICEMODE_VOICES` | Comma-separated voice preferences | `F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy` | `F1,M1` |
 | `VOICEMODE_TTS_VOICE` | Default TTS voice | First from VOICES | `nova` |
-| `VOICEMODE_TTS_MODELS` | Comma-separated TTS models | `tts-1-hd,tts-1` | `gpt-4o-mini-tts,tts-1` |
+| `VOICEMODE_TTS_MODELS` | Comma-separated TTS models | `tts-1,tts-1-hd` | `tts-1-hd` |
 | `VOICEMODE_TTS_MODEL` | Default TTS model | First from MODELS | `tts-1-hd` |
 | `VOICEMODE_TTS_SPEED` | Speech speed (0.25-4.0) | `1.0` | `1.5` |
 
@@ -87,7 +87,7 @@ See the [Soundfonts Guide](../guides/soundfonts.md) for details.
 | Variable | Description | Default | Example |
 |----------|-------------|---------|---------|
 | `VOICEMODE_AUDIO_FORMAT` | Global audio format | `pcm` | `mp3` |
-| `VOICEMODE_TTS_AUDIO_FORMAT` | TTS-specific format | `pcm` | `opus` |
+| `VOICEMODE_TTS_AUDIO_FORMAT` | TTS-specific format | `mp3` | `wav` |
 | `VOICEMODE_STT_AUDIO_FORMAT` | STT-specific format | `mp3` | `wav` |
 
 Supported formats: `pcm`, `opus`, `mp3`, `wav`, `flac`, `aac`
