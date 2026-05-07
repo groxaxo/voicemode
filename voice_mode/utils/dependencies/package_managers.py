@@ -5,6 +5,7 @@ from typing import List, Tuple
 import subprocess
 import shutil
 import logging
+import platform
 
 logger = logging.getLogger(__name__)
 
@@ -135,7 +136,15 @@ def get_package_manager() -> PackageManager:
     Raises:
         RuntimeError: If no supported package manager is found
     """
-    managers = [BrewManager(), DnfManager(), AptManager()]
+    system = platform.system().lower()
+
+    # Prefer native package managers on Linux; keep Homebrew as a fallback.
+    if system == "linux":
+        managers = [AptManager(), DnfManager(), BrewManager()]
+    elif system == "darwin":
+        managers = [BrewManager(), AptManager(), DnfManager()]
+    else:
+        managers = [BrewManager(), DnfManager(), AptManager()]
 
     for manager in managers:
         if manager.check_available():

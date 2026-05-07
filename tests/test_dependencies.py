@@ -151,38 +151,48 @@ class TestPackageManagers:
 class TestPackageManagerSelection:
     """Test automatic package manager selection."""
 
+    @patch('voice_mode.utils.dependencies.package_managers.platform.system')
     @patch('voice_mode.utils.dependencies.package_managers.BrewManager.check_available')
-    def test_get_package_manager_brew(self, mock_brew):
-        """Test getting Brew manager when available."""
+    def test_get_package_manager_brew(self, mock_brew, mock_system):
+        """Test getting Brew manager first on macOS."""
+        mock_system.return_value = "Darwin"
         mock_brew.return_value = True
         manager = get_package_manager()
         assert isinstance(manager, BrewManager)
 
+    @patch('voice_mode.utils.dependencies.package_managers.platform.system')
+    @patch('voice_mode.utils.dependencies.package_managers.AptManager.check_available')
     @patch('voice_mode.utils.dependencies.package_managers.BrewManager.check_available')
     @patch('voice_mode.utils.dependencies.package_managers.DnfManager.check_available')
-    def test_get_package_manager_dnf(self, mock_dnf, mock_brew):
-        """Test getting DNF manager when Brew not available."""
-        mock_brew.return_value = False
+    def test_get_package_manager_dnf(self, mock_dnf, mock_brew, mock_apt, mock_system):
+        """Test getting DNF manager on Linux when APT is unavailable."""
+        mock_system.return_value = "Linux"
+        mock_apt.return_value = False
         mock_dnf.return_value = True
+        mock_brew.return_value = True
         manager = get_package_manager()
         assert isinstance(manager, DnfManager)
 
+    @patch('voice_mode.utils.dependencies.package_managers.platform.system')
     @patch('voice_mode.utils.dependencies.package_managers.BrewManager.check_available')
     @patch('voice_mode.utils.dependencies.package_managers.DnfManager.check_available')
     @patch('voice_mode.utils.dependencies.package_managers.AptManager.check_available')
-    def test_get_package_manager_apt(self, mock_apt, mock_dnf, mock_brew):
-        """Test getting APT manager when others not available."""
-        mock_brew.return_value = False
-        mock_dnf.return_value = False
+    def test_get_package_manager_apt(self, mock_apt, mock_dnf, mock_brew, mock_system):
+        """Test getting APT manager first on Linux."""
+        mock_system.return_value = "Linux"
+        mock_brew.return_value = True
+        mock_dnf.return_value = True
         mock_apt.return_value = True
         manager = get_package_manager()
         assert isinstance(manager, AptManager)
 
+    @patch('voice_mode.utils.dependencies.package_managers.platform.system')
     @patch('voice_mode.utils.dependencies.package_managers.BrewManager.check_available')
     @patch('voice_mode.utils.dependencies.package_managers.DnfManager.check_available')
     @patch('voice_mode.utils.dependencies.package_managers.AptManager.check_available')
-    def test_get_package_manager_none_available(self, mock_apt, mock_dnf, mock_brew):
+    def test_get_package_manager_none_available(self, mock_apt, mock_dnf, mock_brew, mock_system):
         """Test error when no package manager is available."""
+        mock_system.return_value = "Linux"
         mock_brew.return_value = False
         mock_dnf.return_value = False
         mock_apt.return_value = False
