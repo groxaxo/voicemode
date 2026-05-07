@@ -11,6 +11,7 @@ import platform
 import shutil
 import subprocess
 import time
+import urllib.parse
 import urllib.request
 from dataclasses import dataclass, asdict
 from enum import Enum
@@ -22,6 +23,9 @@ import click
 from voice_mode.config import (
     WHISPER_PORT,
     KOKORO_PORT,
+    STT_BASE_URLS,
+    STT_MODEL,
+    STT_MODELS,
     TTS_VOICES,
     OPENAI_API_KEY,
     env_bool,
@@ -397,6 +401,87 @@ def check_openai_compatible_tts_health(port: int) -> Optional[Dict[str, Any]]:
         return None
 
 
+def _local_stt_port() -> Optional[int]:
+    """Return the first configured local OpenAI-compatible STT endpoint port."""
+    for base_url in STT_BASE_URLS:
+        parsed = urllib.parse.urlparse(base_url)
+        if parsed.hostname in {"127.0.0.1", "localhost"}:
+            return parsed.port or (443 if parsed.scheme == "https" else 80)
+    return None
+
+
+def check_openai_compatible_stt_service() -> ServiceInfo:
+    """Check the configured local OpenAI-compatible STT endpoint."""
+    port = _local_stt_port()
+    if port is None:
+        return ServiceInfo(
+            name="Local STT",
+            type="stt",
+            status=ServiceStatus.NOT_RUNNING,
+        )
+
+    status, proc = check_service_status(port)
+    details = {
+        "model": STT_MODELS[0] if STT_MODELS else STT_MODEL,
+    }
+
+    try:
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=2) as response:
+            if response.status == 200:
+                payload = json.loads(response.read().decode("utf-8"))
+                details.update({
+                    "service": "parakeet-tdt" if "default_model" in payload else "openai-compatible-stt",
+                    "default_model": payload.get("default_model"),
+                    "models": payload.get("models"),
+                    "speedup": payload.get("speedup"),
+                    "cpu_optimization": payload.get("cpu_optimization"),
+                })
+                status = "local"
+    except Exception:
+        pass
+
+    if status == "local":
+        try:
+            with proc.oneshot():
+                details["memory"] = format_memory(proc.memory_info().rss)
+                details["uptime"] = format_uptime(time.time() - proc.create_time())
+        except Exception:
+            pass
+        return ServiceInfo(
+            name="Parakeet",
+            type="stt",
+            status=ServiceStatus.RUNNING,
+            port=port,
+            details=details,
+            health="healthy",
+        )
+    if status == "forwarded":
+        return ServiceInfo(
+            name="Parakeet",
+            type="stt",
+            status=ServiceStatus.FORWARDED,
+            port=port,
+            details=details,
+            health="healthy",
+        )
+    if status == "initializing":
+        return ServiceInfo(
+            name="Parakeet",
+            type="stt",
+            status=ServiceStatus.INITIALIZING,
+            port=port,
+            details=details,
+            health="initializing",
+        )
+    return ServiceInfo(
+        name="Parakeet",
+        type="stt",
+        status=ServiceStatus.NOT_RUNNING,
+        port=port,
+        details=details,
+    )
+
+
 def check_openai_api() -> Dict[str, Any]:
     """Check OpenAI API availability."""
     api_key_set = bool(OPENAI_API_KEY)
@@ -408,7 +493,7 @@ def check_openai_api() -> Dict[str, Any]:
     }
 
 
-def get_active_providers(whisper: ServiceInfo, kokoro: ServiceInfo, openai: Dict[str, Any]) -> Dict[str, str]:
+def get_active_providers(whisper: ServiceInfo, parakeet: ServiceInfo, kokoro: ServiceInfo, openai: Dict[str, Any]) -> Dict[str, str]:
     """Determine active TTS and STT providers."""
     # Determine active TTS
     tts_active = "none"
@@ -419,7 +504,9 @@ def get_active_providers(whisper: ServiceInfo, kokoro: ServiceInfo, openai: Dict
 
     # Determine active STT
     stt_active = "none"
-    if whisper.status == ServiceStatus.RUNNING or whisper.status == ServiceStatus.FORWARDED:
+    if parakeet.status == ServiceStatus.RUNNING or parakeet.status == ServiceStatus.FORWARDED:
+        stt_active = "parakeet"
+    elif whisper.status == ServiceStatus.RUNNING or whisper.status == ServiceStatus.FORWARDED:
         stt_active = "whisper"
     elif openai["status"] == "available":
         stt_active = "openai"
@@ -450,11 +537,12 @@ def collect_status_data() -> Dict[str, Any]:
 
     # Check services
     whisper = check_whisper_service()
+    parakeet = check_openai_compatible_stt_service()
     kokoro = check_kokoro_service()
     openai = check_openai_api()
 
     # Get active providers
-    active = get_active_providers(whisper, kokoro, openai)
+    active = get_active_providers(whisper, parakeet, kokoro, openai)
 
     # Check dependencies
     ffmpeg = check_ffmpeg()
@@ -503,6 +591,16 @@ def collect_status_data() -> Dict[str, Any]:
                     "uptime": whisper.details.get("uptime") if whisper.details else None,
                     "auto_start": whisper.auto_start,
                     "health": whisper.health
+                },
+                "parakeet": {
+                    "status": parakeet.status.value,
+                    "port": parakeet.port,
+                    "model": parakeet.details.get("model") if parakeet.details else None,
+                    "default_model": parakeet.details.get("default_model") if parakeet.details else None,
+                    "speedup": parakeet.details.get("speedup") if parakeet.details else None,
+                    "memory": parakeet.details.get("memory") if parakeet.details else None,
+                    "uptime": parakeet.details.get("uptime") if parakeet.details else None,
+                    "health": parakeet.health
                 },
                 "openai": {
                     "status": openai["status"],
@@ -567,6 +665,18 @@ def format_terminal_output(data: Dict[str, Any], use_colors: bool = True) -> str
         return status.replace("_", " ").title()
 
     # Whisper (STT)
+    parakeet = data["stt"]["providers"]["parakeet"]
+    lines.append("── Parakeet (STT) " + "─" * 27)
+    sym = status_symbol(parakeet["status"])
+    lines.append(f"  Status:     {sym} {format_status_text(parakeet['status'])}" + (f" (port {parakeet['port']})" if parakeet["status"] == "running" else ""))
+    if parakeet.get("model"):
+        lines.append(f"  Model:      {parakeet['model']}")
+    if parakeet.get("speedup"):
+        lines.append(f"  Health:     {parakeet['health']} ({parakeet['speedup']})")
+    if parakeet.get("memory") and parakeet.get("uptime"):
+        lines.append(f"  Resources:  {parakeet['memory']}, up {parakeet['uptime']}")
+    lines.append("")
+
     whisper = data["stt"]["providers"]["whisper"]
     lines.append("── Whisper (STT) " + "─" * 28)
     sym = status_symbol(whisper["status"])
@@ -617,7 +727,7 @@ def format_terminal_output(data: Dict[str, Any], use_colors: bool = True) -> str
 
     if tts_active == "kokoro":
         tts_text += " (local preferred)"
-    if stt_active == "whisper":
+    if stt_active in {"parakeet", "whisper"}:
         stt_text += " (local preferred)"
 
     lines.append(f"  TTS: {tts_text}")
@@ -679,6 +789,16 @@ def format_markdown_output(data: Dict[str, Any]) -> str:
     lines.append(f"| OpenAI | TTS | {'✓' if openai['status'] == 'available' else '✗'} {openai['status'].replace('_', ' ').title()} | {', '.join(openai_details) if openai_details else '-'} |")
 
     # Whisper
+    parakeet = data["stt"]["providers"]["parakeet"]
+    parakeet_details = []
+    if parakeet["status"] == "running":
+        parakeet_details.append(f"Port {parakeet['port']}")
+    if parakeet.get("model"):
+        parakeet_details.append(f"Model: {parakeet['model']}")
+    if parakeet.get("speedup"):
+        parakeet_details.append(f"Speed: {parakeet['speedup']}")
+    lines.append(f"| Parakeet | STT | {'✓' if parakeet['status'] in ['running', 'forwarded'] else '✗'} {parakeet['status'].replace('_', ' ').title()} | {', '.join(parakeet_details) if parakeet_details else '-'} |")
+
     whisper = data["stt"]["providers"]["whisper"]
     whisper_details = []
     if whisper["status"] == "running":
@@ -696,7 +816,7 @@ def format_markdown_output(data: Dict[str, Any]) -> str:
 
     lines.append("")
     lines.append(f"Active: TTS={data['tts']['active'].title()}, STT={data['stt']['active'].title()}" +
-                 (" (local preferred)" if data['tts']['active'] in ['kokoro'] or data['stt']['active'] in ['whisper'] else ""))
+                 (" (local preferred)" if data['tts']['active'] in ['kokoro'] or data['stt']['active'] in ['parakeet', 'whisper'] else ""))
     lines.append("")
 
     lines.append("## Configuration")

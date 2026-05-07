@@ -14,7 +14,7 @@ Check the status of VoiceMode services.
 
 ## Description
 
-Shows the current status of VoiceMode plus local OpenAI-compatible endpoints such as Supertonic Express and optional Canary STT.
+Shows the current status of VoiceMode plus local OpenAI-compatible endpoints such as Supertonic Express and Parakeet STT.
 
 ## Implementation
 

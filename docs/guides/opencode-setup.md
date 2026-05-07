@@ -164,6 +164,7 @@ For privacy-focused setup with local Whisper and Kokoro:
       "environment": {
         "VOICEMODE_TTS_BASE_URLS": "http://127.0.0.1:8880/v1,https://api.openai.com/v1",
         "VOICEMODE_STT_BASE_URLS": "http://127.0.0.1:5092/v1,https://api.openai.com/v1",
+        "VOICEMODE_STT_MODELS": "parakeet-tdt-0.6b-v3,whisper-1",
         "VOICEMODE_VOICES": "F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy",
         "VOICEMODE_STT_MODEL": "whisper-1",
         "VOICEMODE_SAVE_AUDIO": "true"

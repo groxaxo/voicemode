@@ -120,7 +120,7 @@ For privacy or offline use, install local speech services:
 - **[Whisper.cpp](docs/guides/whisper-setup.md)** - Local speech-to-text
 - **[Kokoro](docs/guides/kokoro-setup.md)** - Local text-to-speech with multiple voices
 - **[Supertonic Express](docs/guides/supertonic-setup.md)** - OpenAI-compatible local text-to-speech on port 8880
-- **Canary STT Adapter** - Optional OpenAI-compatible local speech-to-text on port 5092
+- **Parakeet STT Endpoint** - OpenAI-compatible local speech-to-text on port 5092
 
 These provide the same API as OpenAI, so VoiceMode switches seamlessly between them.
 
@@ -144,25 +144,24 @@ export INWORLD_DEFAULT_VOICE="Blake"
 
 Available voices: `Blake`, `Sarah`, `Ethan`, `Luna`, `Marcus`, `Zoe`, `James`, `Emma`, `David`, `Sophie`
 
-### Canary STT Adapter
+### Parakeet STT Endpoint
 
-Fast speech-to-text using NVIDIA's Canary 180M Flash model via ONNX:
+Fast local speech-to-text using NVIDIA Parakeet TDT 0.6B v3 via ONNX Runtime:
 
 ```bash
-# Install VoiceMode with Canary dependencies
-uv tool install "git+https://github.com/groxaxo/voicemode.git[canary,adapters]" --force
+# Start the local OpenAI-compatible endpoint (default port 5092)
+conda activate parakeet-onnx
+cd /home/op/parakeet-tdt-0.6b-v3-fastapi-openai
+python app.py
 
-# Start the adapter (default port 5092)
-voicemode-canary-adapter
-
-# Configure environment
-export CANARY_ADAPTER_PORT="5092"
-export CANARY_DEFAULT_LANGUAGE="en"
+# Configure VoiceMode endpoint and fallback models
+export VOICEMODE_STT_BASE_URLS="http://127.0.0.1:5092/v1,https://api.openai.com/v1"
+export VOICEMODE_STT_MODELS="parakeet-tdt-0.6b-v3,whisper-1"
 ```
 
 Features:
-- Auto-detects Spanish vs English based on text content
-- Supports translation mode (Spanish → English)
+- OpenAI-compatible `/v1/audio/transcriptions` endpoint
+- Automatic language detection for supported Parakeet languages
 - Runs entirely locally with ONNX runtime
 
 ### Configuration
@@ -173,6 +172,7 @@ Add the adapters to your VoiceMode configuration:
 # In ~/.voicemode/voicemode.env
 VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1,https://api.openai.com/v1
 VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1,https://api.openai.com/v1
+VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3,whisper-1
 VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy
 ```
 

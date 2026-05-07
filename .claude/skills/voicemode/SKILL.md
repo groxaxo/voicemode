@@ -216,7 +216,7 @@ voicemode:service("whisper", "logs", lines=50)
 | --------- | ---- | --------------- |
 | whisper   | 2022 | Speech-to-text  |
 | kokoro    | 8880 | Kokoro or Supertonic-compatible text-to-speech |
-| canary    | 5092 | Optional OpenAI-compatible speech-to-text adapter |
+| parakeet  | 5092 | Local OpenAI-compatible speech-to-text endpoint |
 | voicemode | 8765 | HTTP/SSE server |
 
 **Actions:** status, start, stop, restart, logs, enable, disable
@@ -364,7 +364,7 @@ Expose local Whisper (STT) and Kokoro (TTS) to other devices on your Tailnet via
 # Expose TTS (Kokoro or Supertonic Express on port 8880)
 tailscale serve --bg --set-path /v1/audio/speech http://localhost:8880/v1/audio/speech
 
-# Expose STT (Canary on 5092 or Whisper on 2022)
+# Expose STT (Parakeet on 5092 or Whisper on 2022)
 tailscale serve --bg --set-path /v1/audio/transcriptions http://localhost:5092/v1/audio/transcriptions
 
 # Verify configuration

@@ -12,7 +12,7 @@ This directory contains all the FastMCP prompt definitions for the Voice Mode se
 - `kokoro-stop`: Instructions to stop the Kokoro TTS service  
 - `kokoro-status`: Instructions to check Kokoro TTS service status
 - `supertonic`: Instructions to check the external Supertonic Express TTS endpoint
-- `canary`: Instructions to check the optional Canary STT adapter
+- `parakeet`: Instructions to check the local Parakeet STT endpoint
 
 ### status.py
 - `voice-status`: Instructions to check comprehensive status of all voice services

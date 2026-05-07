@@ -51,9 +51,9 @@ def supertonic_prompt(action: str = "status") -> str:
     return "Check Supertonic Express with curl http://127.0.0.1:8880/health and use VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1,https://api.openai.com/v1."
 
 
-@mcp.prompt(name="canary")
-def canary_prompt(action: str = "status") -> str:
-    """Check Canary OpenAI-compatible speech-to-text adapter."""
+@mcp.prompt(name="parakeet")
+def parakeet_prompt(action: str = "status") -> str:
+    """Check Parakeet OpenAI-compatible speech-to-text endpoint."""
     if action != "status":
-        return "Canary is an optional adapter. Install the canary extra and start it with voicemode-canary-adapter, then configure VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1,https://api.openai.com/v1."
-    return "If Canary is running, check curl http://127.0.0.1:5092/health. If it is not running, VoiceMode should fall back to OpenAI STT when configured."
+        return "Parakeet is managed locally from /home/op/parakeet-tdt-0.6b-v3-fastapi-openai. Start it with systemctl --user start parakeet-tdt or conda run -n parakeet-onnx python app.py."
+    return "Check Parakeet with curl http://127.0.0.1:5092/health and use VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1,https://api.openai.com/v1 plus VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3,whisper-1."

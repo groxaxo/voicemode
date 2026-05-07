@@ -23,7 +23,7 @@ voicemode status
 | FFmpeg | ~50MB | Audio processing (via Homebrew) |
 | VoiceMode CLI | ~10MB | Command-line tools |
 | Supertonic Express | existing local service | Text-to-speech on `:8880` |
-| OpenAI or Canary | API or optional local adapter | Speech-to-text |
+| OpenAI or Parakeet | API or local endpoint | Speech-to-text |
 
 ## Implementation
 
@@ -76,4 +76,4 @@ This install process assumes:
 
 The VoiceMode installer will install Homebrew if missing on macOS.
 
-For local ASR, install the Canary extra and run `voicemode-canary-adapter` on port `5092`.
+For local ASR on this machine, use the Parakeet TDT service in `/home/op/parakeet-tdt-0.6b-v3-fastapi-openai` on port `5092`.
