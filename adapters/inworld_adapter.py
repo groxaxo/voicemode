@@ -22,10 +22,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("inworld-adapter")
 
 INWORLD_API_URL = "https://api.inworld.ai/tts/v1/voice:stream"
-INWORLD_API_KEY = os.getenv(
-    "INWORLD_API_KEY",
-    "QzUyYWRGakphR2VMSmFQN21FU0J4NlNXWkY2UDlhZTY6YzY1NHhBYjJ0VWw4bHQ0SnphNUl6NHRYcEI1NE56WkdON0h4ak51djdQQkVoTE13Q3F4S2hKNTBlN280MGFsMA==",
-)
+INWORLD_API_KEY = os.getenv("INWORLD_API_KEY", "")
 
 INWORLD_MODEL = os.getenv("INWORLD_MODEL", "inworld-tts-1.5-max")
 DEFAULT_VOICE = os.getenv("INWORLD_DEFAULT_VOICE", "Blake")
@@ -107,6 +104,12 @@ async def list_voices():
 
 @app.post("/v1/audio/speech")
 async def create_speech(request: SpeechRequest):
+    if not INWORLD_API_KEY:
+        raise HTTPException(
+            status_code=500,
+            detail="INWORLD_API_KEY is required for the Inworld TTS adapter",
+        )
+
     voice = request.voice if request.voice in INWORLD_VOICES else DEFAULT_VOICE
 
     audio_format = request.response_format.upper()
