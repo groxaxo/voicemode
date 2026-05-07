@@ -102,7 +102,7 @@
 
 2. Environment variables are set correctly:
    - `OPENAI_API_KEY` (if using OpenAI)
-   - Service URLs for Whisper/Kokoro
+   - Service URLs for Parakeet and Supertonic Express
 
 3. Network connectivity to services
 
@@ -145,9 +145,9 @@
 **Problem:** Words mispronounced, especially for non-English.
 
 **Solutions:**
-1. For non-English, use Kokoro with appropriate voice:
+1. For non-English, use a verified local or cloud voice:
    ```python
-   converse("Bonjour", voice="ff_siwis", tts_provider="kokoro")
+   converse("Bonjour", voice="F1", tts_provider="supertonic-express")
    ```
 
 2. See `voicemode-languages` resource for language-specific voices
@@ -160,7 +160,7 @@
 1. Try different voice:
    ```python
    converse("Hello", voice="nova")  # OpenAI
-   converse("Hello", voice="af_sky", tts_provider="kokoro")
+   converse("Hello", voice="F1", tts_provider="supertonic-express")
    ```
 
 2. Use HD model for better quality:
@@ -236,7 +236,7 @@ Set the environment variable with words you frequently use:
 VOICEMODE_STT_PROMPT="tmux, Tali, kubectl, pytest, VoiceMode"
 ```
 
-This "primes" Whisper to recognize these specific terms correctly.
+This gives the local STT provider vocabulary hints for these specific terms.
 
 **See:** [Parameters - Vocabulary Biasing](parameters.md#vocabulary-biasing-stt-prompt) for detailed configuration options.
 
@@ -264,11 +264,11 @@ This "primes" Whisper to recognize these specific terms correctly.
 
 ### Using coral voice
 ❌ **Don't:** `voice="coral"` - Not supported
-✅ **Do:** Use supported voices (nova, shimmer, af_sky, etc.)
+✅ **Do:** Use supported voices (F1, M1, nova, shimmer, etc.)
 
 ### Not specifying voice for non-English
 ❌ **Don't:** `converse("Bonjour")`
-✅ **Do:** `converse("Bonjour", voice="ff_siwis", tts_provider="kokoro")`
+✅ **Do:** `converse("Bonjour", voice="F1", tts_provider="supertonic-express")`
 
 ### Setting listen_duration_max too low
 ❌ **Don't:** `listen_duration_max=5` for complex questions

@@ -401,7 +401,7 @@ livekit............ >= 0.17.5 (optional)
                 <div class="box-header">═[ API COMPATIBILITY ]═</div>
                 <div class="box-content">
                     <div class="code-block">
-STT.......: OpenAI Whisper API v1
+STT.......: OpenAI-compatible transcription API v1
 TTS.......: OpenAI TTS API v1
 PROTOCOL..: Model Context Protocol 2024.11
                     </div>
@@ -418,9 +418,8 @@ check_room_status()
 check_audio_devices()
 voice_status()
 list_tts_voices(provider=None)
-kokoro_start(models_dir=None)
-kokoro_stop()
-kokoro_status()
+voice_status()
+providers()
                     </div>
                 </div>
             </div>
@@ -432,7 +431,7 @@ kokoro_status()
 OPENAI_API_KEY          # Required for cloud services
 STT_BASE_URL            # Custom STT endpoint
 STT_API_KEY             # STT authentication
-STT_MODEL               # Whisper model selection
+STT_MODEL               # Parakeet model selection
 TTS_BASE_URL            # Custom TTS endpoint
 TTS_API_KEY             # TTS authentication
 TTS_MODEL               # TTS model selection
@@ -470,16 +469,16 @@ $ pip install voice-mode
                 <div class="box-content">
                     <p class="yellow">Run everything on your machine. No cloud dependencies.</p>
                     <div class="code-block">
-                        <div class="code-header">WHISPER.CPP (PORT 2022)</div>
-$ make whisper-start
+                        <div class="code-header">PARAKEET TDT (PORT 5092)</div>
+$ curl http://127.0.0.1:5092/health
 Local speech-to-text with OpenAI-compatible API
-CPU optimized with AVX/NEON support
+Default model: parakeet-tdt-0.6b-v3
                     </div>
                     <div class="code-block">
-                        <div class="code-header">KOKORO TTS (PORT 8880)</div>
-$ make kokoro-start
+                        <div class="code-header">SUPERTONIC EXPRESS (PORT 8880)</div>
+$ curl http://127.0.0.1:8880/health
 Local text-to-speech with multiple voice options
-Zero-shot voice cloning capable
+Default voices: F1-F5, M1-M5
                     </div>
                     <div class="code-block">
                         <div class="code-header">LIVEKIT (PORT 7880)</div>

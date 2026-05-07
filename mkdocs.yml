@@ -90,17 +90,11 @@ nav:
     - Custom Endpoints: guides/custom-endpoints.md
     - Selective Tool Loading: guides/selective-tool-loading.md
     - Remote Access (serve): guides/serve-configuration.md
-  - VoiceMode Connect:
-    - Overview: connect/README.md
-    - Architecture: connect/architecture.md
-    - Setup:
-      - Claude Code: connect/setup/claude-code.md
-    - Reference:
-      - MCP Tools: connect/reference/mcp-tools.md
   - Local Services:
-    - Whisper STT: guides/whisper-setup.md
-    - Kokoro TTS: guides/kokoro-setup.md
+    - Parakeet STT: guides/parakeet-setup.md
     - Supertonic Express TTS: guides/supertonic-setup.md
+    - Legacy Whisper STT: guides/whisper-setup.md
+    - Legacy Kokoro TTS: guides/kokoro-setup.md
   - Reference:
     - CLI Commands: reference/cli.md
     - Service Commands: reference/cli/service-commands.md

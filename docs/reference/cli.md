@@ -212,7 +212,7 @@ Commands:
 ## Service Management
 
 ### whisper
-Manage Whisper STT service
+Manage legacy Whisper STT service
 
 ```bash
 # Installation and setup
@@ -249,7 +249,7 @@ Available models:
 - large-v3-turbo (1.6 GB)
 
 ### kokoro
-Manage Kokoro TTS service
+Manage legacy Kokoro TTS service
 
 ```bash
 # Installation and setup
@@ -424,11 +424,11 @@ voicemode transcribe < recording.wav
 
 ### Service Setup
 ```bash
-# Full local setup
-voicemode whisper install
-voicemode kokoro install
-voicemode whisper enable
-voicemode kokoro enable
+# Default local setup
+export VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1
+export VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3
+export VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1
+voicemode status
 ```
 
 ### Development
@@ -446,17 +446,16 @@ voicemode diag info
 ### Troubleshooting
 ```bash
 # Check what's running
-voicemode whisper status
-voicemode kokoro status
+voicemode status
+curl http://127.0.0.1:5092/health
+curl http://127.0.0.1:8880/health
 
 # View logs
-voicemode whisper logs --follow
-voicemode kokoro logs --follow
+voicemode logs --tail 50
 
 # Check registry and providers
 voicemode diag registry
 
 # Restart services
-voicemode whisper restart
-voicemode kokoro restart
+voicemode status
 ```

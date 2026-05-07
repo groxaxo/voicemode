@@ -16,7 +16,6 @@ Common local endpoints:
 | --- | --- | --- |
 | Supertonic Express | `http://127.0.0.1:8880/v1` | TTS |
 | Parakeet TDT | `http://127.0.0.1:5092/v1` | STT |
-| Whisper.cpp | `http://127.0.0.1:2022/v1` | STT |
 
 Supertonic voices are `F1`-`F5` and `M1`-`M5`. Set them with:
 

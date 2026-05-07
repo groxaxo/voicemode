@@ -47,6 +47,20 @@
           "name": "VOICEMODE_PREFER_LOCAL"
         },
         {
+          "description": "Comma-separated TTS endpoints (default: http://127.0.0.1:8880/v1 for Supertonic Express)",
+          "is_required": false,
+          "format": "string",
+          "is_secret": false,
+          "name": "VOICEMODE_TTS_BASE_URLS"
+        },
+        {
+          "description": "Comma-separated STT endpoints (default: http://127.0.0.1:5092/v1 for Parakeet TDT)",
+          "is_required": false,
+          "format": "string",
+          "is_secret": false,
+          "name": "VOICEMODE_STT_BASE_URLS"
+        },
+        {
           "description": "Audio format: pcm, mp3, wav, flac, aac, opus (default: pcm)",
           "is_required": false,
           "format": "string",
@@ -54,11 +68,11 @@
           "name": "VOICEMODE_AUDIO_FORMAT"
         },
         {
-          "description": "Whisper model: tiny, base, small, medium, large (default: base)",
+          "description": "STT model for the local OpenAI-compatible transcription endpoint (default: parakeet-tdt-0.6b-v3)",
           "is_required": false,
           "format": "string",
           "is_secret": false,
-          "name": "VOICEMODE_WHISPER_MODEL"
+          "name": "VOICEMODE_STT_MODEL"
         },
         {
           "description": "Disable silence detection for continuous recording (true/false)",

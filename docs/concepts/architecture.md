@@ -21,7 +21,7 @@ VoiceMode is built as a Model Context Protocol (MCP) server that provides voice 
 ├──────────────────────────────────────────────┤
 │            Voice Services                    │
 │  ┌──────────────────┐  ┌──────────────────┐  │
-│  │     Whisper      │  │      Kokoro      │  │
+│  │     Parakeet     │  │    Supertonic    │  │
 │  │      (STT)       │  │       (TTS)      │  │
 │  └──────────────────┘  └──────────────────┘  │
 └──────────────────────────────────────────────┘
@@ -48,9 +48,9 @@ Tools are the primary interface for voice interactions:
 - Uses local microphone for audio capture
 
 **Service tools**: Installation and management
-- `whisper_install`, `kokoro_install`
-- Service start/stop/status operations
-- Model and configuration management
+- Default local endpoints are external OpenAI-compatible services
+- Legacy `whisper_*` and `kokoro_*` tools remain for existing deployments
+- Service start/stop/status operations for supported managed services
 
 ### Provider System
 
@@ -77,21 +77,21 @@ Multi-layered configuration system (`config.py`):
 
 ## Voice Services
 
-### Whisper (Speech-to-Text)
+### Parakeet TDT (Speech-to-Text)
 
-Local STT service using OpenAI's Whisper model:
-- Runs on port 2022 by default
+Default local STT service:
+- Runs on port 5092 by default
 - Provides OpenAI-compatible API
-- Supports multiple model sizes
-- Hardware acceleration (Metal, CUDA)
+- Uses `parakeet-tdt-0.6b-v3` by default
+- Works anywhere VoiceMode can call `/v1/audio/transcriptions`
 
-### Kokoro (Text-to-Speech)
+### Supertonic Express (Text-to-Speech)
 
-Local TTS service with natural voices:
+Default local TTS service:
 - Runs on port 8880 by default
 - OpenAI-compatible API
-- Multiple languages and voices
-- Efficient caching system
+- Voices are `F1`-`F5` and `M1`-`M5`
+- Works anywhere VoiceMode can call `/v1/audio/speech`
 
 ## Audio Pipeline
 
@@ -164,7 +164,7 @@ Direct microphone/speaker access using PyAudio:
 
 ### Caching Strategy
 
-- Model caching (Whisper/Kokoro)
+- Model caching for local providers
 - Audio format caching
 - Provider health caching
 - Configuration caching

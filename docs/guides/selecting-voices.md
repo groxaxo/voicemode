@@ -5,12 +5,17 @@ Voice Mode supports multiple TTS providers with different voices. This guide hel
 ## Available Voices
 
 
-### Kokoro Voices (Local TTS)
-- **af_sky** - Natural female voice
-- **af_sarah** - Alternative female voice
-- **am_adam** - Natural male voice
-- **af_river** - Additional female option
-- **am_michael** - Additional male option
+### Supertonic Express Voices (Local TTS)
+- **F1** - Female voice 1
+- **F2** - Female voice 2
+- **F3** - Female voice 3
+- **F4** - Female voice 4
+- **F5** - Female voice 5
+- **M1** - Male voice 1
+- **M2** - Male voice 2
+- **M3** - Male voice 3
+- **M4** - Male voice 4
+- **M5** - Male voice 5
 
 ### OpenAI Voices
 - **alloy** - Balanced, neutral voice (default)
@@ -35,30 +40,30 @@ This ensures you get your preferred voice when possible, regardless of which pro
 ### Quick Setup
 Add to your `.voicemode.env`:
 ```bash
-# Try Kokoro first, fallback to OpenAI
-VOICEMODE_VOICES=af_sky,nova,alloy
+# Try Supertonic first, fallback to OpenAI
+VOICEMODE_VOICES=F1,F2,M1,nova,alloy
 ```
 
 ### Voice-First Examples
 
 **Prefer expressive female voices:**
 ```bash
-VOICEMODE_VOICES=shimmer,nova,af_sky
+VOICEMODE_VOICES=F1,shimmer,nova
 ```
 
 **Prefer male voices:**
 ```bash
-VOICEMODE_VOICES=am_adam,onyx,echo
+VOICEMODE_VOICES=M1,M2,onyx,echo
 ```
 
 **Local-first setup:**
 ```bash
-VOICEMODE_VOICES=af_sky,am_adam,nova
+VOICEMODE_VOICES=F1,M1,nova
 ```
 
 **Cloud-first setup:**
 ```bash
-VOICEMODE_VOICES=nova,shimmer,af_sky
+VOICEMODE_VOICES=nova,shimmer,F1
 ```
 
 ## Provider Considerations
@@ -68,7 +73,7 @@ VOICEMODE_VOICES=nova,shimmer,af_sky
 - **Cons**: Requires API key, costs money, internet dependent
 - **Best for**: Quick setup, reliable fallback
 
-### Kokoro (Local)
+### Supertonic Express (Local)
 - **Pros**: Free, private, works offline
 - **Cons**: Requires setup, resource intensive
 - **Best for**: Privacy, cost control, offline use
@@ -80,14 +85,14 @@ Voice preferences follow this priority order:
 1. **Environment variables** (`VOICEMODE_VOICES=voice1,voice2`)
 2. **Project `.voicemode.env`** files (searched up directory tree)
 3. **Global `~/.voicemode/voicemode.env`**
-4. **Built-in defaults** (`af_sky,alloy`)
+4. **Built-in defaults** (`F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy`)
 
 ## Testing Voice Selection
 
 You can test specific voices:
 
 ```bash
-VOICEMODE_VOICES=af_sky voicemode converse
+VOICEMODE_VOICES=F1 voicemode converse
 ```
 
 ## Troubleshooting

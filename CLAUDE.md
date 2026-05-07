@@ -66,10 +66,10 @@ make docs-check
 
 2. **Tool System (`voice_mode/tools/`)**
    - **converse.py**: Primary voice conversation tool with TTS/STT integration
-   - **service.py**: Unified service management for Whisper/Kokoro
+   - **service.py**: Unified service management for local voice services
    - **providers.py**: Provider discovery and registry management
    - **devices.py**: Audio device detection and management
-   - Services subdirectory contains install/uninstall tools for Whisper and Kokoro
+   - Services subdirectory contains legacy install/uninstall tools for Whisper and Kokoro
    - See [Tool Loading Architecture](docs/reference/tool-loading-architecture.md) for internal details
 
 3. **Provider System (`voice_mode/providers.py`)**
@@ -85,14 +85,15 @@ make docs-check
 5. **Resources (`voice_mode/resources/`)**
    - MCP resources exposed for client access
    - Statistics, configuration, changelog, and version information
-   - Whisper model management
+   - STT model and local provider configuration
 
 ### Service Architecture
 
 The project supports multiple voice service backends:
 - **OpenAI API**: Cloud-based TTS/STT (requires API key)
-- **Whisper.cpp**: Local speech-to-text service
-- **Kokoro**: Local text-to-speech with multiple voices
+- **Parakeet TDT**: Default local speech-to-text service at `http://127.0.0.1:5092/v1`
+- **Supertonic Express**: Default local text-to-speech service at `http://127.0.0.1:8880/v1`
+- **Whisper.cpp/Kokoro**: Legacy optional local services kept for compatibility
 
 Services can be installed and managed through MCP tools, with automatic service discovery and health checking.
 

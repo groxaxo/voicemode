@@ -775,7 +775,7 @@ async def play_system_audio(message_key: str, fallback_text: Optional[str] = Non
         from voice_mode.simple_failover import simple_tts_failover
         success, metrics, config = await simple_tts_failover(
             text=fallback_text,
-            voice="af_sky",  # Use AF Sky for system messages
+            voice="F1",
             model="tts-1"  # Use standard TTS model for system messages
         )
         return success

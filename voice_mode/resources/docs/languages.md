@@ -2,118 +2,25 @@
 
 ## Overview
 
-When speaking non-English languages, you **must** specify both `voice` and `tts_provider` for proper pronunciation. Default OpenAI voices speak non-English with an American accent.
+VoiceMode's default local stack uses Supertonic Express for TTS and Parakeet for STT. Keep provider selection automatic unless you have verified that a specific endpoint and voice support the language you need.
 
-## Recommended Kokoro Voices
+## Local Voices
 
-### Spanish
+Supertonic Express local voices:
+
+- `F1`, `F2`, `F3`, `F4`, `F5`
+- `M1`, `M2`, `M3`, `M4`, `M5`
+
+Example:
+
 ```python
-converse("¿Cómo estás?", voice="ef_dora", tts_provider="kokoro")
+converse("Bonjour!", voice="F1", tts_provider="supertonic-express")
 ```
 
-### French
-```python
-converse("Bonjour!", voice="ff_siwis", tts_provider="kokoro")
-```
+## OpenAI Voices
 
-### Italian
-```python
-converse("Ciao!", voice="if_sara", tts_provider="kokoro")
-```
+OpenAI voices work for many languages but may retain an American English accent:
 
-### Chinese
-```python
-converse("你好", voice="zf_xiaobei", tts_provider="kokoro")
-```
-
-### Japanese
-```python
-converse("こんにちは", voice="jf_alpha", tts_provider="kokoro")
-```
-
-## Available Kokoro Voices by Language
-
-### English
-- `af_sky` - Female
-- `af_sarah` - Female
-- `am_adam` - Male
-- `am_michael` - Male
-
-### Spanish
-- `ef_dora` - Female
-- `em_marco` - Male
-
-### French
-- `ff_siwis` - Female
-- `fm_jean` - Male
-
-### Italian
-- `if_sara` - Female
-- `im_marco` - Male
-
-### Chinese (Mandarin)
-- `zf_xiaobei` - Female
-- `zm_xiaoming` - Male
-
-### Japanese
-- `jf_alpha` - Female
-- `jm_beta` - Male
-
-### German
-- `gf_lisa` - Female
-- `gm_hans` - Male
-
-### Portuguese (Brazilian)
-- `bf_maria` - Female
-- `bm_joao` - Male
-
-### Russian
-- `rf_natasha` - Female
-- `rm_dmitri` - Male
-
-### Korean
-- `kf_yuna` - Female
-- `km_junho` - Male
-
-### Hindi
-- `hf_priya` - Female
-- `hm_raj` - Male
-
-### Arabic
-- `af_layla` - Female
-- `am_omar` - Male
-
-### Turkish
-- `tf_ayse` - Female
-- `tm_mehmet` - Male
-
-## Voice Naming Convention
-
-Kokoro voices follow the pattern: `{language}{gender}_{name}`
-
-- **Language code:** First letter(s) of language
-  - `a` = English (American)
-  - `e` = Spanish (Español)
-  - `f` = French (Français)
-  - `i` = Italian
-  - `z` = Chinese (中文)
-  - `j` = Japanese
-  - `g` = German
-  - `b` = Brazilian Portuguese
-  - `r` = Russian
-  - `k` = Korean
-  - `h` = Hindi
-  - `t` = Turkish
-
-- **Gender:**
-  - `f` = Female
-  - `m` = Male
-
-- **Name:** Given name in that language
-
-## OpenAI Voices (English-centric)
-
-OpenAI voices work for any language but maintain American English accent:
 - `nova` - Female
 - `shimmer` - Female
 - `alloy` - Neutral
@@ -121,15 +28,18 @@ OpenAI voices work for any language but maintain American English accent:
 - `fable` - Male
 - `onyx` - Male
 
-**Not recommended for non-English** - use Kokoro instead.
+## STT Language Handling
+
+Parakeet is exposed through the standard OpenAI-compatible `/v1/audio/transcriptions` endpoint. Keep `VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3` unless your Parakeet service advertises a different model.
 
 ## Important Notes
 
-1. **Always specify both `voice` and `tts_provider`** when using non-English
-2. **Never use `coral` voice** - it's not supported
-3. Kokoro provides native pronunciation for each language
-4. STT (speech-to-text) auto-detects language by default. Set `VOICEMODE_WHISPER_LANGUAGE` to a specific language code (e.g., `it` for Italian) for better accuracy with non-English audio
+1. Let VoiceMode auto-select providers for normal use.
+2. Specify `voice` only when you know that voice exists on the selected TTS endpoint.
+3. Never use `coral` voice.
+4. Use `VOICEMODE_STT_PROMPT` for vocabulary biasing when Parakeet misrecognizes project-specific words.
 
 ## See Also
+
 - `voicemode-parameters` - Full parameter reference
 - `voicemode-quickstart` - Basic usage examples

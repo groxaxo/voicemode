@@ -293,7 +293,7 @@
                     livekit >= 0.17.5 (optional)<br>
                     <br>
                     <div class="spec-header">API COMPATIBILITY</div>
-                    STT: OpenAI Whisper API v1<br>
+                    STT: OpenAI-compatible transcription API v1<br>
                     TTS: OpenAI TTS API v1<br>
                     PROTOCOL: Model Context Protocol 2024.11
                 </div>
@@ -308,9 +308,8 @@
                     check_audio_devices()<br>
                     voice_status()<br>
                     list_tts_voices(provider=None)<br>
-                    kokoro_start(models_dir=None)<br>
-                    kokoro_stop()<br>
-                    kokoro_status()
+                    voice_status()<br>
+                    providers()
                 </div>
             </section>
 
@@ -320,7 +319,7 @@
                     OPENAI_API_KEY          # Required for cloud services<br>
                     STT_BASE_URL            # Custom STT endpoint<br>
                     STT_API_KEY             # STT authentication<br>
-                    STT_MODEL               # Whisper model selection<br>
+                    STT_MODEL               # Parakeet model selection<br>
                     TTS_BASE_URL            # Custom TTS endpoint<br>
                     TTS_API_KEY             # TTS authentication<br>
                     TTS_MODEL               # TTS model selection<br>
@@ -352,12 +351,12 @@
                 <h2>LOCAL VOICE STACK</h2>
                 <p>Run everything on your machine. No cloud dependencies.</p>
                 <div class="spec">
-                    <div class="spec-header">WHISPER.CPP (PORT 2022)</div>
-                    $ make whisper-start<br>
+                    <div class="spec-header">PARAKEET TDT (PORT 5092)</div>
+                    $ curl http://127.0.0.1:5092/health<br>
                     Local speech-to-text with OpenAI-compatible API<br>
                     <br>
-                    <div class="spec-header">KOKORO TTS (PORT 8880)</div>
-                    $ make kokoro-start<br>
+                    <div class="spec-header">SUPERTONIC EXPRESS (PORT 8880)</div>
+                    $ curl http://127.0.0.1:8880/health<br>
                     Local text-to-speech with multiple voice options<br>
                     <br>
                     <div class="spec-header">LIVEKIT (PORT 7880)</div>

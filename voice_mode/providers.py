@@ -283,9 +283,13 @@ async def is_provider_available(provider_id: str, timeout: float = 2.0) -> bool:
     # This is now handled by the provider registry
     await provider_registry.initialize()
     
-    # Map old provider IDs to base URLs
+    # Map provider IDs to base URLs. Legacy IDs stay for compatibility.
     provider_map = {
+        "supertonic-express": "http://127.0.0.1:8880/v1",
+        "supertonic": "http://127.0.0.1:8880/v1",
         "kokoro": "http://127.0.0.1:8880/v1",
+        "parakeet": "http://127.0.0.1:5092/v1",
+        "parakeet-tdt": "http://127.0.0.1:5092/v1",
         "openai": "https://api.openai.com/v1",
         "whisper-local": "http://127.0.0.1:2022/v1",
         "openai-whisper": "https://api.openai.com/v1"
@@ -296,7 +300,7 @@ async def is_provider_available(provider_id: str, timeout: float = 2.0) -> bool:
         return False
     
     # Check in appropriate registry
-    service_type = "tts" if provider_id in ["kokoro", "openai"] else "stt"
+    service_type = "tts" if provider_id in ["supertonic-express", "supertonic", "kokoro", "openai"] else "stt"
     endpoint_info = provider_registry.registry[service_type].get(base_url)
 
     # Without health checks, we just return if the endpoint is configured
@@ -305,11 +309,21 @@ async def is_provider_available(provider_id: str, timeout: float = 2.0) -> bool:
 
 def get_provider_by_voice(voice: str) -> Optional[Dict[str, Any]]:
     """Get provider info by voice (compatibility function)."""
-    # Kokoro voices
+    # Supertonic Express voices
+    if voice in ["F1", "F2", "F3", "F4", "F5", "M1", "M2", "M3", "M4", "M5"]:
+        return {
+            "id": "supertonic-express",
+            "name": "Supertonic Express",
+            "type": "tts",
+            "base_url": "http://127.0.0.1:8880/v1",
+            "voices": ["F1", "F2", "F3", "F4", "F5", "M1", "M2", "M3", "M4", "M5"]
+        }
+
+    # Legacy Kokoro voices
     if voice.startswith(('af_', 'am_', 'bf_', 'bm_')):
         return {
             "id": "kokoro",
-            "name": "Kokoro TTS",
+            "name": "Legacy Kokoro TTS",
             "type": "tts",
             "base_url": "http://127.0.0.1:8880/v1",
             "voices": ["af_sky", "af_sarah", "am_adam", "af_river", "am_michael"]
@@ -329,7 +343,9 @@ def select_best_voice(provider: str, available_voices: Optional[List[str]] = Non
     """Select the best available voice (compatibility function)."""
     if available_voices is None:
         # Get from registry if possible
-        if provider == "kokoro":
+        if provider in ["supertonic-express", "supertonic"]:
+            available_voices = ["F1", "F2", "F3", "F4", "F5", "M1", "M2", "M3", "M4", "M5"]
+        elif provider == "kokoro":
             available_voices = ["af_sky", "af_sarah", "am_adam", "af_river", "am_michael"]
         else:
             available_voices = ["alloy", "nova", "echo", "fable", "onyx", "shimmer"]

@@ -229,4 +229,4 @@ def bidirectional_relay(worker_outbox, worker_inbox):
 
 - **[Handoff](./handoff.md)**: Direct voice transfer between agents
 - **[Call Routing Overview](./README.md)**: All routing patterns
-- **[Voicemail](./voicemail.md)**: Async message passing (planned)
+- **Voicemail**: Async message passing (planned)

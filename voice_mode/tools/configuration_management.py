@@ -203,14 +203,14 @@ def write_env_file(file_path: Path, config: Dict[str, str], preserve_comments: b
         other_keys = sorted([k for k in new_keys if not k.startswith('VOICEMODE_WHISPER_') and not k.startswith('VOICEMODE_KOKORO_')])
         
         if whisper_keys:
-            existing_lines.append("# Whisper Configuration\n")
+            existing_lines.append("# Legacy Whisper Configuration\n")
             for key in whisper_keys:
                 formatted_value = _format_env_value(config[key])
                 existing_lines.append(f"{key}={formatted_value}\n")
             existing_lines.append('\n')
 
         if kokoro_keys:
-            existing_lines.append("# Kokoro Configuration\n")
+            existing_lines.append("# Legacy Kokoro Configuration\n")
             for key in kokoro_keys:
                 formatted_value = _format_env_value(config[key])
                 existing_lines.append(f"{key}={formatted_value}\n")
@@ -311,19 +311,26 @@ async def list_config_keys() -> str:
             ("VOICEMODE_TTS_MODELS", "Comma-separated list of preferred models"),
             ("VOICEMODE_PREFER_LOCAL", "Prefer local providers over cloud (true/false)"),
             ("VOICEMODE_ALWAYS_TRY_LOCAL", "Always attempt local providers (true/false)"),
-            ("VOICEMODE_AUTO_START_KOKORO", "Auto-start Kokoro service (true/false)"),
+            ("VOICEMODE_AUTO_START_KOKORO", "Auto-start legacy Kokoro service (true/false)"),
         ]),
-        ("Whisper Configuration", [
-            ("VOICEMODE_WHISPER_MODEL", "Whisper model to use (e.g., large-v2)"),
-            ("VOICEMODE_WHISPER_PORT", "Whisper server port (default: 2022)"),
-            ("VOICEMODE_WHISPER_LANGUAGE", "Language for transcription (default: auto)"),
-            ("VOICEMODE_WHISPER_MODEL_PATH", "Path to Whisper models"),
+        ("Local Service Configuration", [
+            ("VOICEMODE_LOCAL_TTS_PORT", "Supertonic Express port (default: 8880)"),
+            ("VOICEMODE_LOCAL_TTS_DIR", "Supertonic Express service directory"),
+            ("VOICEMODE_LOCAL_STT_PORT", "Parakeet service port (default: 5092)"),
+            ("VOICEMODE_LOCAL_STT_DIR", "Parakeet service directory"),
+            ("VOICEMODE_STT_MODEL", "Parakeet STT model (default: parakeet-tdt-0.6b-v3)"),
         ]),
-        ("Kokoro Configuration", [
-            ("VOICEMODE_KOKORO_PORT", "Kokoro server port (default: 8880)"),
-            ("VOICEMODE_KOKORO_MODELS_DIR", "Directory for Kokoro models"),
-            ("VOICEMODE_KOKORO_CACHE_DIR", "Directory for Kokoro cache"),
-            ("VOICEMODE_KOKORO_DEFAULT_VOICE", "Default Kokoro voice (e.g., af_sky)"),
+        ("Legacy Whisper Configuration", [
+            ("VOICEMODE_WHISPER_MODEL", "Legacy Whisper model to use (e.g., large-v2)"),
+            ("VOICEMODE_WHISPER_PORT", "Legacy Whisper server port (default: 2022)"),
+            ("VOICEMODE_WHISPER_LANGUAGE", "Legacy Whisper language for transcription (default: auto)"),
+            ("VOICEMODE_WHISPER_MODEL_PATH", "Path to legacy Whisper models"),
+        ]),
+        ("Legacy Kokoro Configuration", [
+            ("VOICEMODE_KOKORO_PORT", "Legacy Kokoro server port (default: 8880)"),
+            ("VOICEMODE_KOKORO_MODELS_DIR", "Directory for legacy Kokoro models"),
+            ("VOICEMODE_KOKORO_CACHE_DIR", "Directory for legacy Kokoro cache"),
+            ("VOICEMODE_KOKORO_DEFAULT_VOICE", "Default legacy Kokoro voice (e.g., af_sky)"),
         ]),
         ("API Keys", [
             ("OPENAI_API_KEY", "OpenAI API key for cloud TTS/STT"),
@@ -340,7 +347,7 @@ async def list_config_keys() -> str:
             lines.append(f"    {description}")
         lines.append("")
     
-    lines.append("💡 Usage: update_config(key='VOICEMODE_VOICES', value='af_sky,nova')")
+    lines.append("💡 Usage: update_config(key='VOICEMODE_VOICES', value='F1,M1,nova')")
     
     return "\n".join(lines)
 

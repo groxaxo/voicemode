@@ -148,7 +148,7 @@ def load_voicemode_env():
 # VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1
 # VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3
 
-# STT prompt for vocabulary biasing - helps Whisper recognize names and technical terms
+# STT prompt for vocabulary biasing - helps local STT recognize names and technical terms
 # Use when specific words are consistently misrecognized
 # Example: VOICEMODE_STT_PROMPT=tmux, Tali, kubectl, VoiceMode
 # VOICEMODE_STT_PROMPT=
@@ -165,14 +165,14 @@ def load_voicemode_env():
 # Always attempt local providers (true/false)
 # VOICEMODE_ALWAYS_TRY_LOCAL=true
 
-# Auto-start Kokoro service (true/false)
+# Auto-start legacy Kokoro service (true/false)
 # VOICEMODE_AUTO_START_KOKORO=false
 
 #############
-# Whisper Configuration
+# Legacy Whisper Configuration
 #############
 
-# Whisper model to use (tiny, base, small, medium, large, large-v2, large-v3)
+# Legacy Whisper model to use (tiny, base, small, medium, large, large-v2, large-v3)
 # VOICEMODE_WHISPER_MODEL=base
 
 # Whisper server port (default: 2022)
@@ -667,8 +667,7 @@ KOKORO_MAX_REQUESTS = int(os.getenv("VOICEMODE_KOKORO_MAX_REQUESTS", "25"))
 
 # ==================== MLX-AUDIO SERVICE CONFIGURATION ====================
 
-# mlx-audio is the unified Whisper STT + Kokoro TTS + Qwen3-TTS
-# clone-voice service used on Apple Silicon. The launchd plist /
+# mlx-audio is the Apple Silicon clone-voice service. The launchd plist /
 # systemd unit reads VOICEMODE_MLX_AUDIO_HOST / VOICEMODE_MLX_AUDIO_PORT
 # from voicemode.env so changes here are picked up at next service start.
 MLX_AUDIO_HOST = os.getenv("VOICEMODE_MLX_AUDIO_HOST", "127.0.0.1")

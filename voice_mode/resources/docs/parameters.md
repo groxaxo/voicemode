@@ -47,20 +47,19 @@ Override TTS voice selection.
 
 **Examples:**
 - OpenAI: nova, shimmer, alloy, echo, fable, onyx
-- Kokoro: af_sky, af_sarah, am_adam, ef_dora, etc.
+- Supertonic Express: F1, F2, F3, F4, F5, M1, M2, M3, M4, M5
 
 **Important:** Never use 'coral' voice.
 
 ### tts_provider
-**Type:** "openai" | "kokoro" (optional)
+**Type:** "openai" | "supertonic-express" | "kokoro" (optional)
 TTS provider selection.
 
 **When to specify:**
 - User explicitly requests provider
 - Failover testing
-- Non-English languages (usually kokoro)
 
-**Usually:** Let system auto-select.
+**Usually:** Let system auto-select. `kokoro` is retained for legacy configs; new local installs use Supertonic Express.
 
 ### tts_model
 **Type:** string (optional)
@@ -101,7 +100,7 @@ Speech playback rate.
 - 1.5 = 1.5x speed
 - 2.0 = double speed
 
-**Supported by:** Both OpenAI and Kokoro
+**Supported by:** OpenAI and local OpenAI-compatible TTS providers
 
 ## Audio & Silence Detection
 
@@ -152,11 +151,11 @@ Time to add after audio chime ends.
 ### VOICEMODE_STT_PROMPT
 **Type:** environment variable (string, optional)
 
-Bias Whisper's speech recognition toward specific words and names using a prompt hint. This helps improve recognition of technical terms, proper names, and domain-specific vocabulary that Whisper might otherwise mishear.
+Bias speech recognition toward specific words and names using a prompt hint. This helps improve recognition of technical terms, proper names, and domain-specific vocabulary that the STT provider might otherwise mishear.
 
 **How it works:**
 
-Whisper uses a "prompt" field to condition its recognition. By providing words and phrases you frequently use, the model is primed to hear them correctly. This is especially useful for:
+OpenAI-compatible STT services can use a `prompt` field to condition recognition. By providing words and phrases you frequently use, the model is primed to hear them correctly. This is especially useful for:
 
 - **Names**: People, pets, places (Tali, Mike, Brisbane)
 - **Technical terms**: Command names, tools (tmux, kubectl, pytest)
@@ -191,14 +190,14 @@ export VOICEMODE_STT_PROMPT="tmux, neovim, Tali, Brisbane, taskmaster"
 
 **Token limit:**
 
-Whisper uses the last 224 tokens of the prompt. In practice, this means:
+Some STT providers only use the final portion of the prompt. In practice, this means:
 - Short word lists: No problem (most use cases)
 - Long prompts: Only the end matters, so put important words last
 - Typical vocabulary: 50-100 words fits easily within the limit
 
 **When to use:**
 
-- Whisper consistently mishears specific words
+- STT consistently mishears specific words
 - You use unusual names or technical jargon
 - Domain-specific vocabulary isn't recognized
 
@@ -259,7 +258,7 @@ LiveKit room name.
 ## Endpoint Requirements
 
 STT/TTS services must expose OpenAI-compatible endpoints:
-- Whisper/Kokoro must serve on:
+- Parakeet/Supertonic Express must serve on:
   - `/v1/audio/transcriptions` (STT)
   - `/v1/audio/speech` (TTS)
 

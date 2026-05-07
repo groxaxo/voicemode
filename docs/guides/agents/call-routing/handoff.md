@@ -262,15 +262,15 @@ echo "VOICEMODE_TTS_VOICE=onyx" > .voicemode
 
 **Via converse parameter:**
 ```python
-voicemode:converse("Hello!", voice="alloy", tts_provider="kokoro")
+voicemode:converse("Hello!", voice="F1", tts_provider="supertonic-express")
 ```
 
 ### Voice Fallback Chain
 
 VoiceMode uses `VOICEMODE_VOICES` for fallback:
 ```bash
-# Try Kokoro's af_alloy first, fall back to OpenAI's alloy
-export VOICEMODE_VOICES=af_alloy,alloy
+# Try Supertonic first, fall back to OpenAI's alloy
+export VOICEMODE_VOICES=F1,alloy
 ```
 
 ## Troubleshooting
@@ -278,18 +278,18 @@ export VOICEMODE_VOICES=af_alloy,alloy
 ### New Agent Doesn't Speak
 
 1. **Check skill loaded**: Look for "Successfully loaded skill" in output
-2. **Verify services**: `voicemode:service("whisper", "status")`
+2. **Verify services**: `voicemode status`
 3. **Check prompt**: Ensure instructions say to use converse
 
 ### Audio Conflicts
 
 1. **Multiple agents speaking**: Only one should have converse active
 2. **Check for competing calls**: Search output for "converse" calls
-3. **Use The Conch**: See [multi-agent coordination](./coordination.md)
+3. **Use The Conch**: Follow the planned multi-agent coordination pattern
 
 ### User Can't Hear New Agent
 
-1. **Check TTS service**: `voicemode:service("kokoro", "status")`
+1. **Check TTS service**: `curl http://127.0.0.1:8880/health`
 2. **Verify audio output**: Same device as before handoff?
 3. **Check voice setting**: Is the voice available?
 
@@ -312,7 +312,6 @@ export VOICEMODE_VOICES=af_alloy,alloy
 
 - **[Call Routing Overview](./README.md)**: All routing patterns
 - **[Voice Proxy](./proxy.md)**: Relay for agents without voice
-- **[Multi-Agent Coordination](./coordination.md)**: The Conch lock system (planned)
-- **[Call Waiting](./call-waiting.md)**: Handling multiple waiting agents (planned)
-- **[Voicemail](./voicemail.md)**: Async message passing (planned)
-
+- **Multi-Agent Coordination**: The Conch lock system (planned)
+- **Call Waiting**: Handling multiple waiting agents (planned)
+- **Voicemail**: Async message passing (planned)

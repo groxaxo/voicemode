@@ -47,20 +47,19 @@ Override TTS voice selection.
 
 **Examples:**
 - OpenAI: nova, shimmer, alloy, echo, fable, onyx
-- Kokoro: af_sky, af_sarah, am_adam, ef_dora, etc.
+- Supertonic Express: F1, F2, F3, F4, F5, M1, M2, M3, M4, M5
 
 **Important:** Never use 'coral' voice.
 
 ### tts_provider
-**Type:** "openai" | "kokoro" (optional)
+**Type:** "openai" | "supertonic-express" | "kokoro" (optional)
 TTS provider selection.
 
 **When to specify:**
 - User explicitly requests provider
 - Failover testing
-- Non-English languages (usually kokoro)
 
-**Usually:** Let system auto-select.
+**Usually:** Let system auto-select. `kokoro` is retained for legacy configs; new local installs use Supertonic Express.
 
 ### tts_model
 **Type:** string (optional)
@@ -101,7 +100,7 @@ Speech playback rate.
 - 1.5 = 1.5x speed
 - 2.0 = double speed
 
-**Supported by:** Both OpenAI and Kokoro
+**Supported by:** OpenAI and local OpenAI-compatible TTS providers
 
 ## Audio & Silence Detection
 
@@ -192,10 +191,12 @@ VOICEMODE_DEBUG=true
 If STT fails but audio was recorded, manually transcribe:
 
 ```bash
-whisper-cli ~/.voicemode/audio/latest-STT.wav
+curl -s http://127.0.0.1:5092/v1/audio/transcriptions \
+  -F model=parakeet-tdt-0.6b-v3 \
+  -F file=@~/.voicemode/audio/latest-STT.wav
 ```
 
-See [STT Recovery](../../.claude/skills/voicemode/SKILL.md#stt-recovery---manual-transcription) and [Troubleshooting - No Speech Detected](../../troubleshooting/index.md#1-no-speech-detected) for details.
+See [STT Recovery](https://github.com/mbailey/voicemode/blob/main/.claude/skills/voicemode/SKILL.md#stt-recovery---manual-transcription) and [Troubleshooting - No Speech Detected](../troubleshooting/index.md#1-no-speech-detected) for details.
 
 ### chime_enabled
 **Type:** boolean | string (optional)
@@ -220,7 +221,7 @@ Skip text-to-speech, show text only.
 ## Endpoint Requirements
 
 STT/TTS services must expose OpenAI-compatible endpoints:
-- Whisper/Kokoro must serve on:
+- Parakeet/Supertonic Express must serve on:
   - `/v1/audio/transcriptions` (STT)
   - `/v1/audio/speech` (TTS)
 

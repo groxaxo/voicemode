@@ -37,7 +37,7 @@ DEFAULT_CLONE_MODEL = CLONE_MODEL
 
 # Legacy single-URL STT endpoint. Kept for backwards reference only --
 # _transcribe_audio() now walks voice_mode.config.STT_BASE_URLS instead.
-WHISPER_STT_URL = "http://localhost:2022/v1/audio/transcriptions"
+LEGACY_STT_URL = "http://localhost:2022/v1/audio/transcriptions"
 
 
 def _load_voices_json() -> Dict[str, Any]:
@@ -135,7 +135,7 @@ def _transcribe_audio(audio_path: Path) -> str:
     body_parts.append(f"--{boundary}".encode())
     body_parts.append(b'Content-Disposition: form-data; name="model"')
     body_parts.append(b"")
-    body_parts.append(b"whisper-1")
+    body_parts.append(str(getattr(_vm_config, "STT_MODEL", "parakeet-tdt-0.6b-v3")).encode())
 
     # Closing boundary
     body_parts.append(f"--{boundary}--".encode())
@@ -296,14 +296,14 @@ async def clone_add(
     """Add a new voice profile from a reference audio clip.
 
     Copies the audio file to ~/.voicemode/voices/<name>.wav and
-    auto-transcribes it via the local Whisper STT service unless
+    auto-transcribes it via the configured local STT service unless
     ref_text is provided explicitly.
 
     Args:
         name: Voice profile name (lowercase, no spaces recommended).
         audio_file: Path to the reference audio file (WAV preferred).
         description: Human-readable description of the voice.
-        ref_text: Transcript of the reference audio. If None, auto-transcribes via Whisper.
+        ref_text: Transcript of the reference audio. If None, auto-transcribes via configured STT.
         model: TTS model override. Defaults to CLONE_MODEL from config.
         base_url: TTS endpoint override. Defaults to DEFAULT_CLONE_BASE_URL.
 
@@ -379,8 +379,7 @@ async def clone_add(
                 "success": False,
                 "error": str(e),
                 "hint": (
-                    "Install an STT service (e.g. 'voicemode whisper service install' "
-                    "or 'voicemode mlx-audio service install'), or configure "
+                    "Start Parakeet at http://127.0.0.1:5092/v1, or configure "
                     "VOICEMODE_STT_BASE_URLS to point at an existing endpoint."
                 ),
             }

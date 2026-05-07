@@ -54,7 +54,7 @@ The questions and confusions noted here reflect **genuine user experience** when
 ## TTS Parameters
 
 ### ✅ Good as-is
-- `tts_provider` - Clear (openai, kokoro)
+- `tts_provider` - Clear (openai, supertonic-express; kokoro legacy)
 - `tts_model` - Clear
 - `tts_instructions` - Clear purpose
 

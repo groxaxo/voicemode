@@ -430,8 +430,8 @@ curl https://your-machine.tail12345.ts.net/mcp
 **Symptom**: VoiceMode connects but voice tools fail.
 
 **Solutions**:
-1. Ensure Whisper and Kokoro services are running on the server
-2. Check service status: `voicemode whisper status` and `voicemode kokoro status`
+1. Ensure Supertonic Express and Parakeet are running on the server
+2. Check local health: `curl http://127.0.0.1:8880/health` and `curl http://127.0.0.1:5092/health`
 3. Services must run on the same machine as `voicemode serve`
 
 ## Environment Variables

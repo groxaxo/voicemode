@@ -80,6 +80,45 @@ def test_codex_integration_is_idempotent():
     assert second.path.read_text() == content
 
 
+def test_codex_integration_replaces_unmanaged_legacy_block():
+    integrations = load_integrations_module()
+
+    config_path = Path.home() / ".codex" / "config.toml"
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    config_path.write_text(
+        """model = "gpt-5"
+
+[mcp_servers.voicemode]
+command = "uvx"
+args = ["voice-mode"]
+
+[mcp_servers.voicemode.env]
+VOICEMODE_TTS_BASE_URLS = "http://localhost:8880/v1"
+VOICEMODE_STT_BASE_URLS = "http://localhost:2022/v1"
+
+[mcp_servers.voicemode.tools.converse]
+approval_mode = "approve"
+
+[plugins.github]
+enabled = true
+"""
+    )
+
+    result = integrations.install_codex_integration()
+    updated_text = result.path.read_text()
+
+    assert result.changed is True
+    assert 'command = "uvx"' not in updated_text
+    assert "http://localhost:2022/v1" not in updated_text
+    assert updated_text.count("[mcp_servers.voicemode]\n") == 1
+    assert updated_text.count("[mcp_servers.voicemode.env]\n") == 1
+    assert "[mcp_servers.voicemode.tools.converse]" in updated_text
+    assert 'approval_mode = "approve"' in updated_text
+    assert "[plugins.github]" in updated_text
+    assert integrations.CODEX_BLOCK_START in updated_text
+    assert 'VOICEMODE_STT_BASE_URLS = "http://127.0.0.1:5092/v1"' in updated_text
+
+
 def test_opencode_integration_merges_existing_jsonc():
     integrations = load_integrations_module()
 

@@ -24,7 +24,7 @@ That's it! Voice conversations and service management now work without prompts.
 | Permission | What It Does |
 |------------|--------------|
 | `mcp__voicemode__converse` | Voice conversations (speak and listen) |
-| `mcp__voicemode__service` | Start/stop Whisper and Kokoro services |
+| `mcp__voicemode__service` | Manage supported local voice services |
 
 ## Permission Levels
 
@@ -171,21 +171,21 @@ Or delete the permissions block entirely.
 | Tool | Capabilities |
 |------|--------------|
 | `converse` | Records audio from microphone, plays audio through speakers |
-| `service` | Starts/stops background processes for Whisper and Kokoro |
+| `service` | Starts/stops supported background service processes |
 
 ### What Requires Manual Approval
 
 These tools always prompt (not included in recommendations):
 
-- `whisper_install` / `whisper_uninstall` - Downloads and compiles software
-- `kokoro_install` / `kokoro_uninstall` - Downloads and installs Python packages
-- `whisper_model_install` - Downloads large model files (100MB-3GB)
+- Legacy `whisper_install` / `whisper_uninstall` - Downloads and compiles software
+- Legacy `kokoro_install` / `kokoro_uninstall` - Downloads and installs Python packages
+- Legacy `whisper_model_install` - Downloads large model files (100MB-3GB)
 
 ### Privacy
 
-- Audio is processed locally by Whisper (speech-to-text)
+- Audio is processed locally by Parakeet (speech-to-text) and Supertonic Express (text-to-speech)
 - No audio is sent to external servers unless you configure OpenAI as a provider
-- See [Privacy documentation](../reference/privacy.md) for details
+- Review this file's permission examples before enabling tools for shared projects
 
 ## Project vs Global Settings
 
@@ -201,4 +201,4 @@ Settings merge: global → project → local (local wins).
 
 - [Getting Started](../tutorials/getting-started.md) - Installation guide
 - [Configuration](configuration.md) - VoiceMode settings
-- [Troubleshooting](../reference/troubleshooting.md) - Common issues
+- [Troubleshooting](../troubleshooting/index.md) - Common issues

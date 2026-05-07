@@ -35,16 +35,15 @@ The plugin requires VoiceMode services to be installed and running. After instal
 
 This runs the VoiceMode installer which sets up:
 
-- **Whisper.cpp** - Local speech-to-text
-- **Kokoro** - Local text-to-speech
+- **Parakeet TDT** - Local speech-to-text endpoint at `http://127.0.0.1:5092/v1`
+- **Supertonic Express** - Local text-to-speech endpoint at `http://127.0.0.1:8880/v1`
 - **FFmpeg** - Audio processing (via Homebrew on macOS)
 
 Or install VoiceMode directly using uv:
 
 ```bash
 uv tool install voice-mode
-voicemode whisper service install
-voicemode kokoro install
+voice-mode-install --integrations claude
 ```
 
 ## Slash Commands
@@ -73,7 +72,7 @@ voicemode kokoro install
 /voicemode:status
 ```
 
-Shows whether Whisper (STT) and Kokoro (TTS) services are running and healthy.
+Shows whether Parakeet (STT) and Supertonic Express (TTS) services are reachable and healthy.
 
 ## MCP Tools
 
@@ -112,26 +111,26 @@ See the [Soundfonts Guide](soundfonts.md) for customization, sound lookup order,
 Check individual service status:
 
 ```bash
-voicemode whisper service status
-voicemode kokoro service status
+voicemode status
+curl http://127.0.0.1:5092/health
+curl http://127.0.0.1:8880/health
 ```
 
 View logs:
 
 ```bash
-voicemode whisper service logs
-voicemode kokoro service logs
+voicemode logs --tail 50
 ```
 
 ### No Audio Output
 
 1. Ensure your system audio is working
-2. Check that Kokoro service is running
+2. Check that Supertonic Express is running
 3. Verify FFmpeg is installed: `which ffmpeg`
 
 ### Speech Not Recognized
 
-1. Ensure Whisper service is running
+1. Ensure Parakeet is running
 2. Check microphone permissions for Terminal/Claude Code
 3. Try speaking more clearly or adjusting VAD aggressiveness
 
@@ -140,14 +139,15 @@ voicemode kokoro service logs
 VoiceMode respects configuration from `~/.voicemode/voicemode.env`:
 
 ```bash
-# Default TTS voice
-VOICEMODE_TTS_VOICE=nova
+# Default local TTS voice
+VOICEMODE_TTS_VOICE=F1
 
-# Whisper model (base, small, medium, large)
-VOICEMODE_WHISPER_MODEL=base
+# Local STT endpoint and model
+VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1
+VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3
 
-# Override thread count for Whisper
-VOICEMODE_WHISPER_THREADS=4
+# Local TTS endpoint
+VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1
 ```
 
 Edit configuration:

@@ -87,15 +87,15 @@ class TestTTSErrorHandling:
 
             success, metrics, config = await simple_tts_failover(
                 text="Hello world",
-                voice="af_sky",
+                voice="F1",
                 model="tts-1"
             )
 
             assert success is True
             assert metrics == {'duration': 1.5}
-            assert config['provider'] == 'kokoro'
+            assert config['provider'] == 'supertonic-express'
             assert config['endpoint'] == 'http://localhost:8880/v1/audio/speech'
-            assert config['voice'] == 'af_sky'
+            assert config['voice'] == 'F1'
 
     @pytest.mark.asyncio
     async def test_fallback_to_openai(self):
@@ -130,17 +130,17 @@ class TestTTSErrorHandling:
             # Simulate successful TTS
             mock_tts.return_value = (True, {})
 
-            # Try with a Kokoro voice that should be mapped to OpenAI
+            # Try with a local voice that should be mapped to OpenAI
             success, metrics, config = await simple_tts_failover(
                 text="Test",
-                voice="af_sky",  # Kokoro voice
+                voice="F1",
                 model="tts-1"
             )
 
-            # Check that af_sky was mapped to nova for OpenAI
+            # Check that F1 was mapped to nova for OpenAI
             mock_tts.assert_called_once()
             call_args = mock_tts.call_args
-            assert call_args[1]['tts_voice'] == 'nova'  # af_sky maps to nova
+            assert call_args[1]['tts_voice'] == 'nova'
 
     @pytest.mark.asyncio
     async def test_detailed_error_info(self):
@@ -166,7 +166,7 @@ class TestTTSErrorHandling:
 
             # Check first endpoint error details
             endpoint1 = config['attempted_endpoints'][0]
-            assert endpoint1['provider'] == 'kokoro'
+            assert endpoint1['provider'] == 'supertonic-express'
             assert endpoint1['voice'] == 'nova'
             assert endpoint1['model'] == 'tts-1-hd'
             assert '404 Not Found' in endpoint1['error']

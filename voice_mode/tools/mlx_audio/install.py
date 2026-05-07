@@ -2,7 +2,7 @@
 
 mlx-audio is a single Python server that exposes OpenAI-compatible
 ``/v1/audio/transcriptions`` and ``/v1/audio/speech`` endpoints, backed
-by MLX models for Whisper STT, Kokoro TTS, and Qwen3-TTS clone-voice.
+by MLX speech and voice models plus Qwen3-TTS clone-voice.
 
 Install layout::
 
@@ -14,8 +14,8 @@ The install pipeline is:
 1. Apple Silicon gate -- mlx-audio is MLX-native, no Intel/Linux fallback.
 2. ``uv tool install mlx-audio>=0.4.3 --with <extras>`` -- the extras list
    is hardcoded in :data:`MLX_AUDIO_EXTRAS` and is the minimum surface
-   needed to make the upstream server.py serve Kokoro TTS, Qwen3-TTS
-   clone-voice, and Whisper STT under the OpenAI-compatible API. The
+   needed to make the upstream server.py serve TTS, Qwen3-TTS
+   clone-voice, and STT under the OpenAI-compatible API. The
    ``>=0.4.3`` floor exists because that's the first release that absorbed
    the MLX Metal thread-safety serialisation lock. (See VM-1108.)
 3. Apply the bundled ``mlx_audio_server.patch`` to add OpenAI-style STT
@@ -399,7 +399,7 @@ async def mlx_audio_install(
             "success": False,
             "error": (
                 "mlx-audio requires Apple Silicon (macOS arm64). "
-                "On Intel macOS or Linux, keep using whisper.cpp + kokoro-fastapi."
+                "On Intel macOS or Linux, use Parakeet and Supertonic Express."
             ),
             "platform": f"{platform.system()} {platform.machine()}",
         }

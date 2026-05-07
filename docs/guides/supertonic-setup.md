@@ -1,6 +1,6 @@
 # Supertonic Express TTS
 
-VoiceMode can use Supertonic Express as a local OpenAI-compatible text-to-speech endpoint.
+VoiceMode uses Supertonic Express as the default local OpenAI-compatible text-to-speech endpoint.
 
 On this machine the service is expected at:
 
@@ -26,4 +26,4 @@ curl http://127.0.0.1:8880/health
 curl http://127.0.0.1:8880/v1/audio/voices
 ```
 
-VoiceMode sends standard OpenAI `/v1/audio/speech` requests, so Supertonic works as the local TTS provider.
+VoiceMode sends standard OpenAI `/v1/audio/speech` requests, so Supertonic works as the local TTS provider. For a complete local stack, pair it with Parakeet TDT at `http://127.0.0.1:5092/v1`.

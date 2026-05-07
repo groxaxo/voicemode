@@ -257,16 +257,15 @@
                 listen_for_speech() <span class="comment"># Listen and convert to text</span><br>
                 check_room_status() <span class="comment"># Check LiveKit room status</span><br>
                 check_audio_devices() <span class="comment"># List audio devices</span><br>
-                start_kokoro()      <span class="comment"># Start local TTS service</span><br>
-                stop_kokoro()       <span class="comment"># Stop local TTS service</span><br>
-                kokoro_status()     <span class="comment"># Check Kokoro TTS status</span>
+                voice_status()      <span class="comment"># Check local voice services</span><br>
+                providers()         <span class="comment"># Inspect STT/TTS endpoints</span>
             </div>
 
             <div class="code-block">
                 <span class="comment"># Optional configuration</span><br>
-                <span class="command">STT_BASE_URL</span>=http://127.0.0.1:2022/v1  <span class="comment"># Local Whisper</span><br>
-                <span class="command">TTS_BASE_URL</span>=http://127.0.0.1:8880/v1  <span class="comment"># Local TTS</span><br>
-                <span class="command">TTS_VOICE</span>=alloy                        <span class="comment"># Voice selection</span><br>
+                <span class="command">STT_BASE_URL</span>=http://127.0.0.1:5092/v1  <span class="comment"># Local Parakeet</span><br>
+                <span class="command">TTS_BASE_URL</span>=http://127.0.0.1:8880/v1  <span class="comment"># Local Supertonic</span><br>
+                <span class="command">TTS_VOICE</span>=F1                           <span class="comment"># Voice selection</span><br>
                 <span class="command">VOICE_MODE_DEBUG</span>=true                   <span class="comment"># Enable debug mode</span><br>
                 <span class="command">VOICE_MODE_SAVE_AUDIO</span>=true              <span class="comment"># Save audio files</span>
             </div>

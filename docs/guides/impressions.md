@@ -74,7 +74,7 @@ From the CLI:
 voicemode converse --voice fleabag
 ```
 
-VoiceMode automatically routes any voice name that matches a profile in `VOICEMODE_VOICES_DIR` to the mlx-audio service instead of Kokoro / OpenAI.
+VoiceMode automatically routes any voice name that matches a profile in `VOICEMODE_VOICES_DIR` to the mlx-audio service instead of Supertonic Express / OpenAI.
 
 ## Picking a good reference clip
 
@@ -85,17 +85,17 @@ The model copies what it hears. Garbage in, garbage out.
 - **Conversational delivery** — natural prosody outperforms read-aloud.
 - **WAV preferred**, but anything FFmpeg can decode works.
 
-For deeper guidance on ranking samples (mlx-whisper word-timestamp ranker, `ffmpeg loudnorm` recipes), see the [Impressions skill](../../.claude/skills/impressions/docs/finding-samples.md).
+For deeper guidance on ranking samples (word-timestamp rankers, `ffmpeg loudnorm` recipes), see the [Impressions skill](https://github.com/mbailey/voicemode/blob/main/.claude/skills/impressions/docs/finding-samples.md).
 
 ## Footguns
 
-### Voice name collisions with Kokoro
+### Voice name collisions with local TTS
 
-Kokoro voices live in a flat namespace (`af_sky`, `am_michael`, `bf_emma`, …). If you create `~/.voicemode/voices/af_sky/`, **your impression profile shadows the Kokoro voice with the same name** — the next `voice="af_sky"` call routes to mlx-audio, not Kokoro. Pick distinctive names (`fleabag`, `mike-2026`, `bryan_morning`) to avoid surprises.
+Supertonic voices live in a flat namespace (`F1`, `F2`, `M1`, ...). If you create `~/.voicemode/voices/F1/`, **your impression profile shadows the Supertonic voice with the same name** -- the next `voice="F1"` call routes to mlx-audio, not Supertonic. Pick distinctive names (`fleabag`, `mike-2026`, `bryan_morning`) to avoid surprises.
 
 ### Apple Silicon only
 
-`mlx-audio` requires MLX, which is Apple-Silicon-only. There is no fallback path on Intel Macs, Linux, or Windows. If the service install fails on a non-supported platform, impressions are simply unavailable on that machine — Kokoro and OpenAI TTS continue to work as normal.
+`mlx-audio` requires MLX, which is Apple-Silicon-only. There is no fallback path on Intel Macs, Linux, or Windows. If the service install fails on a non-supported platform, impressions are simply unavailable on that machine -- Supertonic Express and OpenAI TTS continue to work as normal.
 
 ### First synthesis is slow
 
@@ -158,13 +158,13 @@ mlx-audio exposes an OpenAI-compatible `/v1/audio/speech` endpoint with two extr
   "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16",
   "input": "Text to speak",
   "ref_audio": "/path/to/voices/fleabag/default.wav",
-  "ref_text": "(auto-transcribed via local Whisper, or provided explicitly)"
+  "ref_text": "(auto-transcribed via local Parakeet, or provided explicitly)"
 }
 ```
 
 ## See also
 
-- [Impressions skill](../../.claude/skills/impressions/SKILL.md) — agent-facing reference for adding voices and troubleshooting on demand.
-- [Setup deep-dive](../../.claude/skills/impressions/docs/setup.md) — model quants, remote mlx-audio config, install troubleshooting.
-- [Finding good samples](../../.claude/skills/impressions/docs/finding-samples.md) — ranking heuristics, ffmpeg recipes, voice-lab tooling.
+- [Impressions skill](https://github.com/mbailey/voicemode/blob/main/.claude/skills/impressions/SKILL.md) — agent-facing reference for adding voices and troubleshooting on demand.
+- [Setup deep-dive](https://github.com/mbailey/voicemode/blob/main/.claude/skills/impressions/docs/setup.md) — model quants, remote mlx-audio config, install troubleshooting.
+- [Finding good samples](https://github.com/mbailey/voicemode/blob/main/.claude/skills/impressions/docs/finding-samples.md) — ranking heuristics, ffmpeg recipes, voice-lab tooling.
 - [voice-lab](https://github.com/mbailey/voice-lab) — companion repo for curating reference clips and personas.

@@ -41,7 +41,7 @@ This glossary defines key terms and concepts used throughout the Voice Mode proj
 
 **Prompt**: Pre-written instructions that help guide AI assistants in using MCP tools effectively.
 
-**Provider**: A service that provides TTS (text-to-speech) or STT (speech-to-text) capabilities. Examples: OpenAI, Kokoro, Whisper.
+**Provider**: A service that provides TTS (text-to-speech) or STT (speech-to-text) capabilities. Examples: OpenAI, Supertonic Express, Parakeet.
 
 **MCP Server**: A program that provides tools and resources via MCP. Voice Mode is an MCP server that provides voice interaction capabilities.
 

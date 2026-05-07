@@ -13,7 +13,7 @@ from voice_mode.provider_discovery import ProviderRegistry, is_local_provider, d
 # pin them here regardless of what the developer has in ~/.voicemode/voicemode.env.
 # See VM-1138.
 DEFAULT_TTS_BASE_URLS = [
-    "http://127.0.0.1:8880/v1",      # Kokoro (local TTS)
+    "http://127.0.0.1:8880/v1",      # Supertonic Express (local TTS)
     "https://api.openai.com/v1",     # OpenAI (remote)
 ]
 DEFAULT_STT_BASE_URLS = [
@@ -56,9 +56,9 @@ class TestProviderResilience:
     def test_detect_provider_type(self):
         """Test provider type detection."""
         assert detect_provider_type("https://api.openai.com/v1") == "openai"
-        assert detect_provider_type("http://127.0.0.1:8880/v1") == "kokoro"
+        assert detect_provider_type("http://127.0.0.1:8880/v1") == "supertonic-express"
         assert detect_provider_type("http://127.0.0.1:2022/v1") == "whisper"
-        assert detect_provider_type("http://localhost:8880/v1") == "kokoro"
+        assert detect_provider_type("http://localhost:8880/v1") == "supertonic-express"
         assert detect_provider_type("http://127.0.0.1:9999/v1") == "local"
         assert detect_provider_type("https://api.example.com/v1") == "unknown"
 
@@ -155,7 +155,7 @@ class TestProviderResilience:
     async def test_endpoint_order_maintained(self):
         """Test that endpoint order is maintained regardless of failures."""
         with patch.object(config, 'TTS_BASE_URLS', [
-            "http://127.0.0.1:8880/v1",  # Kokoro (local)
+            "http://127.0.0.1:8880/v1",  # Supertonic Express (local)
             "https://api.openai.com/v1",  # OpenAI (remote)
             "http://127.0.0.1:2022/v1"    # Whisper (local)
         ]):

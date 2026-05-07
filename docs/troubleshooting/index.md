@@ -46,9 +46,11 @@ voicemode:converse("message", listen_duration_min=5.0)
 
 **Manual Recovery:** If audio was saved but STT failed, manually transcribe the recording:
 ```bash
-# Check if recording exists and transcribe it
+# Check if recording exists and transcribe it with local Parakeet
 if [ -f ~/.voicemode/audio/latest-STT.wav ]; then
-  whisper-cli ~/.voicemode/audio/latest-STT.wav
+  curl -s http://127.0.0.1:5092/v1/audio/transcriptions \
+    -F model=parakeet-tdt-0.6b-v3 \
+    -F file=@~/.voicemode/audio/latest-STT.wav
 fi
 ```
 
@@ -68,7 +70,7 @@ This recovery technique allows you to retrieve the transcription without asking 
 
 ### 4. Service Not Available
 **Symptoms:** "Failed to connect to TTS/STT service"
-**Quick Fix:** Check service status with `voicemode whisper status` or `voicemode kokoro status`
+**Quick Fix:** Run `voicemode status` and check `http://127.0.0.1:5092/health` plus `http://127.0.0.1:8880/health`
 
 ### 5. Poor Audio Quality
 **Symptoms:** Garbled or robotic voice output
@@ -88,8 +90,8 @@ This recovery technique allows you to retrieve the transcription without asking 
 
 ### Service Issues
 - **Provider Selection** - Failover and discovery (coming soon)
-- **Whisper Problems** - Local STT service (coming soon)
-- **Kokoro Problems** - Local TTS service (coming soon)
+- **Parakeet Problems** - Local STT service (coming soon)
+- **Supertonic Problems** - Local TTS service (coming soon)
 - **LiveKit Issues** - Room-based communication (coming soon)
 
 ### Audio Device Problems
@@ -122,8 +124,9 @@ voicemode diag info
 voicemode diag devices
 
 # Check service status
-voicemode whisper status
-voicemode kokoro status
+voicemode status
+curl http://127.0.0.1:5092/health
+curl http://127.0.0.1:8880/health
 
 # View recent logs
 voicemode logs --tail 50
@@ -144,7 +147,7 @@ When reporting issues, include:
 |-------|---------|---------|
 | No audio | `voicemode diag devices` | List available audio devices |
 | Test voice | `voicemode converse` | Interactive voice test |
-| Service down | `voicemode whisper status` | Check Whisper service |
+| Service down | `voicemode status` | Check local provider health |
 | API errors | `voicemode config get OPENAI_API_KEY` | Verify API key |
 | Debug mode | `export VOICEMODE_DEBUG=true` | Enable detailed logging |
 

@@ -43,7 +43,7 @@ Key parameters:
 - `--wait/--no-wait`: Whether to wait for response
 - `--duration, -d`: Listen duration
 - `--voice`: TTS voice to use
-- `--tts-provider`: OpenAI or Kokoro
+- `--tts-provider`: OpenAI, Supertonic Express, or legacy Kokoro
 - `--continuous, -c`: Continuous conversation mode
 
 The function creates an async wrapper (line 1690) that calls the actual tool implementation.
@@ -82,8 +82,9 @@ Key functions:
 
 Discovers and manages TTS/STT providers:
 - OpenAI API (cloud)
-- Whisper.cpp (local STT)
-- Kokoro (local TTS)
+- Parakeet TDT (default local STT)
+- Supertonic Express (default local TTS)
+- Whisper.cpp and Kokoro (legacy optional local services)
 - LiveKit (real-time communication)
 
 The provider registry is imported at line 60 of converse.py and used to select the best available provider.

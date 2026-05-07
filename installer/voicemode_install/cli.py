@@ -195,7 +195,7 @@ Examples:
   # Install specific version
   voice-mode-install --voice-mode-version=5.1.3
 
-  # Skip service installation
+  # Skip local service checks
   voice-mode-install --skip-services
 
   # Configure Codex and OpenCode after installation
@@ -218,7 +218,7 @@ Examples:
 @click.command(epilog=EPILOG, context_settings={'help_option_names': ['-h', '--help']})
 @click.option('-d', '--dry-run', is_flag=True, help='Show what would be installed without installing')
 @click.option('-v', '--voice-mode-version', default=None, help='Specific VoiceMode version to install')
-@click.option('-s', '--skip-services', is_flag=True, help='Skip local service installation')
+@click.option('-s', '--skip-services', is_flag=True, help='Skip local service health checks')
 @click.option('--integrations', default='', help='Comma-separated CLIs to configure: codex, opencode, qwen, gemini, all')
 @click.option('--integrations-only', is_flag=True, help='Only configure agent integrations, skip VoiceMode installation')
 @click.option('--no-integrations', is_flag=True, help='Do not autodetect or configure agent CLI integrations')
@@ -239,7 +239,7 @@ def main(dry_run, voice_mode_version, skip_services, integrations, integrations_
 
       4. Install VoiceMode using uv
 
-      5. Optionally install local voice services
+      5. Check local Supertonic Express and Parakeet services
 
       6. Configure shell completions
 
@@ -496,7 +496,7 @@ def main(dry_run, voice_mode_version, skip_services, integrations, integrations_
                     print_warning(f"{service_name} is not reachable yet: {health_url}")
 
             click.echo()
-            click.echo("The installer no longer installs Whisper/Kokoro by default for this local stack.")
+            click.echo("The installer checks these external services and leaves service installation to the local stack.")
 
         integration_results = []
         if integration_targets:

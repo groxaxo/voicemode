@@ -136,7 +136,7 @@ def add(name, audio_file, description, ref_text, model, base_url):
     """Add a clone voice profile from a reference audio clip.
 
     Copies the audio file to ~/.voicemode/voices/ and auto-transcribes it
-    via the local Whisper STT service (unless --ref-text is provided).
+    via the configured local STT service (unless --ref-text is provided).
 
     \b
     Examples:
@@ -246,20 +246,20 @@ def service():
 
     \b
     Services:
-      whisper    Local speech-to-text (STT) on port 2022
-      kokoro     Local text-to-speech (TTS) on port 8880
+      whisper    Legacy local speech-to-text (STT) on port 2022
+      kokoro     Legacy local text-to-speech (TTS) on port 8880
       voicemode  HTTP MCP server for remote access on port 8765
-      mlx-audio  Apple Silicon: unified Whisper + Kokoro + Qwen3-TTS on port 8890
+      mlx-audio  Apple Silicon voice service on port 8890
 
     \b
     Quick Start:
       voicemode service status           # Check all services
-      voicemode service start whisper    # Start Whisper STT
-      voicemode service enable whisper   # Auto-start whisper on login
+      voicemode status                   # Check default local endpoints
+      voicemode service start voicemode  # Start HTTP MCP server
 
     \b
     Service Lifecycle:
-      install  Install service software (whisper, kokoro, mlx-audio)
+      install  Install managed service software (legacy whisper/kokoro, mlx-audio)
       start    Start a service
       stop     Stop a service
       restart  Restart a service
@@ -280,10 +280,10 @@ def service_start(service_name):
 
     \b
     Services:
-      whisper    Local speech-to-text (STT)
-      kokoro     Local text-to-speech (TTS)
+      whisper    Legacy local speech-to-text (STT)
+      kokoro     Legacy local text-to-speech (TTS)
       voicemode  HTTP MCP server for remote access
-      mlx-audio  Apple Silicon: unified Whisper STT + Kokoro TTS + Qwen3-TTS
+      mlx-audio  Apple Silicon voice service
     """
     from voice_mode.tools.service import start_service
     result = asyncio.run(start_service(_normalize_service_name(service_name)))
@@ -298,10 +298,10 @@ def service_stop(service_name):
 
     \b
     Services:
-      whisper    Local speech-to-text (STT)
-      kokoro     Local text-to-speech (TTS)
+      whisper    Legacy local speech-to-text (STT)
+      kokoro     Legacy local text-to-speech (TTS)
       voicemode  HTTP MCP server for remote access
-      mlx-audio  Apple Silicon: unified Whisper STT + Kokoro TTS + Qwen3-TTS
+      mlx-audio  Apple Silicon voice service
     """
     from voice_mode.tools.service import stop_service
     result = asyncio.run(stop_service(_normalize_service_name(service_name)))
@@ -316,10 +316,10 @@ def service_restart(service_name):
 
     \b
     Services:
-      whisper    Local speech-to-text (STT)
-      kokoro     Local text-to-speech (TTS)
+      whisper    Legacy local speech-to-text (STT)
+      kokoro     Legacy local text-to-speech (TTS)
       voicemode  HTTP MCP server for remote access
-      mlx-audio  Apple Silicon: unified Whisper STT + Kokoro TTS + Qwen3-TTS
+      mlx-audio  Apple Silicon voice service
     """
     from voice_mode.tools.service import restart_service
     result = asyncio.run(restart_service(_normalize_service_name(service_name)))
@@ -482,10 +482,10 @@ def service_install(service_name, force):
 
     \b
     Downloads and installs the service software:
-      whisper    whisper.cpp speech-to-text server
-      kokoro     Kokoro text-to-speech server
+      whisper    legacy whisper.cpp speech-to-text server
+      kokoro     legacy Kokoro text-to-speech server
       voicemode  Already installed (enables the HTTP server)
-      mlx-audio  Apple Silicon: unified Whisper STT + Kokoro TTS + Qwen3-TTS
+      mlx-audio  Apple Silicon voice service
 
     \b
     Examples:
@@ -560,24 +560,24 @@ def service_install(service_name, force):
 @voice_mode_main_cli.group(hidden=True)
 @click.help_option('-h', '--help', help='Show this message and exit')
 def kokoro():
-    """Manage Kokoro TTS service. [DEPRECATED: Use 'voicemode service' instead]"""
+    """Manage legacy Kokoro TTS service. [DEPRECATED: Use 'voicemode service' instead]"""
     pass
 
 
 @voice_mode_main_cli.group(hidden=True)
 @click.help_option('-h', '--help', help='Show this message and exit')
 def whisper():
-    """Manage Whisper STT service. [DEPRECATED: Use 'voicemode service' instead]"""
+    """Manage legacy Whisper STT service. [DEPRECATED: Use 'voicemode service' instead]"""
     pass
 
 
 # Service functions are imported lazily in their respective command handlers to improve startup time
 
 
-# Kokoro service commands (deprecated - hidden from help but still functional)
+# Legacy Kokoro service commands (deprecated - hidden from help but still functional)
 @kokoro.command(hidden=True)
 def status():
-    """(Deprecated) Show Kokoro service status. Use 'voicemode service status kokoro' instead."""
+    """(Deprecated) Show legacy Kokoro service status. Use 'voicemode service status kokoro' instead."""
     click.secho("⚠️  Deprecated: Use 'voicemode service status kokoro' instead", fg='yellow', err=True)
     from voice_mode.tools.service import status_service
     result = asyncio.run(status_service("kokoro"))
@@ -586,7 +586,7 @@ def status():
 
 @kokoro.command(hidden=True)
 def start():
-    """(Deprecated) Start Kokoro service. Use 'voicemode service start kokoro' instead."""
+    """(Deprecated) Start legacy Kokoro service. Use 'voicemode service start kokoro' instead."""
     click.secho("⚠️  Deprecated: Use 'voicemode service start kokoro' instead", fg='yellow', err=True)
     from voice_mode.tools.service import start_service
     result = asyncio.run(start_service("kokoro"))
@@ -595,7 +595,7 @@ def start():
 
 @kokoro.command(hidden=True)
 def stop():
-    """(Deprecated) Stop Kokoro service. Use 'voicemode service stop kokoro' instead."""
+    """(Deprecated) Stop legacy Kokoro service. Use 'voicemode service stop kokoro' instead."""
     click.secho("⚠️  Deprecated: Use 'voicemode service stop kokoro' instead", fg='yellow', err=True)
     from voice_mode.tools.service import stop_service
     result = asyncio.run(stop_service("kokoro"))
@@ -604,7 +604,7 @@ def stop():
 
 @kokoro.command(hidden=True)
 def restart():
-    """(Deprecated) Restart Kokoro service. Use 'voicemode service restart kokoro' instead."""
+    """(Deprecated) Restart legacy Kokoro service. Use 'voicemode service restart kokoro' instead."""
     click.secho("⚠️  Deprecated: Use 'voicemode service restart kokoro' instead", fg='yellow', err=True)
     from voice_mode.tools.service import restart_service
     result = asyncio.run(restart_service("kokoro"))
@@ -613,7 +613,7 @@ def restart():
 
 @kokoro.command(hidden=True)
 def enable():
-    """(Deprecated) Enable Kokoro service. Use 'voicemode service enable kokoro' instead."""
+    """(Deprecated) Enable legacy Kokoro service. Use 'voicemode service enable kokoro' instead."""
     click.secho("⚠️  Deprecated: Use 'voicemode service enable kokoro' instead", fg='yellow', err=True)
     from voice_mode.tools.service import enable_service
     result = asyncio.run(enable_service("kokoro"))
@@ -622,7 +622,7 @@ def enable():
 
 @kokoro.command(hidden=True)
 def disable():
-    """(Deprecated) Disable Kokoro service. Use 'voicemode service disable kokoro' instead."""
+    """(Deprecated) Disable legacy Kokoro service. Use 'voicemode service disable kokoro' instead."""
     click.secho("⚠️  Deprecated: Use 'voicemode service disable kokoro' instead", fg='yellow', err=True)
     from voice_mode.tools.service import disable_service
     result = asyncio.run(disable_service("kokoro"))
@@ -1777,8 +1777,8 @@ voice_mode_main_cli.add_command(transcribe_audio_cmd)
 @click.option('--wait/--no-wait', default=True, help='Wait for response after speaking')
 @click.option('--duration', '-d', type=float, default=DEFAULT_LISTEN_DURATION, help='Listen duration in seconds')
 @click.option('--min-duration', type=float, default=MIN_RECORDING_DURATION, help='Minimum listen duration before silence detection')
-@click.option('--voice', help='TTS voice to use (e.g., nova, shimmer, af_sky)')
-@click.option('--tts-provider', type=click.Choice(['openai', 'kokoro']), help='TTS provider')
+@click.option('--voice', help='TTS voice to use (e.g., F1, M1, nova)')
+@click.option('--tts-provider', type=click.Choice(['openai', 'supertonic-express', 'kokoro']), help='TTS provider (kokoro is legacy)')
 @click.option('--tts-model', help='TTS model (e.g., tts-1, tts-1-hd)')
 @click.option('--tts-instructions', help='Tone/style instructions for gpt-4o-mini-tts')
 @click.option('--audio-feedback/--no-audio-feedback', default=None, help='Enable/disable audio feedback')

@@ -301,7 +301,7 @@ def check_whisper_service() -> ServiceInfo:
 
 
 def check_kokoro_service() -> ServiceInfo:
-    """Check the OpenAI-compatible TTS service on the Kokoro/Supertonic port."""
+    """Check the local OpenAI-compatible TTS service."""
     status, proc = check_service_status(KOKORO_PORT)
 
     # Check if installed
@@ -322,7 +322,7 @@ def check_kokoro_service() -> ServiceInfo:
 
     if not is_installed and status not in ("local", "forwarded") and not health_details:
         return ServiceInfo(
-            name="Kokoro/Supertonic",
+            name="Supertonic Express",
             type="tts",
             status=ServiceStatus.NOT_INSTALLED,
             port=KOKORO_PORT,
@@ -330,7 +330,7 @@ def check_kokoro_service() -> ServiceInfo:
         )
 
     if status == "local":
-        details = {"voice": TTS_VOICES[0] if TTS_VOICES else "af_sky"}
+        details = {"voice": TTS_VOICES[0] if TTS_VOICES else "F1"}
         if health_details:
             details.update(health_details)
 
@@ -356,7 +356,7 @@ def check_kokoro_service() -> ServiceInfo:
         except Exception:
             pass
 
-        service_name = (health_details or {}).get("service") or "Kokoro/Supertonic"
+        service_name = (health_details or {}).get("service") or "Supertonic Express"
         return ServiceInfo(
             name=service_name,
             type="tts",
@@ -368,7 +368,7 @@ def check_kokoro_service() -> ServiceInfo:
         )
     elif status == "forwarded":
         return ServiceInfo(
-            name=(health_details or {}).get("service") or "Kokoro/Supertonic",
+            name=(health_details or {}).get("service") or "Supertonic Express",
             type="tts",
             status=ServiceStatus.FORWARDED,
             port=KOKORO_PORT,
@@ -378,7 +378,7 @@ def check_kokoro_service() -> ServiceInfo:
         )
     else:
         return ServiceInfo(
-            name="Kokoro",
+            name="Supertonic Express",
             type="tts",
             status=ServiceStatus.NOT_RUNNING,
             port=KOKORO_PORT,
@@ -448,7 +448,7 @@ def check_openai_compatible_stt_service() -> ServiceInfo:
         pass
 
     if status == "local":
-        display_name = "Parakeet" if "parakeet" in details.get("service", "") else "Local Whisper"
+        display_name = "Parakeet" if "parakeet" in details.get("service", "") else "Legacy Whisper"
         try:
             with proc.oneshot():
                 details["memory"] = format_memory(proc.memory_info().rss)
@@ -465,7 +465,7 @@ def check_openai_compatible_stt_service() -> ServiceInfo:
         )
     if status == "forwarded":
         return ServiceInfo(
-            name="Local Whisper",
+            name="Legacy Whisper",
             type="stt",
             status=ServiceStatus.FORWARDED,
             port=port,
@@ -474,7 +474,7 @@ def check_openai_compatible_stt_service() -> ServiceInfo:
         )
     if status == "initializing":
         return ServiceInfo(
-            name="Local Whisper",
+            name="Legacy Whisper",
             type="stt",
             status=ServiceStatus.INITIALIZING,
             port=port,
@@ -482,7 +482,7 @@ def check_openai_compatible_stt_service() -> ServiceInfo:
             health="initializing",
         )
     return ServiceInfo(
-        name="Local Whisper",
+        name="Legacy Whisper",
         type="stt",
         status=ServiceStatus.NOT_RUNNING,
         port=port,
@@ -529,7 +529,7 @@ def get_config_info() -> Dict[str, Any]:
     """Get configuration information."""
     config_file = Path.home() / ".voicemode" / "voicemode.env"
 
-    voices = TTS_VOICES if TTS_VOICES else ["af_sky"]
+    voices = TTS_VOICES if TTS_VOICES else ["F1"]
     audio_feedback = env_bool("VOICEMODE_AUDIO_FEEDBACK", True)
 
     return {
@@ -546,11 +546,11 @@ def collect_status_data() -> Dict[str, Any]:
     # Check services
     whisper = check_whisper_service()
     parakeet = check_openai_compatible_stt_service()
-    kokoro = check_kokoro_service()
+    supertonic = check_kokoro_service()
     openai = check_openai_api()
 
     # Get active providers
-    active = get_active_providers(whisper, parakeet, kokoro, openai)
+    active = get_active_providers(whisper, parakeet, supertonic, openai)
 
     # Check dependencies
     ffmpeg = check_ffmpeg()
@@ -564,21 +564,21 @@ def collect_status_data() -> Dict[str, Any]:
         "version": __version__,
         "runtime": {
             "mode": "mcp",
-            "command": "uvx voice-mode"
+            "command": "voicemode"
         },
         "tts": {
             "active": active["tts"],
             "providers": {
-                "kokoro": {
-                    "name": kokoro.name,
-                    "status": kokoro.status.value,
-                    "port": kokoro.port,
-                    "voice": kokoro.details.get("voice") if kokoro.details else None,
-                    "version": kokoro.details.get("version") if kokoro.details else None,
-                    "memory": kokoro.details.get("memory") if kokoro.details else None,
-                    "uptime": kokoro.details.get("uptime") if kokoro.details else None,
-                    "auto_start": kokoro.auto_start,
-                    "health": kokoro.health
+                "supertonic": {
+                    "name": supertonic.name,
+                    "status": supertonic.status.value,
+                    "port": supertonic.port,
+                    "voice": supertonic.details.get("voice") if supertonic.details else None,
+                    "version": supertonic.details.get("version") if supertonic.details else None,
+                    "memory": supertonic.details.get("memory") if supertonic.details else None,
+                    "uptime": supertonic.details.get("uptime") if supertonic.details else None,
+                    "auto_start": supertonic.auto_start,
+                    "health": supertonic.health
                 },
                 "openai": {
                     "status": openai["status"],
@@ -675,7 +675,7 @@ def format_terminal_output(data: Dict[str, Any], use_colors: bool = True) -> str
             return "Not configured"
         return status.replace("_", " ").title()
 
-    # Whisper (STT)
+    # Parakeet/local STT
     parakeet = data["stt"]["providers"]["parakeet"]
     parakeet_name = parakeet.get("name") or "Local STT"
     lines.append(f"── {parakeet_name} (STT) " + "─" * max(1, 34 - len(parakeet_name)))
@@ -690,7 +690,7 @@ def format_terminal_output(data: Dict[str, Any], use_colors: bool = True) -> str
     lines.append("")
 
     whisper = data["stt"]["providers"]["whisper"]
-    lines.append("── Whisper (STT) " + "─" * 28)
+    lines.append("── Legacy Whisper (STT) " + "─" * 21)
     sym = status_symbol(whisper["status"])
     lines.append(f"  Status:     {sym} {format_status_text(whisper['status'])}" + (f" (port {whisper['port']})" if whisper["status"] == "running" else ""))
     if whisper.get("model"):
@@ -705,19 +705,19 @@ def format_terminal_output(data: Dict[str, Any], use_colors: bool = True) -> str
     lines.append(f"  Auto-start: {'enabled' if whisper.get('auto_start') else 'disabled'}")
     lines.append("")
 
-    # Kokoro (TTS)
-    kokoro = data["tts"]["providers"]["kokoro"]
-    kokoro_name = kokoro.get("name") or "Kokoro/Supertonic"
-    lines.append(f"── {kokoro_name} (TTS) " + "─" * max(1, 34 - len(kokoro_name)))
-    sym = status_symbol(kokoro["status"])
-    lines.append(f"  Status:     {sym} {format_status_text(kokoro['status'])}" + (f" (port {kokoro['port']})" if kokoro["status"] == "running" else ""))
-    if kokoro.get("voice"):
-        lines.append(f"  Voice:      {kokoro['voice']}")
-    if kokoro.get("version"):
-        lines.append(f"  Version:    {kokoro['version']}")
-    if kokoro.get("memory") and kokoro.get("uptime"):
-        lines.append(f"  Resources:  {kokoro['memory']}, up {kokoro['uptime']}")
-    lines.append(f"  Auto-start: {'enabled' if kokoro.get('auto_start') else 'disabled'}")
+    # Supertonic/local TTS
+    supertonic = data["tts"]["providers"]["supertonic"]
+    supertonic_name = supertonic.get("name") or "Supertonic Express"
+    lines.append(f"── {supertonic_name} (TTS) " + "─" * max(1, 34 - len(supertonic_name)))
+    sym = status_symbol(supertonic["status"])
+    lines.append(f"  Status:     {sym} {format_status_text(supertonic['status'])}" + (f" (port {supertonic['port']})" if supertonic["status"] == "running" else ""))
+    if supertonic.get("voice"):
+        lines.append(f"  Voice:      {supertonic['voice']}")
+    if supertonic.get("version"):
+        lines.append(f"  Version:    {supertonic['version']}")
+    if supertonic.get("memory") and supertonic.get("uptime"):
+        lines.append(f"  Resources:  {supertonic['memory']}, up {supertonic['uptime']}")
+    lines.append(f"  Auto-start: {'enabled' if supertonic.get('auto_start') else 'disabled'}")
     lines.append("")
 
     # OpenAI API
@@ -738,9 +738,9 @@ def format_terminal_output(data: Dict[str, Any], use_colors: bool = True) -> str
     tts_text = tts_active.title() if tts_active != "none" else "None available"
     stt_text = stt_active.title() if stt_active != "none" else "None available"
 
-    if tts_active in {"kokoro", "kokoro/supertonic", "supertonic-express", "openai-compatible-tts"}:
+    if tts_active in {"supertonic-express", "openai-compatible-tts"}:
         tts_text += " (local preferred)"
-    if stt_active in {"parakeet", "parakeet-tdt", "local-whisper", "openai-compatible-stt", "whisper"}:
+    if stt_active in {"parakeet", "parakeet-tdt", "openai-compatible-stt", "local-whisper", "whisper"}:
         stt_text += " (local preferred)"
 
     lines.append(f"  TTS: {tts_text}")
@@ -763,7 +763,7 @@ def format_terminal_output(data: Dict[str, Any], use_colors: bool = True) -> str
         lines.append(f"  Config: {config['file']}")
     else:
         lines.append("  Config: ~/.voicemode/voicemode.env (not found)")
-    lines.append(f"  Voices: {', '.join(config.get('voices', ['af_sky']))}")
+    lines.append(f"  Voices: {', '.join(config.get('voices', ['F1']))}")
     lines.append(f"  Audio feedback: {'enabled' if config.get('audio_feedback') else 'disabled'}")
 
     return "\n".join(lines)
@@ -784,15 +784,15 @@ def format_markdown_output(data: Dict[str, Any]) -> str:
     lines.append("| Service | Type | Status | Details |")
     lines.append("|---------|------|--------|---------|")
 
-    # Kokoro
-    kokoro = data["tts"]["providers"]["kokoro"]
-    kokoro_details = []
-    if kokoro["status"] == "running":
-        kokoro_details.append(f"Port {kokoro['port']}")
-    if kokoro.get("voice"):
-        kokoro_details.append(f"Voice: {kokoro['voice']}")
-    kokoro_name = kokoro.get("name") or "Kokoro/Supertonic"
-    lines.append(f"| {kokoro_name} | TTS | {'✓' if kokoro['status'] in ['running', 'forwarded'] else '✗'} {kokoro['status'].replace('_', ' ').title()} | {', '.join(kokoro_details) if kokoro_details else '-'} |")
+    # Supertonic/local TTS
+    supertonic = data["tts"]["providers"]["supertonic"]
+    supertonic_details = []
+    if supertonic["status"] == "running":
+        supertonic_details.append(f"Port {supertonic['port']}")
+    if supertonic.get("voice"):
+        supertonic_details.append(f"Voice: {supertonic['voice']}")
+    supertonic_name = supertonic.get("name") or "Supertonic Express"
+    lines.append(f"| {supertonic_name} | TTS | {'✓' if supertonic['status'] in ['running', 'forwarded'] else '✗'} {supertonic['status'].replace('_', ' ').title()} | {', '.join(supertonic_details) if supertonic_details else '-'} |")
 
     # OpenAI TTS
     openai = data["tts"]["providers"]["openai"]
@@ -802,7 +802,7 @@ def format_markdown_output(data: Dict[str, Any]) -> str:
         openai_details.append(f"Model: {openai['model']}")
     lines.append(f"| OpenAI | TTS | {'✓' if openai['status'] == 'available' else '✗'} {openai['status'].replace('_', ' ').title()} | {', '.join(openai_details) if openai_details else '-'} |")
 
-    # Whisper
+    # Parakeet/local STT
     parakeet = data["stt"]["providers"]["parakeet"]
     parakeet_details = []
     if parakeet["status"] == "running":
@@ -823,7 +823,7 @@ def format_markdown_output(data: Dict[str, Any]) -> str:
         if whisper.get("coreml"):
             model_info += " (CoreML)"
         whisper_details.append(f"Model: {model_info}")
-    lines.append(f"| Whisper | STT | {'✓' if whisper['status'] in ['running', 'forwarded'] else '✗'} {whisper['status'].replace('_', ' ').title()} | {', '.join(whisper_details) if whisper_details else '-'} |")
+    lines.append(f"| Legacy Whisper | STT | {'✓' if whisper['status'] in ['running', 'forwarded'] else '✗'} {whisper['status'].replace('_', ' ').title()} | {', '.join(whisper_details) if whisper_details else '-'} |")
 
     # OpenAI STT
     openai_stt = data["stt"]["providers"]["openai"]
@@ -831,13 +831,13 @@ def format_markdown_output(data: Dict[str, Any]) -> str:
 
     lines.append("")
     lines.append(f"Active: TTS={data['tts']['active'].title()}, STT={data['stt']['active'].title()}" +
-                 (" (local preferred)" if data['tts']['active'] in ['kokoro', 'kokoro/supertonic', 'supertonic-express', 'openai-compatible-tts'] or data['stt']['active'] in ['parakeet', 'parakeet-tdt', 'local-whisper', 'openai-compatible-stt', 'whisper'] else ""))
+                 (" (local preferred)" if data['tts']['active'] in ['supertonic-express', 'openai-compatible-tts'] or data['stt']['active'] in ['parakeet', 'parakeet-tdt', 'local-whisper', 'openai-compatible-stt', 'whisper'] else ""))
     lines.append("")
 
     lines.append("## Configuration")
     config = data["config"]
     lines.append(f"- Config file: {config.get('file', '~/.voicemode/voicemode.env')}")
-    lines.append(f"- Voices: {', '.join(config.get('voices', ['af_sky']))}")
+    lines.append(f"- Voices: {', '.join(config.get('voices', ['F1']))}")
     lines.append(f"- Audio feedback: {'enabled' if config.get('audio_feedback') else 'disabled'}")
     lines.append("")
 

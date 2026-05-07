@@ -16,7 +16,7 @@ Align the tool names and function signatures between VoiceMode (local MCP) and V
 ### VoiceMode Local (`voice_mode/tools/`)
 Default tools exposed:
 - `converse(message, wait_for_response, voice, ...)` — TTS + STT via local mic/speakers
-- `service(service_name, action, lines)` — manage Whisper/Kokoro services
+- `service(service_name, action, lines)` -- manage supported local voice services
 
 Additional tools:
 - `register_wakeable(team_name, agent_name, agent_platform)` — register as wakeable via Connect

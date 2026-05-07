@@ -30,19 +30,19 @@ class OpenAIErrorParser:
             'title': '💳 OpenAI Quota Exceeded',
             'message': 'Your OpenAI API quota has been exceeded.',
             'suggestion': 'Check your OpenAI account at https://platform.openai.com/usage to review your usage and billing limits. Consider adding funds or upgrading your plan.',
-            'fallback': 'You can use local voice services (Whisper/Kokoro) which don\'t require API credits.'
+            'fallback': 'You can use local voice services (Parakeet/Supertonic Express) which don\'t require API credits.'
         },
         'auth_failed': {
             'title': '🔐 OpenAI Authentication Failed',
             'message': 'The OpenAI API key is invalid or missing.',
             'suggestion': 'Set your OPENAI_API_KEY environment variable with a valid key from https://platform.openai.com/api-keys',
-            'fallback': 'You can use local voice services (Whisper/Kokoro) without an API key.'
+            'fallback': 'You can use local voice services (Parakeet/Supertonic Express) without an API key.'
         },
         'rate_limit': {
             'title': '⏱️ OpenAI Rate Limit',
             'message': 'You\'ve hit the OpenAI API rate limit.',
             'suggestion': 'Wait a moment and try again, or reduce the frequency of requests.',
-            'fallback': 'Local services (Whisper/Kokoro) have no rate limits.'
+            'fallback': 'Local services (Parakeet/Supertonic Express) have no rate limits.'
         },
         'billing_limit': {
             'title': '💰 OpenAI Billing Limit Reached',
@@ -54,7 +54,7 @@ class OpenAIErrorParser:
             'title': '🚫 OpenAI Access Terminated',
             'message': 'Your OpenAI account access has been terminated.',
             'suggestion': 'Contact OpenAI support or create a new account if appropriate.',
-            'fallback': 'Use local voice services (Whisper/Kokoro) instead.'
+            'fallback': 'Use local voice services (Parakeet/Supertonic Express) instead.'
         },
         'invalid_request': {
             'title': '❌ Invalid Request',

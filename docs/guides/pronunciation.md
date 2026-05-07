@@ -18,7 +18,7 @@ TTS \b3M\b "three M" # Company name'
 export VOICEMODE_PRONOUNCE_NETWORKING='TTS \bPoE\b "P O E" # Power over Ethernet
 TTS \bGbE\b "gigabit ethernet" # Network speed'
 
-export VOICEMODE_PRONOUNCE_STT='STT "me tool" metool # Whisper correction'
+export VOICEMODE_PRONOUNCE_STT='STT "me tool" metool # STT correction'
 ```
 
 ## Format Specification
@@ -97,8 +97,8 @@ TTS \b(\d+)\s*GB\b "$1 gigabytes" # Storage
 ### STT Corrections
 
 ```bash
-# Fix common Whisper misrecognitions
-STT "me tool" metool # Whisper hears this wrong
+# Fix common STT misrecognitions
+STT "me tool" metool # STT hears this wrong
 STT "cora 7" "Cora 7" # Fix capitalization
 STT "(tally|tahlee|tolly)" Tali # Multiple variations
 ```

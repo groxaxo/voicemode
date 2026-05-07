@@ -60,6 +60,7 @@ from voice_mode.config import (
     METRICS_LEVEL,
     STT_AUDIO_FORMAT,
     STT_SAVE_FORMAT,
+    STT_MODEL,
     MP3_BITRATE,
     CONCH_ENABLED,
     CONCH_TIMEOUT,
@@ -369,23 +370,23 @@ async def startup_initialization():
     logger.info("Initializing provider registry...")
     await provider_registry.initialize()
     
-    # Check if we should auto-start Kokoro
+    # Check if we should auto-start legacy Kokoro
     auto_start_kokoro = os.getenv("VOICE_MODE_AUTO_START_KOKORO", "").lower() in ("true", "1", "yes", "on")
     if auto_start_kokoro:
         try:
-            # Check if Kokoro is already running
+            # Check if legacy Kokoro is already running
             async with httpx.AsyncClient(timeout=3.0) as client:
-                base_url = 'http://127.0.0.1:8880'  # Kokoro default
+                base_url = 'http://127.0.0.1:8880'  # legacy Kokoro endpoint
                 health_url = f"{base_url}/health"
                 response = await client.get(health_url)
                 
                 if response.status_code == 200:
-                    logger.info("Kokoro TTS is already running externally")
+                    logger.info("Legacy Kokoro TTS is already running externally")
                 else:
                     raise Exception("Not running")
         except:
-            # Kokoro is not running, start it
-            logger.info("Auto-starting Kokoro TTS service...")
+            # Legacy Kokoro is not running, start it
+            logger.info("Auto-starting legacy Kokoro TTS service...")
             try:
                 # Import here to avoid circular dependency
                 import subprocess
@@ -404,9 +405,9 @@ async def startup_initialization():
                     
                     # Verify it started
                     if process.poll() is None:
-                        logger.info(f"✓ Kokoro TTS started successfully (PID: {process.pid})")
+                        logger.info(f"✓ Legacy Kokoro TTS started successfully (PID: {process.pid})")
                     else:
-                        logger.error("Failed to start Kokoro TTS")
+                        logger.error("Failed to start legacy Kokoro TTS")
             except Exception as e:
                 logger.error(f"Error auto-starting Kokoro: {e}")
     
@@ -439,6 +440,8 @@ async def get_tts_config(provider: Optional[str] = None, voice: Optional[str] = 
     # Map provider names to base URLs
     provider_urls = {
         'openai': 'https://api.openai.com/v1',
+        'supertonic-express': 'http://127.0.0.1:8880/v1',
+        'supertonic': 'http://127.0.0.1:8880/v1',
         'kokoro': 'http://127.0.0.1:8880/v1'
     }
 
@@ -470,6 +473,8 @@ async def get_stt_config(provider: Optional[str] = None):
 
     # Map provider names to base URLs
     provider_urls = {
+        'parakeet': 'http://127.0.0.1:5092/v1',
+        'parakeet-tdt': 'http://127.0.0.1:5092/v1',
         'whisper-local': 'http://127.0.0.1:2022/v1',
         'openai-whisper': 'https://api.openai.com/v1'
     }
@@ -488,8 +493,8 @@ async def get_stt_config(provider: Optional[str] = None):
     # Return simplified configuration
     return {
         'base_url': base_url,
-        'model': 'whisper-1',
-        'provider': 'whisper-local' if '127.0.0.1' in base_url or 'localhost' in base_url else 'openai-whisper',
+        'model': 'whisper-1' if provider_type == 'openai' else STT_MODEL,
+        'provider': provider_type,
         'provider_type': provider_type
     }
 
@@ -536,7 +541,7 @@ def prepare_audio_for_stt(audio_data: np.ndarray, output_format: str = "mp3") ->
     Prepare audio data for STT upload with optional compression.
 
     Converts raw audio to the specified format, optionally compressing and
-    downsampling to 16kHz (Whisper's native rate) for optimal bandwidth.
+    downsampling to 16kHz for optimal speech-recognition bandwidth.
 
     Args:
         audio_data: Raw audio data as numpy array (16-bit PCM)
@@ -559,7 +564,7 @@ def prepare_audio_for_stt(audio_data: np.ndarray, output_format: str = "mp3") ->
     # Calculate original size for logging
     original_size = len(audio_data) * 2  # 16-bit = 2 bytes per sample
 
-    # Downsample to 16kHz (Whisper's native rate) for better compression
+    # Downsample to 16kHz for better compression and broad STT compatibility
     # This also reduces size by ~33% even before compression
     whisper_sample_rate = 16000
     if SAMPLE_RATE != whisper_sample_rate:
@@ -1191,7 +1196,7 @@ async def converse(
     listen_duration_min: float = 2.0,
     timeout: float = 60.0,
     voice: Optional[str] = None,
-    tts_provider: Optional[Literal["openai", "kokoro"]] = None,
+    tts_provider: Optional[Literal["openai", "supertonic-express", "kokoro"]] = None,
     tts_model: Optional[str] = None,
     tts_instructions: Optional[str] = None,
     chime_enabled: Optional[Union[bool, str]] = None,
@@ -1233,7 +1238,7 @@ KEY PARAMETERS:
 • message (required): The message to speak
 • wait_for_response (bool, default: true): Listen for response after speaking
 • voice (string): TTS voice name (auto-selected unless specified)
-• tts_provider ("openai"|"kokoro"): Provider selection (auto-selected unless specified)
+• tts_provider ("openai"|"supertonic-express"|"kokoro"): Provider selection (auto-selected unless specified; kokoro is legacy)
 • disable_silence_detection (bool, default: false): Disable auto-stop on silence
 • vad_aggressiveness (0-3, default: 3): Voice detection strictness (0=permissive, 3=strict)
 • speed (0.25-4.0): Speech rate (1.0=normal, 2.0=double speed)
@@ -1552,7 +1557,7 @@ consult the MCP resources listed above.
                         # Check if API key is missing for OpenAI
                         from voice_mode.config import OPENAI_API_KEY
                         if not OPENAI_API_KEY:
-                            result = "Error: Could not speak message. OpenAI API key is not set. Please set OPENAI_API_KEY environment variable or use local services (Kokoro TTS)."
+                            result = "Error: Could not speak message. OpenAI API key is not set. Please set OPENAI_API_KEY environment variable or use local services (Supertonic Express TTS)."
                         else:
                             result = "Error: Could not speak message. TTS request to OpenAI failed. Please check your API key and network connection."
                     else:
@@ -1922,7 +1927,7 @@ consult the MCP resources listed above.
                     
                     conversation_logger.log_stt(
                         text=response_text if response_text else "[no speech detected]",
-                        model=stt_config.get('model', 'whisper-1'),
+                        model=stt_config.get('model', STT_MODEL),
                         provider=stt_config.get('provider', 'openai'),
                         provider_url=stt_config.get('base_url'),
                         provider_type=stt_config.get('provider_type'),
@@ -2004,7 +2009,7 @@ consult the MCP resources listed above.
                         "transport": transport,
                         "voice": voice,
                         "model": tts_model,
-                        "stt_model": "whisper-1",  # Default STT model
+                        "stt_model": STT_MODEL,
                         "timing": timing_str,
                         "timestamp": datetime.now().isoformat()
                     }
@@ -2127,7 +2132,3 @@ consult the MCP resources listed above.
             # Force garbage collection
             collected = gc.collect()
             logger.debug(f"Garbage collected {collected} objects")
-
-
-
-

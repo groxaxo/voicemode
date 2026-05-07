@@ -5,7 +5,7 @@ from voice_mode.server import mcp
 
 @mcp.prompt(name="whisper")
 def whisper_prompt(action: str = "status") -> str:
-    """Manage Whisper speech-to-text service.
+    """Manage legacy Whisper speech-to-text service.
     
     Args:
         action: Service action (status, start, stop, restart, enable, disable, logs) or install request
@@ -15,7 +15,7 @@ def whisper_prompt(action: str = "status") -> str:
     # Check if user wants to install
     install_keywords = ["install", "setup", "configure", "download", "get"]
     if action.lower() in install_keywords or any(keyword in action.lower() for keyword in install_keywords):
-        return "The user wants to install Whisper. Use the whisper_install tool to install the Whisper STT service."
+        return "The user wants to install legacy Whisper. Use the whisper_install tool to install the legacy Whisper STT service."
     
     if action not in valid_actions:
         return f"Invalid action '{action}'. Use one of: {', '.join(valid_actions)}"
@@ -25,7 +25,7 @@ def whisper_prompt(action: str = "status") -> str:
 
 @mcp.prompt(name="kokoro")
 def kokoro_prompt(action: str = "status") -> str:
-    """Manage Kokoro text-to-speech service.
+    """Manage legacy Kokoro text-to-speech service.
     
     Args:
         action: Service action (status, start, stop, restart, enable, disable, logs) or install request
@@ -35,7 +35,7 @@ def kokoro_prompt(action: str = "status") -> str:
     # Check if user wants to install
     install_keywords = ["install", "setup", "configure", "download", "get"]
     if action.lower() in install_keywords or any(keyword in action.lower() for keyword in install_keywords):
-        return "The user wants to install Kokoro. Use the kokoro_install tool to install the Kokoro TTS service."
+        return "The user wants to install legacy Kokoro. Use the kokoro_install tool to install the legacy Kokoro TTS service."
     
     if action not in valid_actions:
         return f"Invalid action '{action}'. Use one of: {', '.join(valid_actions)}"

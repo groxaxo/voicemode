@@ -239,10 +239,15 @@ voicemode service status voicemode
 ### Local Service Paths
 
 ```bash
-# Kokoro TTS
-VOICEMODE_KOKORO_PORT=8880
-VOICEMODE_KOKORO_MODELS_DIR=~/Models/kokoro
-VOICEMODE_KOKORO_CACHE_DIR=~/.voicemode/cache/kokoro
+# Supertonic Express TTS
+VOICEMODE_LOCAL_TTS_PORT=8880
+VOICEMODE_LOCAL_TTS_DIR=/home/op/supertonic-express
+VOICEMODE_DEFAULT_LOCAL_VOICE=F1
+
+# Parakeet STT
+VOICEMODE_LOCAL_STT_PORT=5092
+VOICEMODE_LOCAL_STT_DIR=/home/op/parakeet
+VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3
 
 # Service directories
 VOICEMODE_DATA_DIR=~/.voicemode

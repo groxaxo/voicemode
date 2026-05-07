@@ -116,7 +116,8 @@ def install_codex_integration(dry_run: bool = False) -> IntegrationResult:
     path = Path.home() / ".codex" / "config.toml"
     managed_block = _build_codex_block()
     existing_text = path.read_text() if path.exists() else ""
-    updated_text = _upsert_managed_block(existing_text, CODEX_BLOCK_START, CODEX_BLOCK_END, managed_block)
+    cleaned_text = _remove_unmanaged_codex_voicemode_tables(existing_text)
+    updated_text = _upsert_managed_block(cleaned_text, CODEX_BLOCK_START, CODEX_BLOCK_END, managed_block)
     changed = updated_text != existing_text
 
     if changed and not dry_run:
@@ -259,6 +260,44 @@ def _upsert_managed_block(text: str, start_marker: str, end_marker: str, block: 
     if text:
         text += "\n"
     return text + replacement
+
+
+def _remove_unmanaged_codex_voicemode_tables(text: str) -> str:
+    """Remove older unmarked Codex VoiceMode tables before writing the managed block."""
+    voicemode_tables = {
+        "mcp_servers.voicemode",
+        "mcp_servers.voicemode.env",
+    }
+    lines = text.splitlines(keepends=True)
+    kept: list[str] = []
+    in_managed_block = False
+    skipping_table = False
+
+    for line in lines:
+        stripped = line.strip()
+
+        if stripped == CODEX_BLOCK_START:
+            in_managed_block = True
+            skipping_table = False
+            kept.append(line)
+            continue
+        if stripped == CODEX_BLOCK_END:
+            in_managed_block = False
+            kept.append(line)
+            continue
+
+        table_match = re.match(r"^\s*\[([A-Za-z0-9_.-]+)\]\s*(?:#.*)?$", line)
+        if table_match and not in_managed_block:
+            skipping_table = table_match.group(1) in voicemode_tables
+            if skipping_table:
+                continue
+
+        if skipping_table and not in_managed_block:
+            continue
+
+        kept.append(line)
+
+    return "".join(kept)
 
 
 def _load_json_like(path: Path) -> dict[str, Any]:

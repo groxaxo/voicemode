@@ -17,7 +17,7 @@ voice_mode/tools/
 ├── __init__.py                  # Discovery and loading logic
 ├── {tool_name}.py               # Regular tools (e.g. converse.py, devices.py)
 ├── services/                    # Service-specific tools
-│   ├── {service}/               # Service directory (e.g. whisper/, kokoro/)
+│   ├── {service}/               # Service directory (for legacy managed services)
 │   │   ├── {tool}.py           # Service tool modules (e.g. install.py, uninstall.py)
 │   │   └── helpers.py          # Shared utilities (excluded)
 │   └── ...
@@ -160,7 +160,7 @@ No explicit registration needed - tools are discovered at import time.
 
 ### Structure
 
-Service tools are organized by service:
+Service tools are organized by service. The Whisper and Kokoro service tools are legacy compatibility modules; default local installs use external Parakeet and Supertonic Express endpoints.
 
 ```
 services/
@@ -177,8 +177,8 @@ services/
 ### Naming Convention
 
 Service tools follow the pattern `{service}_{action}`:
-- `whisper_install` - Install Whisper service
-- `kokoro_status` - Check Kokoro service status
+- `whisper_install` - Install legacy Whisper service
+- `kokoro_status` - Check legacy Kokoro service status
 
 ## Performance Considerations
 

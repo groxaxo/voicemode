@@ -32,7 +32,7 @@ Key parameters:
 - wait_for_response: Listen for response after speaking (default: true)
 - listen_duration: Max listen time in seconds (default: 120)
 - voice: TTS voice name (auto-selected unless specified)
-- tts_provider: openai or kokoro (auto-selected unless specified)
+- tts_provider: openai or supertonic-express (auto-selected unless specified; kokoro is a legacy alias)
 - disable_silence_detection: Disable auto-stop on silence (default: false)
 
 For full parameter list and advanced options, see voicemode-parameters resource.

@@ -127,7 +127,7 @@ converse("This is double speed", speed=2.0)
 converse("This is slower speech", speed=0.8)
 ```
 
-**Note:** Works with both OpenAI and Kokoro providers
+**Note:** Works with OpenAI and local OpenAI-compatible TTS providers
 
 ## VAD Aggressiveness Pattern
 

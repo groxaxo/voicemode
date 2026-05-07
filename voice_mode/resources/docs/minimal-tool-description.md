@@ -25,7 +25,7 @@ KEY PARAMETERS:
 • listen_duration (number, default: 120): Max listen time in seconds
 • min_listen_duration (number, default: 2.0): Min recording time before silence detection
 • voice (string): TTS voice name (auto-selected unless specified)
-• tts_provider ("openai"|"kokoro"): Provider selection (auto-selected unless specified)
+• tts_provider ("openai"|"supertonic-express"|"kokoro"): Provider selection (auto-selected unless specified; kokoro is legacy)
 • disable_silence_detection (bool, default: false): Disable auto-stop on silence
 • vad_aggressiveness (0-3, default: 3): Voice detection strictness (0=permissive, 3=strict)
 • speed (0.25-4.0): Speech rate (1.0=normal, 2.0=double speed)

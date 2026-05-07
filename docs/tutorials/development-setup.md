@@ -76,13 +76,13 @@ pytest -v
 For development without API keys:
 
 ```bash
-# Or manually
-voicemode whisper install
-voicemode kokoro install
+export VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1
+export VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1
+export VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3
 
-# Or manually
-voicemode whisper start
-voicemode kokoro start
+# Check local services
+curl http://127.0.0.1:8880/health
+curl http://127.0.0.1:5092/health
 ```
 
 ## Project Structure
@@ -155,8 +155,7 @@ export VOICEMODE_LOG_LEVEL=debug
 
 ```bash
 # Check service status
-voicemode whisper status
-voicemode kokoro status
+voicemode status
 ```
 
 ## Testing
@@ -178,7 +177,7 @@ pytest -m "not integration"
 pytest tests/integration/
 
 # Run specific service tests
-pytest tests/integration/test_whisper.py
+pytest tests/test_stt_config.py
 ```
 
 ### Manual Testing
@@ -274,13 +273,13 @@ uv pip install -e .
 
 ```bash
 # Check if ports are in use
-lsof -i :8880  # Kokoro
-lsof -i :2022  # Whisper
+lsof -i :8880  # Supertonic Express
+lsof -i :5092  # Parakeet
 lsof -i :7880  # LiveKit
 
 # Kill stuck processes
-pkill -f kokoro
-pkill -f whisper
+pkill -f supertonic
+pkill -f parakeet
 ```
 
 ## Additional Resources

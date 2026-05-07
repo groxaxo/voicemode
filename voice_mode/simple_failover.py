@@ -70,13 +70,23 @@ async def simple_tts_failover(
             selected_model = clone_profile.model
             logger.info(f"Clone voice '{voice}': model={selected_model}")
         elif provider_type == "openai":
-            # Map Kokoro voices to OpenAI equivalents, or use OpenAI default
+            # Map local voices to OpenAI equivalents, or use OpenAI default
             openai_voices = ["alloy", "echo", "fable", "nova", "onyx", "shimmer"]
             if voice in openai_voices:
                 selected_voice = voice
             else:
-                # Map common Kokoro voices to OpenAI equivalents
+                # Map common local and legacy voices to OpenAI equivalents
                 voice_mapping = {
+                    "F1": "nova",
+                    "F2": "nova",
+                    "F3": "shimmer",
+                    "F4": "alloy",
+                    "F5": "fable",
+                    "M1": "onyx",
+                    "M2": "echo",
+                    "M3": "onyx",
+                    "M4": "echo",
+                    "M5": "fable",
                     "af_sky": "nova",
                     "af_sarah": "nova",
                     "af_alloy": "alloy",

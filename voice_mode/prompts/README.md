@@ -8,9 +8,9 @@ This directory contains all the FastMCP prompt definitions for the Voice Mode se
 - `converse`: Start an interactive voice conversation - provides instructions for conducting natural voice conversations
 
 ### kokoro_management.py
-- `kokoro-start`: Instructions to start the Kokoro TTS service
-- `kokoro-stop`: Instructions to stop the Kokoro TTS service  
-- `kokoro-status`: Instructions to check Kokoro TTS service status
+- `kokoro-start`: Instructions to start the legacy Kokoro TTS service
+- `kokoro-stop`: Instructions to stop the legacy Kokoro TTS service
+- `kokoro-status`: Instructions to check legacy Kokoro TTS service status
 - `supertonic`: Instructions to check the external Supertonic Express TTS endpoint
 - `parakeet`: Instructions to check the local Parakeet STT endpoint
 

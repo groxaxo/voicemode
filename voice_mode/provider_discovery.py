@@ -74,7 +74,10 @@ def _default_stt_models(base_url: str) -> List[str]:
     # Display-only seed. mlx-audio rejects "whisper-1" (it expects a full HF
     # repo id), so advertise its websocket default instead. Wire payloads are
     # unaffected -- VM-1100 owns the per-endpoint resolver.
-    if detect_provider_type(base_url) == "mlx-audio":
+    provider_type = detect_provider_type(base_url)
+    if provider_type == "parakeet":
+        return [config.STT_MODEL or "parakeet-tdt-0.6b-v3"]
+    if provider_type == "mlx-audio":
         return ["mlx-community/whisper-large-v3-turbo"]
     return ["whisper-1"]
 

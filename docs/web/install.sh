@@ -210,7 +210,7 @@ ensure_uv() {
     fi
 }
 
-# Ensure Rust is available (for ARM64 Kokoro dependencies)
+# Ensure Rust is available for optional legacy service builds
 # Uses rustup for latest version since distro packages are often too old
 ensure_rust() {
     # Check if Rust is already installed and recent enough (1.82+)
@@ -431,14 +431,14 @@ install_linux_deps() {
     case "$distro" in
         debian)
             all_packages=(python3-dev gcc libasound2-dev libportaudio2 ffmpeg)
-            # ARM64 needs g++ for Kokoro's mojimoji dependency
+            # ARM64 needs g++ for some optional service dependencies
             if [[ "$(uname -m)" == "aarch64" || "$(uname -m)" == "arm64" ]]; then
                 all_packages+=(g++)
             fi
             ;;
         fedora)
             all_packages=(python3-devel gcc alsa-lib-devel portaudio ffmpeg)
-            # ARM64 needs g++ for Kokoro's mojimoji dependency
+            # ARM64 needs g++ for some optional service dependencies
             if [[ "$(uname -m)" == "aarch64" || "$(uname -m)" == "arm64" ]]; then
                 all_packages+=(gcc-c++)
             fi
@@ -558,10 +558,7 @@ install_system_deps() {
             distro=$(detect_linux_distro)
             ok "Platform: Linux/$distro ($arch)"
             install_linux_deps "$distro"
-            # ARM64 Linux needs Rust via rustup for Kokoro dependencies
-            if [[ "$arch" == "arm64" ]]; then
-                ensure_rust
-            fi
+            # Rust is not installed by default; optional legacy service builds may need it.
             ;;
         windows)
             die "Windows is not yet supported. Please use WSL2 instead."
@@ -570,17 +567,16 @@ install_system_deps() {
 }
 
 # -----------------------------------------------------------------------------
-# Local Voice Services (Whisper & Kokoro)
+# Local Voice Services (Supertonic Express & Parakeet)
 # -----------------------------------------------------------------------------
 
-# Check if Whisper STT is installed
-is_whisper_installed() {
-    [[ -d "$HOME/.voicemode/services/whisper" ]]
-}
-
-# Check if Kokoro TTS is installed
-is_kokoro_installed() {
-    [[ -d "$HOME/.voicemode/services/kokoro" ]]
+endpoint_healthy() {
+    local url="$1"
+    if command_exists curl; then
+        curl -fsS --max-time 2 "$url" >/dev/null 2>&1
+    else
+        return 1
+    fi
 }
 
 # Assess system capability for local voice services
@@ -634,24 +630,6 @@ get_capability_message() {
 install_voice_services() {
     local os="$1"
     local arch="$2"
-    local whisper_installed=false
-    local kokoro_installed=false
-
-    # Check what's already installed
-    if is_whisper_installed; then
-        whisper_installed=true
-        ok "Whisper STT already installed"
-    fi
-
-    if is_kokoro_installed; then
-        kokoro_installed=true
-        ok "Kokoro TTS already installed"
-    fi
-
-    # If both are installed, nothing to do
-    if [[ "$whisper_installed" == "true" && "$kokoro_installed" == "true" ]]; then
-        return 0
-    fi
 
     # Assess system capability
     local capability
@@ -664,68 +642,23 @@ install_voice_services() {
     echo "${BOLD}Local Voice Services${RESET}"
     info "$capability_msg"
 
-    # Build list of what would be installed
-    local services_to_install=""
-    if [[ "$whisper_installed" == "false" ]]; then
-        services_to_install="Whisper (speech-to-text)"
-    fi
-    if [[ "$kokoro_installed" == "false" ]]; then
-        if [[ -n "$services_to_install" ]]; then
-            services_to_install="$services_to_install, Kokoro (text-to-speech)"
-        else
-            services_to_install="Kokoro (text-to-speech)"
-        fi
-    fi
+    info "VoiceMode defaults to OpenAI-compatible local endpoints:"
+    info "  TTS: Supertonic Express at http://127.0.0.1:8880/v1"
+    info "  STT: Parakeet TDT at http://127.0.0.1:5092/v1"
 
-    # Show download size estimate
-    local download_size="~3GB"
-    if [[ "$whisper_installed" == "false" && "$kokoro_installed" == "false" ]]; then
-        download_size="~3GB total"
-    elif [[ "$whisper_installed" == "false" ]]; then
-        download_size="~1.5GB"
-    elif [[ "$kokoro_installed" == "false" ]]; then
-        download_size="~1.5GB"
-    fi
-
-    info "Available: $services_to_install ($download_size download)"
-
-    # Prompt for installation (only if interactive AND TTY available)
-    if [[ "$INTERACTIVE" == "true" ]] && tty_available; then
-        echo ""
-        read -r -p "Install local voice services? [Y/n] " response </dev/tty
-        case "$response" in
-            [nN][oO]|[nN])
-                info "Skipping local voice services"
-                info "You can install them later with: voicemode whisper install && voicemode kokoro install"
-                return 0
-                ;;
-        esac
+    if endpoint_healthy "http://127.0.0.1:8880/health"; then
+        ok "Supertonic Express is reachable"
     else
-        # Non-interactive: skip voice services by default (they're large downloads)
-        info "Skipping local voice services (non-interactive mode)"
-        info "Install later with: voicemode whisper install && voicemode kokoro install"
-        return 0
+        warn "Supertonic Express is not reachable at http://127.0.0.1:8880/health"
     fi
 
-    # Install Whisper if needed
-    if [[ "$whisper_installed" == "false" ]]; then
-        info "Installing Whisper STT..."
-        if voicemode whisper install; then
-            ok "Whisper STT installed"
-        else
-            warn "Whisper installation failed - you can retry with: voicemode whisper install"
-        fi
+    if endpoint_healthy "http://127.0.0.1:5092/health"; then
+        ok "Parakeet TDT is reachable"
+    else
+        warn "Parakeet TDT is not reachable at http://127.0.0.1:5092/health"
     fi
 
-    # Install Kokoro if needed
-    if [[ "$kokoro_installed" == "false" ]]; then
-        info "Installing Kokoro TTS..."
-        if voicemode kokoro install; then
-            ok "Kokoro TTS installed"
-        else
-            warn "Kokoro installation failed - you can retry with: voicemode kokoro install"
-        fi
-    fi
+    info "The installer checks these services and leaves service installation to the local stack."
 }
 
 # -----------------------------------------------------------------------------

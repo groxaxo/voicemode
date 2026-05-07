@@ -41,23 +41,33 @@ Environment variables are processed in this order (highest to lowest priority):
 | `VOICEMODE_STT_MODEL` | STT model | `parakeet-tdt-0.6b-v3` | `parakeet-tdt-0.6b-v3` |
 | `VOICEMODE_STT_PROMPT` | Vocabulary biasing for STT (names, terms) | None | `tmux, Tali, kubectl` |
 
-### Whisper Configuration
+### Parakeet Configuration
 
 | Variable | Description | Default | Example |
 |----------|-------------|---------|---------|
-| `VOICEMODE_WHISPER_MODEL` | Whisper model size | `large-v2` | `base.en` |
-| `VOICEMODE_WHISPER_LANGUAGE` | Language code or 'auto' | `auto` | `en` |
-| `VOICEMODE_WHISPER_PORT` | Whisper server port | `2022` | `2023` |
-| `VOICEMODE_WHISPER_MODEL_PATH` | Path to Whisper models | `~/.voicemode/models/whisper` | `/models/whisper` |
+| `VOICEMODE_LOCAL_STT_PORT` | Local Parakeet service port | `5092` | `5093` |
+| `VOICEMODE_LOCAL_STT_DIR` | Local Parakeet service directory | `/home/op/parakeet` | `/opt/parakeet` |
+| `VOICEMODE_STT_MODELS` | Comma-separated local STT models | `parakeet-tdt-0.6b-v3` | `parakeet-tdt-0.6b-v3` |
 
-### Kokoro Configuration
+### Supertonic Express Configuration
 
 | Variable | Description | Default | Example |
 |----------|-------------|---------|---------|
-| `VOICEMODE_KOKORO_PORT` | Kokoro server port | `8880` | `8881` |
-| `VOICEMODE_KOKORO_MODELS_DIR` | Kokoro models directory | `~/Models/kokoro` | `/models/kokoro` |
-| `VOICEMODE_KOKORO_CACHE_DIR` | Kokoro cache directory | `~/.voicemode/cache/kokoro` | `/cache/kokoro` |
-| `VOICEMODE_KOKORO_DEFAULT_VOICE` | Default Kokoro voice | `af_sky` | `am_adam` |
+| `VOICEMODE_LOCAL_TTS_PORT` | Local Supertonic service port | `8880` | `8881` |
+| `VOICEMODE_LOCAL_TTS_DIR` | Local Supertonic service directory | `/home/op/supertonic-express` | `/opt/supertonic-express` |
+| `VOICEMODE_DEFAULT_LOCAL_VOICE` | Default local voice | `F1` | `M1` |
+
+### Legacy Service Configuration
+
+These variables are retained for pre-existing Whisper.cpp or Kokoro deployments. They are not used by the default local install path.
+
+| Variable | Description | Default | Example |
+|----------|-------------|---------|---------|
+| `VOICEMODE_WHISPER_MODEL` | Legacy Whisper model size | `large-v2` | `base.en` |
+| `VOICEMODE_WHISPER_LANGUAGE` | Legacy Whisper language code or 'auto' | `auto` | `en` |
+| `VOICEMODE_WHISPER_PORT` | Legacy Whisper server port | `2022` | `2023` |
+| `VOICEMODE_KOKORO_PORT` | Legacy Kokoro server port | `8880` | `8881` |
+| `VOICEMODE_KOKORO_MODELS_DIR` | Legacy Kokoro models directory | `~/Models/kokoro` | `/models/kokoro` |
 
 ## Soundfonts
 

@@ -43,19 +43,19 @@ async def startup_initialization():
     # Check if we should auto-start Kokoro
     if AUTO_START_KOKORO:
         try:
-            # Check if Kokoro is already running
+            # Check if legacy Kokoro is already running
             async with httpx.AsyncClient(timeout=3.0) as client:
-                base_url = 'http://127.0.0.1:8880'  # Kokoro default endpoint
+                base_url = 'http://127.0.0.1:8880'  # legacy Kokoro endpoint
                 health_url = f"{base_url}/health"
                 response = await client.get(health_url)
                 
                 if response.status_code == 200:
-                    logger.info("Kokoro TTS is already running externally")
+                    logger.info("Legacy Kokoro TTS is already running externally")
                 else:
                     raise Exception("Not running")
         except:
-            # Kokoro is not running, start it
-            logger.info("Auto-starting Kokoro TTS service...")
+            # Legacy Kokoro is not running, start it
+            logger.info("Auto-starting legacy Kokoro TTS service...")
             try:
                 global service_processes
                 if "kokoro" not in service_processes:
@@ -73,9 +73,9 @@ async def startup_initialization():
                     
                     # Verify it started
                     if process.poll() is None:
-                        logger.info(f"✓ Kokoro TTS started successfully (PID: {process.pid})")
+                        logger.info(f"✓ Legacy Kokoro TTS started successfully (PID: {process.pid})")
                     else:
-                        logger.error("Failed to start Kokoro TTS")
+                        logger.error("Failed to start legacy Kokoro TTS")
             except Exception as e:
                 logger.error(f"Error auto-starting Kokoro: {e}")
     

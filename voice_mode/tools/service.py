@@ -894,12 +894,14 @@ async def service(
     action: Literal["status", "start", "stop", "restart", "enable", "disable", "logs"] = "status",
     lines: Optional[Union[int, str]] = None
 ) -> str:
-    """Unified service management tool for voice mode services.
+    """Unified service management tool for managed voice mode services.
 
-    Manage Whisper (STT), Kokoro (TTS), and VoiceMode (HTTP MCP server) services.
+    Manage legacy Whisper (STT), legacy Kokoro (TTS), mlx_audio, and VoiceMode
+    (HTTP MCP server) services. Default local installs use external Parakeet
+    and Supertonic Express endpoints checked by `voicemode status`.
 
     Args:
-        service_name: The service to manage ("whisper", "kokoro", or "voicemode")
+        service_name: The service to manage ("whisper", "kokoro", "mlx_audio", or "voicemode")
         action: The action to perform (default: "status")
             - status: Show if service is running and resource usage
             - start: Start the service
@@ -914,11 +916,11 @@ async def service(
         Status message indicating the result of the action
 
     Examples:
-        service("whisper", "status")  # Check if Whisper is running
-        service("kokoro", "start")    # Start Kokoro service
+        service("whisper", "status")  # Check legacy Whisper service
+        service("kokoro", "start")    # Start legacy Kokoro service
         service("voicemode", "start") # Start VoiceMode HTTP MCP server
         service("voicemode", "enable") # Enable VoiceMode HTTP MCP server
-        service("whisper", "logs", 100)  # View last 100 lines of Whisper logs
+        service("whisper", "logs", 100)  # View last 100 lines of legacy Whisper logs
     """
     # Convert lines to integer if provided as string
     if lines is not None and isinstance(lines, str):

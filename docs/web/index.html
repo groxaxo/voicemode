@@ -659,7 +659,7 @@ claude plugin install voicemode@mbailey<br><br>
                 </li>
                 <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
                     <span style="position: absolute; left: 0; color: var(--accent);">✓</span>
-                    Sets up optional local STT/TTS services (Whisper, Kokoro)
+                    Checks local STT/TTS services (Parakeet, Supertonic Express)
                 </li>
                 <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
                     <span style="position: absolute; left: 0; color: var(--accent);">✓</span>
@@ -678,13 +678,14 @@ claude plugin install voicemode@mbailey<br><br>
             </h3>
             <p>
                 For complete privacy, run speech recognition and text-to-speech locally instead of using OpenAI.
-                Both <a href="https://github.com/ggerganov/whisper.cpp">whisper.cpp</a> and <a href="https://github.com/remsky/Kokoro-FastAPI">Kokoro-FastAPI</a> provide OpenAI-compatible APIs for seamless integration.
+                Parakeet TDT and Supertonic Express provide OpenAI-compatible APIs for seamless integration.
             </p>
             <div class="code-block" style="margin-top: 1rem;">
-<span class="comment"># Install local speech-to-text (Whisper)</span><br>
-voicemode whisper install<br><br>
-<span class="comment"># Install local text-to-speech (Kokoro)</span><br>
-voicemode kokoro install
+<span class="comment"># Default local speech-to-text (Parakeet)</span><br>
+VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1<br>
+VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3<br><br>
+<span class="comment"># Default local text-to-speech (Supertonic Express)</span><br>
+VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1
             </div>
         </div>
 

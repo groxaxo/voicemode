@@ -28,7 +28,7 @@ uvx voice-mode-install --dry-run
 # Install specific version
 uvx voice-mode-install --voice-mode-version=5.1.3
 
-# Skip service installation
+# Skip local service health checks
 uvx voice-mode-install --skip-services
 
 # Configure Codex and OpenCode
@@ -88,7 +88,8 @@ uvx voice-mode-install --non-interactive
    - Ubuntu/Debian: `sudo apt install`
    - Fedora: `sudo dnf install`
 5. **VoiceMode Installation** - Runs `uv tool install voice-mode[==version]`
-6. **Post-Install** - Configures shell completion and verifies installation
+6. **Local Service Check** - Verifies Supertonic Express and Parakeet endpoints when present
+7. **Post-Install** - Configures shell completion and verifies installation
 
 ## Installation Logs
 

@@ -60,7 +60,7 @@ async def test_provider_resilience():
     # Test 2: Provider type detection
     print("\n2. Testing provider type detection:")
     type_tests = [
-        ("http://127.0.0.1:8880/v1", "kokoro"),
+        ("http://127.0.0.1:8880/v1", "supertonic-express"),
         ("http://localhost:2022/v1", "whisper"),
         ("https://api.openai.com/v1", "openai"),
     ]

@@ -18,9 +18,9 @@ Call routing enables sophisticated voice conversation management across multiple
 | [Handoff](./handoff.md) | Transfer voice to another agent | Documented |
 | [Hand-back](./handoff.md#hand-back-process) | Return voice to original agent | Documented |
 | [Proxy](./proxy.md) | Relay for agents without voice | Documented |
-| [Coordination](./coordination.md) | The Conch - prevent overlapping speech | Planned |
-| [Call Waiting](./call-waiting.md) | Notify when another agent wants to speak | Planned |
-| [Voicemail](./voicemail.md) | Leave messages for busy agents | Planned |
+| Coordination | The Conch - prevent overlapping speech | Planned |
+| Call Waiting | Notify when another agent wants to speak | Planned |
+| Voicemail | Leave messages for busy agents | Planned |
 
 ## Quick Reference
 

@@ -12,7 +12,8 @@ from ..config import (
     AUDIO_FEEDBACK_ENABLED, PREFER_LOCAL, ALWAYS_TRY_LOCAL, AUTO_START_KOKORO,
     # Service settings
     OPENAI_API_KEY, TTS_BASE_URLS, STT_BASE_URLS, TTS_VOICES, TTS_MODELS,
-    STT_MODEL, STT_MODELS,
+    STT_MODEL, STT_MODELS, LOCAL_TTS_PORT, LOCAL_TTS_SERVICE_DIR,
+    LOCAL_STT_PORT, LOCAL_STT_SERVICE_DIR,
     # Whisper settings
     WHISPER_MODEL, WHISPER_PORT, WHISPER_LANGUAGE, WHISPER_MODEL_PATH,
     # Kokoro settings
@@ -52,7 +53,7 @@ async def all_configuration() -> str:
     - Core settings (directories, saving options)
     - Provider settings (TTS/STT endpoints and preferences)
     - Audio settings (formats, quality)
-    - Service-specific settings (Whisper, Kokoro)
+    - Service-specific settings (Parakeet, Supertonic Express, legacy services)
     - Silence detection parameters
     - Streaming configuration
     - Event logging settings
@@ -78,7 +79,7 @@ async def all_configuration() -> str:
     lines.append("Provider Settings:")
     lines.append(f"  Prefer Local: {PREFER_LOCAL}")
     lines.append(f"  Always Try Local: {ALWAYS_TRY_LOCAL}")
-    lines.append(f"  Auto-start Kokoro: {AUTO_START_KOKORO}")
+    lines.append(f"  Auto-start legacy Kokoro: {AUTO_START_KOKORO}")
     lines.append(f"  TTS Endpoints: {', '.join(TTS_BASE_URLS)}")
     lines.append(f"  STT Endpoints: {', '.join(STT_BASE_URLS)}")
     lines.append(f"  TTS Voices: {', '.join(TTS_VOICES)}")
@@ -121,17 +122,23 @@ async def all_configuration() -> str:
     lines.append(f"  Rotation: {EVENT_LOG_ROTATION}")
     lines.append("")
     
-    # Whisper
-    lines.append("Whisper Configuration:")
+    # Local services
+    lines.append("Local Service Configuration:")
+    lines.append(f"  Supertonic Express Port: {LOCAL_TTS_PORT}")
+    lines.append(f"  Supertonic Express Directory: {LOCAL_TTS_SERVICE_DIR}")
+    lines.append(f"  Parakeet Port: {LOCAL_STT_PORT}")
+    lines.append(f"  Parakeet Directory: {LOCAL_STT_SERVICE_DIR}")
+    lines.append(f"  STT Model: {STT_MODEL}")
+    lines.append("")
+
+    # Legacy services
+    lines.append("Legacy Whisper Configuration:")
     lines.append(f"  Model: {WHISPER_MODEL}")
     lines.append(f"  Port: {WHISPER_PORT}")
     lines.append(f"  Language: {WHISPER_LANGUAGE}")
     lines.append(f"  Model Path: {WHISPER_MODEL_PATH}")
-    lines.append(f"  Endpoint: http://127.0.0.1:{WHISPER_PORT}/v1")
     lines.append("")
-    
-    # Kokoro
-    lines.append("Kokoro Configuration:")
+    lines.append("Legacy Kokoro Configuration:")
     lines.append(f"  Port: {KOKORO_PORT}")
     lines.append(f"  Models Directory: {KOKORO_MODELS_DIR}")
     lines.append(f"  Cache Directory: {KOKORO_CACHE_DIR}")
@@ -144,18 +151,18 @@ async def all_configuration() -> str:
 @mcp.resource("voice://config/whisper")
 async def whisper_configuration() -> str:
     """
-    Whisper service configuration.
+    Legacy Whisper service configuration.
     
-    Shows all Whisper-specific settings including:
+    Shows all legacy Whisper-specific settings including:
     - Model selection
     - Port configuration
     - Language settings
     - Model storage path
     
-    These settings control how the local Whisper.cpp service operates.
+    These settings control the legacy local Whisper.cpp service.
     """
     lines = []
-    lines.append("Whisper Service Configuration")
+    lines.append("Legacy Whisper Service Configuration")
     lines.append("=" * 40)
     lines.append("")
     
@@ -179,18 +186,18 @@ async def whisper_configuration() -> str:
 @mcp.resource("voice://config/kokoro")
 async def kokoro_configuration() -> str:
     """
-    Kokoro TTS service configuration.
+    Legacy Kokoro TTS service configuration.
     
-    Shows all Kokoro-specific settings including:
+    Shows all legacy Kokoro-specific settings including:
     - Port configuration
     - Models directory
     - Cache directory
     - Default voice selection
     
-    These settings control how the local Kokoro TTS service operates.
+    These settings control the legacy local Kokoro TTS service.
     """
     lines = []
-    lines.append("Kokoro Service Configuration")
+    lines.append("Legacy Kokoro Service Configuration")
     lines.append("=" * 40)
     lines.append("")
     
@@ -270,7 +277,7 @@ async def environment_variables() -> str:
         # Provider Settings
         ("VOICEMODE_PREFER_LOCAL", "Prefer local providers over cloud (true/false)"),
         ("VOICEMODE_ALWAYS_TRY_LOCAL", "Always attempt local providers (true/false)"),
-        ("VOICEMODE_AUTO_START_KOKORO", "Auto-start Kokoro service (true/false)"),
+        ("VOICEMODE_AUTO_START_KOKORO", "Auto-start legacy Kokoro service (true/false)"),
         ("VOICEMODE_TTS_BASE_URLS", "Comma-separated list of TTS endpoints"),
         ("VOICEMODE_STT_BASE_URLS", "Comma-separated list of STT endpoints"),
         ("VOICEMODE_VOICES", "Comma-separated list of preferred voices"),
@@ -285,16 +292,21 @@ async def environment_variables() -> str:
         # STT Models
         ("VOICEMODE_STT_MODEL", "Default STT model (e.g. parakeet-tdt-0.6b-v3)"),
         ("VOICEMODE_STT_MODELS", "Comma-separated list of STT models for failover"),
-        # Whisper Configuration
-        ("VOICEMODE_WHISPER_MODEL", "Whisper model to use (e.g., large-v2)"),
-        ("VOICEMODE_WHISPER_PORT", "Whisper server port"),
-        ("VOICEMODE_WHISPER_LANGUAGE", "Language for transcription"),
-        ("VOICEMODE_WHISPER_MODEL_PATH", "Path to Whisper models"),
-        # Kokoro Configuration
-        ("VOICEMODE_KOKORO_PORT", "Kokoro server port"),
-        ("VOICEMODE_KOKORO_MODELS_DIR", "Directory for Kokoro models"),
-        ("VOICEMODE_KOKORO_CACHE_DIR", "Directory for Kokoro cache"),
-        ("VOICEMODE_KOKORO_DEFAULT_VOICE", "Default Kokoro voice"),
+        # Local Service Configuration
+        ("VOICEMODE_LOCAL_TTS_PORT", "Supertonic Express port"),
+        ("VOICEMODE_LOCAL_TTS_DIR", "Supertonic Express service directory"),
+        ("VOICEMODE_LOCAL_STT_PORT", "Parakeet port"),
+        ("VOICEMODE_LOCAL_STT_DIR", "Parakeet service directory"),
+        # Legacy Whisper Configuration
+        ("VOICEMODE_WHISPER_MODEL", "Legacy Whisper model to use (e.g., large-v2)"),
+        ("VOICEMODE_WHISPER_PORT", "Legacy Whisper server port"),
+        ("VOICEMODE_WHISPER_LANGUAGE", "Legacy Whisper language for transcription"),
+        ("VOICEMODE_WHISPER_MODEL_PATH", "Path to legacy Whisper models"),
+        # Legacy Kokoro Configuration
+        ("VOICEMODE_KOKORO_PORT", "Legacy Kokoro server port"),
+        ("VOICEMODE_KOKORO_MODELS_DIR", "Directory for legacy Kokoro models"),
+        ("VOICEMODE_KOKORO_CACHE_DIR", "Directory for legacy Kokoro cache"),
+        ("VOICEMODE_KOKORO_DEFAULT_VOICE", "Default legacy Kokoro voice"),
         # MLX Audio Service (powers Impressions)
         ("VOICEMODE_MLX_AUDIO_HOST", "mlx-audio server bind host (default 127.0.0.1)"),
         ("VOICEMODE_MLX_AUDIO_PORT", "mlx-audio server port (default 8890)"),
@@ -393,13 +405,19 @@ async def environment_template() -> str:
         f"export VOICEMODE_STT_MODEL=\"{STT_MODEL}\"",
         f"export VOICEMODE_STT_MODELS=\"{','.join(STT_MODELS)}\"",
         "",
-        "# Whisper Configuration",
+        "# Local Service Configuration",
+        f"export VOICEMODE_LOCAL_TTS_PORT=\"{LOCAL_TTS_PORT}\"",
+        f"export VOICEMODE_LOCAL_TTS_DIR=\"{LOCAL_TTS_SERVICE_DIR}\"",
+        f"export VOICEMODE_LOCAL_STT_PORT=\"{LOCAL_STT_PORT}\"",
+        f"export VOICEMODE_LOCAL_STT_DIR=\"{LOCAL_STT_SERVICE_DIR}\"",
+        "",
+        "# Legacy Whisper Configuration",
         f"export VOICEMODE_WHISPER_MODEL=\"{WHISPER_MODEL}\"",
         f"export VOICEMODE_WHISPER_PORT=\"{WHISPER_PORT}\"",
         f"export VOICEMODE_WHISPER_LANGUAGE=\"{WHISPER_LANGUAGE}\"",
         f"export VOICEMODE_WHISPER_MODEL_PATH=\"{WHISPER_MODEL_PATH}\"",
         "",
-        "# Kokoro Configuration",
+        "# Legacy Kokoro Configuration",
         f"export VOICEMODE_KOKORO_PORT=\"{KOKORO_PORT}\"",
         f"export VOICEMODE_KOKORO_MODELS_DIR=\"{KOKORO_MODELS_DIR}\"",
         f"export VOICEMODE_KOKORO_CACHE_DIR=\"{KOKORO_CACHE_DIR}\"",

@@ -30,7 +30,7 @@ export VOICEMODE_TOOLS_ENABLED=converse,service,statistics
 Use `VOICEMODE_TOOLS_DISABLED` to load all tools except specific ones. Useful when you want most tools but need to exclude a few.
 
 ```bash
-# Load all tools except service installation
+# Load all tools except legacy service installation
 export VOICEMODE_TOOLS_DISABLED=whisper_install,kokoro_install,livekit_install
 ```
 
@@ -77,8 +77,8 @@ Edit your `.mcp.json` file:
 
 ### Service Management Tools
 - `service` - Unified service management
-- `whisper_install` - Whisper installation
-- `kokoro_install` - Kokoro TTS installation
+- `whisper_install` - Legacy Whisper installation
+- `kokoro_install` - Legacy Kokoro TTS installation
 - `livekit_*` - LiveKit-related tools
 
 ### Utility Tools
