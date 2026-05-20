@@ -142,7 +142,7 @@ def load_voicemode_env():
 #############
 
 # Comma-separated list of TTS endpoints
-# VOICEMODE_TTS_BASE_URLS=http://100.85.200.51:12437/v1
+# VOICEMODE_TTS_BASE_URLS=http://100.85.200.51:6655/v1
 
 # Comma-separated list of STT endpoints
 # VOICEMODE_STT_BASE_URLS=http://100.85.200.51:5092/v1
@@ -154,10 +154,10 @@ def load_voicemode_env():
 # VOICEMODE_STT_PROMPT=
 
 # Comma-separated list of preferred voices
-# VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy
+# VOICEMODE_VOICES=shimmer,onyx,echo,alloy,fable,nova,british_man,british_woman,mergy
 
 # Comma-separated list of preferred models
-# VOICEMODE_TTS_MODELS=tts-1,tts-1-hd
+# VOICEMODE_TTS_MODELS=omnivoice
 
 # Prefer local providers over cloud (true/false)
 # VOICEMODE_PREFER_LOCAL=true
@@ -571,10 +571,10 @@ def parse_comma_list(env_var: str, fallback: str) -> list:
     return [item.strip() for item in value.split(",") if item.strip()]
 
 # New provider endpoint lists configuration
-TTS_BASE_URLS = parse_comma_list("VOICEMODE_TTS_BASE_URLS", "http://100.85.200.51:12437/v1")
+TTS_BASE_URLS = parse_comma_list("VOICEMODE_TTS_BASE_URLS", "http://100.85.200.51:6655/v1")
 STT_BASE_URLS = parse_comma_list("VOICEMODE_STT_BASE_URLS", "http://100.85.200.51:5092/v1")
-TTS_VOICES = parse_comma_list("VOICEMODE_VOICES", "latina-1,mateo,spanish-medium-1,jo,juliette,greta,dave,alloy")
-TTS_MODELS = parse_comma_list("VOICEMODE_TTS_MODELS", "neuphonic/neutts-air-q8-gguf")
+TTS_VOICES = parse_comma_list("VOICEMODE_VOICES", "shimmer,onyx,echo,alloy,fable,nova,british_man,british_woman,mergy")
+TTS_MODELS = parse_comma_list("VOICEMODE_TTS_MODELS", "omnivoice")
 STT_MODEL = os.getenv("VOICEMODE_STT_MODEL", "parakeet-tdt-0.6b-v3")
 STT_MODELS = parse_comma_list("VOICEMODE_STT_MODELS", "parakeet-tdt-0.6b-v3")
 
@@ -630,10 +630,10 @@ def reload_configuration():
     
     # Update global configuration variables
     global TTS_VOICES, TTS_MODELS, TTS_BASE_URLS, STT_BASE_URLS, STT_MODEL, STT_MODELS
-    TTS_BASE_URLS = parse_comma_list("VOICEMODE_TTS_BASE_URLS", "http://100.85.200.51:12437/v1")
+    TTS_BASE_URLS = parse_comma_list("VOICEMODE_TTS_BASE_URLS", "http://100.85.200.51:6655/v1")
     STT_BASE_URLS = parse_comma_list("VOICEMODE_STT_BASE_URLS", "http://100.85.200.51:5092/v1")
-    TTS_VOICES = parse_comma_list("VOICEMODE_VOICES", "latina-1,mateo,spanish-medium-1,jo,juliette,greta,dave,alloy")
-    TTS_MODELS = parse_comma_list("VOICEMODE_TTS_MODELS", "neuphonic/neutts-air-q8-gguf")
+    TTS_VOICES = parse_comma_list("VOICEMODE_VOICES", "shimmer,onyx,echo,alloy,fable,nova,british_man,british_woman,mergy")
+    TTS_MODELS = parse_comma_list("VOICEMODE_TTS_MODELS", "omnivoice")
     STT_MODEL = os.getenv("VOICEMODE_STT_MODEL", "parakeet-tdt-0.6b-v3")
     STT_MODELS = parse_comma_list("VOICEMODE_STT_MODELS", "parakeet-tdt-0.6b-v3")
 

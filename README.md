@@ -14,16 +14,16 @@ The goal is simple: talk to your coding agent with local speech generation and l
 On this LAN the working setup is:
 
 ```bash
-VOICEMODE_TTS_BASE_URLS=http://100.85.200.51:12437/v1
+VOICEMODE_TTS_BASE_URLS=http://100.85.200.51:6655/v1
 VOICEMODE_STT_BASE_URLS=http://100.85.200.51:5092/v1
-VOICEMODE_TTS_MODELS=neuphonic/neutts-air-q8-gguf
-VOICEMODE_TTS_MODEL=neuphonic/neutts-air-q8-gguf
+VOICEMODE_TTS_MODELS=omnivoice
+VOICEMODE_TTS_MODEL=omnivoice
 VOICEMODE_TTS_AUDIO_FORMAT=wav
 VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3
 VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3
-VOICEMODE_VOICES=latina-1,mateo,spanish-medium-1,spanish-medium-2,spanish-long-1,spanish-short-1,female-voice,jo,juliette,greta,dave,chatterbox_en_03_medium,alloy
-VOICEMODE_DEFAULT_LOCAL_VOICE=latina-1
-VOICEMODE_LOCAL_TTS_PORT=12437
+VOICEMODE_VOICES=shimmer,onyx,echo,alloy,fable,nova,british_man,british_woman,mergy
+VOICEMODE_DEFAULT_LOCAL_VOICE=shimmer
+VOICEMODE_LOCAL_TTS_PORT=6655
 VOICEMODE_LOCAL_TTS_DIR=/home/op/neutts
 VOICEMODE_LOCAL_STT_PORT=5092
 VOICEMODE_PREFER_LOCAL=true
@@ -36,14 +36,14 @@ Codex is registered to run the installed `voicemode` executable as an MCP server
 
 ### OpenAI-Compatible LAN TTS
 
-The LAN TTS server provides OpenAI-compatible text-to-speech on port `12437`.
+The LAN TTS server provides OpenAI-compatible text-to-speech on port `6655`.
 
 ```bash
-curl http://100.85.200.51:12437/health
-curl http://100.85.200.51:12437/v1/voices
+curl http://100.85.200.51:6655/health
+curl http://100.85.200.51:6655/v1/voices
 ```
 
-Configured Spanish voices include `latina-1`, `mateo`, and `spanish-medium-1`.
+Configured voices include `shimmer`, `mergy`, `onyx`, and `echo`.
 
 ### Parakeet TDT STT
 
@@ -75,16 +75,16 @@ Register with Codex:
 
 ```bash
 codex mcp add voicemode \
-  --env VOICEMODE_TTS_BASE_URLS=http://100.85.200.51:12437/v1 \
+  --env VOICEMODE_TTS_BASE_URLS=http://100.85.200.51:6655/v1 \
   --env VOICEMODE_STT_BASE_URLS=http://100.85.200.51:5092/v1 \
   --env VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3 \
   --env VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3 \
-  --env VOICEMODE_VOICES=latina-1,mateo,spanish-medium-1,spanish-medium-2,spanish-long-1,spanish-short-1,female-voice,jo,juliette,greta,dave,chatterbox_en_03_medium,alloy \
-  --env VOICEMODE_TTS_MODELS=neuphonic/neutts-air-q8-gguf \
-  --env VOICEMODE_TTS_MODEL=neuphonic/neutts-air-q8-gguf \
+  --env VOICEMODE_VOICES=shimmer,onyx,echo,alloy,fable,nova,british_man,british_woman,mergy \
+  --env VOICEMODE_TTS_MODELS=omnivoice \
+  --env VOICEMODE_TTS_MODEL=omnivoice \
   --env VOICEMODE_TTS_AUDIO_FORMAT=wav \
-  --env VOICEMODE_DEFAULT_LOCAL_VOICE=latina-1 \
-  --env VOICEMODE_LOCAL_TTS_PORT=12437 \
+  --env VOICEMODE_DEFAULT_LOCAL_VOICE=shimmer \
+  --env VOICEMODE_LOCAL_TTS_PORT=6655 \
   --env VOICEMODE_LOCAL_TTS_DIR=/home/op/neutts \
   --env VOICEMODE_LOCAL_STT_PORT=5092 \
   --env VOICEMODE_PREFER_LOCAL=true \

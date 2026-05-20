@@ -444,9 +444,9 @@ async def get_tts_config(provider: Optional[str] = None, voice: Optional[str] = 
     # Map provider names to base URLs
     provider_urls = {
         'openai': 'https://api.openai.com/v1',
-        'supertonic-express': 'http://100.85.200.51:12437/v1',
-        'supertonic': 'http://100.85.200.51:12437/v1',
-        'kokoro': 'http://100.85.200.51:12437/v1'
+        'supertonic-express': 'http://100.85.200.51:6655/v1',
+        'supertonic': 'http://100.85.200.51:6655/v1',
+        'kokoro': 'http://100.85.200.51:6655/v1'
     }
 
     # Convert provider name to URL if it's a known provider
