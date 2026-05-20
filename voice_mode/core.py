@@ -8,6 +8,7 @@ extracted to allow for easier testing and reuse.
 import asyncio
 import logging
 import os
+import re
 import tempfile
 import gc
 import time
@@ -31,6 +32,23 @@ from .utils import (
 from .audio_player import NonBlockingAudioPlayer
 
 logger = logging.getLogger("voicemode")
+
+
+SPANISH_HINT_RE = re.compile(
+    r"[áéíóúñüÁÉÍÓÚÑÜ¿¡]|\b("
+    r"el|la|los|las|un|una|unos|unas|"
+    r"de|del|que|en|por|para|con|sin|"
+    r"hola|gracias|quiero|queres|querés|puedo|podria|podría|"
+    r"español|latino|latina|voz|hablar|decime|revis[eé]|"
+    r"esto|esta|este|como|cómo|mas|más"
+    r")\b",
+    re.IGNORECASE,
+)
+
+
+def _infer_tts_lang_code(text: str) -> Optional[str]:
+    """Infer language hints for local OpenAI-compatible TTS services."""
+    return "es" if SPANISH_HINT_RE.search(text) else None
 
 
 def get_audio_path(filename: str, base_dir: Path, timestamp: Optional[datetime] = None) -> Path:
@@ -251,6 +269,11 @@ async def text_to_speech(
             request_params["speed"] = speed
             logger.info(f"  • Speed: {speed}x")
 
+        lang_code = _infer_tts_lang_code(text)
+        if lang_code and provider != "openai":
+            request_params.setdefault("extra_body", {})["lang_code"] = lang_code
+            logger.info(f"  • Language code: {lang_code}")
+
         # Add voice cloning parameters if a clone profile is active.
         # mlx-audio requires `stream: true` in the request body to emit
         # chunks progressively; without it the server buffers the full
@@ -263,6 +286,7 @@ async def text_to_speech(
         # testing on ms2.
         if clone_profile:
             request_params["extra_body"] = {
+                **request_params.get("extra_body", {}),
                 "ref_audio": clone_profile.ref_audio,
                 "ref_text": clone_profile.ref_text,
                 "stream": True,
