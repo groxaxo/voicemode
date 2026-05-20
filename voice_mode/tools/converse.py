@@ -440,9 +440,9 @@ async def get_tts_config(provider: Optional[str] = None, voice: Optional[str] = 
     # Map provider names to base URLs
     provider_urls = {
         'openai': 'https://api.openai.com/v1',
-        'supertonic-express': 'http://127.0.0.1:8880/v1',
-        'supertonic': 'http://127.0.0.1:8880/v1',
-        'kokoro': 'http://127.0.0.1:8880/v1'
+        'supertonic-express': 'http://100.85.200.51:12437/v1',
+        'supertonic': 'http://100.85.200.51:12437/v1',
+        'kokoro': 'http://100.85.200.51:12437/v1'
     }
 
     # Convert provider name to URL if it's a known provider
@@ -473,8 +473,8 @@ async def get_stt_config(provider: Optional[str] = None):
 
     # Map provider names to base URLs
     provider_urls = {
-        'parakeet': 'http://127.0.0.1:5092/v1',
-        'parakeet-tdt': 'http://127.0.0.1:5092/v1',
+        'parakeet': 'http://100.85.200.51:5092/v1',
+        'parakeet-tdt': 'http://100.85.200.51:5092/v1',
         'whisper-local': 'http://127.0.0.1:2022/v1',
         'openai-whisper': 'https://api.openai.com/v1'
     }

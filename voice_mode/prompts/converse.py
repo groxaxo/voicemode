@@ -10,7 +10,7 @@ def converse() -> str:
 - If this is a new conversation with no prior context, greet briefly and ask what they'd like to work on
 - If continuing an existing conversation, acknowledge and continue from where you left off
 - Use tools from voice-mode to converse
-- Prefer the configured local TTS endpoint first; on this machine Supertonic Express is expected at http://127.0.0.1:8880/v1 with voices F1-F5 and M1-M5
-- For speech-to-text, use the configured Parakeet OpenAI-compatible endpoint at http://127.0.0.1:5092/v1 with model parakeet-tdt-0.6b-v3
+- Prefer the configured local TTS endpoint first; on this machine the local TTS endpoint is expected at http://100.85.200.51:12437/v1 with voice latina-1
+- For speech-to-text, use the configured Parakeet OpenAI-compatible endpoint at http://100.85.200.51:5092/v1 with model parakeet-tdt-0.6b-v3
 - End the chat when the user indicates they want to end it
 - Keep your utterances brief unless a longer response is requested or necessary"""

@@ -23,7 +23,7 @@ else
 fi
 
 # Configuration with environment variable support (defaults match config.py)
-SERVE_HOST="${VOICEMODE_SERVE_HOST:-127.0.0.1}"
+SERVE_HOST="${VOICEMODE_SERVE_HOST:-100.85.200.51}"
 SERVE_PORT="${VOICEMODE_SERVE_PORT:-8765}"
 SERVE_TRANSPORT="${VOICEMODE_SERVE_TRANSPORT:-streamable-http}"
 SERVE_LOG_LEVEL="${VOICEMODE_SERVE_LOG_LEVEL:-info}"
