@@ -1,9 +1,9 @@
 # VoiceMode
 
-VoiceMode is an MCP voice interface for Codex, Claude Code, OpenCode, Qwen Code, Gemini CLI, and other MCP-capable agents. This fork is configured for a fast local voice stack:
+VoiceMode is an MCP voice interface for Codex, Claude Code, OpenCode, Qwen Code, Gemini CLI, and other MCP-capable agents. This fork is configured for a fast local/LAN voice stack:
 
-- **TTS:** Supertonic Express on `http://127.0.0.1:8880/v1`
-- **STT:** Parakeet TDT 0.6B v3 on `http://127.0.0.1:5092/v1`
+- **TTS:** OpenAI-compatible local TTS, either localhost or LAN
+- **STT:** Parakeet TDT 0.6B v3, either localhost or LAN
 - **Fallback:** none configured for Codex MCP by default
 - **MCP tools:** `converse` and `service`
 
@@ -11,17 +11,20 @@ The goal is simple: talk to your coding agent with local speech generation and l
 
 ## Current Local Setup
 
-On this machine the working setup is:
+On this LAN the working setup is:
 
 ```bash
-VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1
-VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1
-VOICEMODE_TTS_MODELS=tts-1,tts-1-hd
-VOICEMODE_TTS_AUDIO_FORMAT=mp3
+VOICEMODE_TTS_BASE_URLS=http://100.85.200.51:12437/v1
+VOICEMODE_STT_BASE_URLS=http://100.85.200.51:5092/v1
+VOICEMODE_TTS_MODELS=neuphonic/neutts-air-q8-gguf
+VOICEMODE_TTS_MODEL=neuphonic/neutts-air-q8-gguf
+VOICEMODE_TTS_AUDIO_FORMAT=wav
 VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3
 VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3
-VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy
-VOICEMODE_DEFAULT_LOCAL_VOICE=F1
+VOICEMODE_VOICES=latina-1,mateo,spanish-medium-1,spanish-medium-2,spanish-long-1,spanish-short-1,female-voice,jo,juliette,greta,dave,chatterbox_en_03_medium,alloy
+VOICEMODE_DEFAULT_LOCAL_VOICE=latina-1
+VOICEMODE_LOCAL_TTS_PORT=12437
+VOICEMODE_LOCAL_TTS_DIR=/home/op/neutts
 VOICEMODE_LOCAL_STT_PORT=5092
 VOICEMODE_PREFER_LOCAL=true
 VOICEMODE_ALWAYS_TRY_LOCAL=true
@@ -31,23 +34,23 @@ Codex is registered to run the installed `voicemode` executable as an MCP server
 
 ## Services
 
-### Supertonic Express TTS
+### OpenAI-Compatible LAN TTS
 
-Supertonic Express provides OpenAI-compatible local text-to-speech on port `8880`.
+The LAN TTS server provides OpenAI-compatible text-to-speech on port `12437`.
 
 ```bash
-curl http://127.0.0.1:8880/health
-curl http://127.0.0.1:8880/v1/audio/voices
+curl http://100.85.200.51:12437/health
+curl http://100.85.200.51:12437/v1/voices
 ```
 
-Configured local voices are `F1`-`F5` and `M1`-`M5`.
+Configured Spanish voices include `latina-1`, `mateo`, and `spanish-medium-1`.
 
 ### Parakeet TDT STT
 
 Parakeet provides OpenAI-compatible local speech-to-text on port `5092`.
 
 ```bash
-curl http://127.0.0.1:5092/health
+curl http://100.85.200.51:5092/health
 ```
 
 The active model sent by VoiceMode is `parakeet-tdt-0.6b-v3`.
@@ -72,16 +75,17 @@ Register with Codex:
 
 ```bash
 codex mcp add voicemode \
-  --env VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1 \
-  --env VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1 \
+  --env VOICEMODE_TTS_BASE_URLS=http://100.85.200.51:12437/v1 \
+  --env VOICEMODE_STT_BASE_URLS=http://100.85.200.51:5092/v1 \
   --env VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3 \
   --env VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3 \
-  --env VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy \
-  --env VOICEMODE_TTS_MODELS=tts-1,tts-1-hd \
-  --env VOICEMODE_TTS_AUDIO_FORMAT=mp3 \
-  --env VOICEMODE_DEFAULT_LOCAL_VOICE=F1 \
-  --env VOICEMODE_LOCAL_TTS_PORT=8880 \
-  --env VOICEMODE_LOCAL_TTS_DIR=/home/op/supertonic-express \
+  --env VOICEMODE_VOICES=latina-1,mateo,spanish-medium-1,spanish-medium-2,spanish-long-1,spanish-short-1,female-voice,jo,juliette,greta,dave,chatterbox_en_03_medium,alloy \
+  --env VOICEMODE_TTS_MODELS=neuphonic/neutts-air-q8-gguf \
+  --env VOICEMODE_TTS_MODEL=neuphonic/neutts-air-q8-gguf \
+  --env VOICEMODE_TTS_AUDIO_FORMAT=wav \
+  --env VOICEMODE_DEFAULT_LOCAL_VOICE=latina-1 \
+  --env VOICEMODE_LOCAL_TTS_PORT=12437 \
+  --env VOICEMODE_LOCAL_TTS_DIR=/home/op/neutts \
   --env VOICEMODE_LOCAL_STT_PORT=5092 \
   --env VOICEMODE_PREFER_LOCAL=true \
   --env VOICEMODE_ALWAYS_TRY_LOCAL=true \
