@@ -11,6 +11,7 @@ This module handles automatic discovery of TTS/STT endpoints, including:
 import asyncio
 import logging
 import time
+import ipaddress
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
@@ -25,27 +26,51 @@ from .config import TTS_BASE_URLS, STT_BASE_URLS, OPENAI_API_KEY
 logger = logging.getLogger("voicemode")
 
 
+def _is_lan_host(hostname: Optional[str]) -> bool:
+    """Return True for loopback, RFC1918, link-local, and Tailscale/CGNAT hosts."""
+    if not hostname:
+        return False
+
+    if hostname in {"localhost"}:
+        return True
+
+    try:
+        address = ipaddress.ip_address(hostname)
+    except ValueError:
+        return False
+
+    return (
+        address.is_loopback
+        or address.is_private
+        or address.is_link_local
+        or address in ipaddress.ip_network("100.64.0.0/10")
+    )
+
+
 def detect_provider_type(base_url: str) -> str:
     """Detect provider type from base URL."""
     if not base_url:
         return "unknown"
     parsed = urlparse(base_url)
     parsed_port = parsed.port
+    hostname = parsed.hostname
     local_tts_port = getattr(config, "LOCAL_TTS_PORT", None)
     local_tts_dir = str(getattr(config, "LOCAL_TTS_SERVICE_DIR", "")).lower()
     if "openai.com" in base_url:
         return "openai"
-    elif parsed_port == local_tts_port and "supertonic" in local_tts_dir:
-        return "supertonic-express"
     elif ":8880" in base_url:
-        return "supertonic-express" if "supertonic" in local_tts_dir else "kokoro"
+        return "supertonic-express"
     elif ":2022" in base_url:
         return "whisper"
     elif parsed_port == getattr(config, "LOCAL_STT_PORT", None) and "parakeet" in getattr(config, "STT_MODEL", ""):
         return "parakeet"
     elif parsed_port == 8890 or "mlx_audio" in base_url or "mlx-audio" in base_url:
         return "mlx-audio"
-    elif "127.0.0.1" in base_url or "localhost" in base_url:
+    elif parsed_port == local_tts_port and _is_lan_host(hostname):
+        return "supertonic-express" if "supertonic" in local_tts_dir else "kokoro"
+    elif parsed_port == local_tts_port and "supertonic" in local_tts_dir:
+        return "supertonic-express"
+    elif _is_lan_host(hostname):
         # Try to infer from port if not already detected
         if base_url.endswith("/v1"):
             port_part = base_url[:-3].split(":")[-1]
@@ -65,9 +90,9 @@ def is_local_provider(base_url: str) -> bool:
     if not base_url:
         return False
     provider_type = detect_provider_type(base_url)
+    hostname = urlparse(base_url).hostname
     return provider_type in ["kokoro", "supertonic-express", "whisper", "parakeet", "mlx-audio", "local"] or \
-           "127.0.0.1" in base_url or \
-           "localhost" in base_url
+           _is_lan_host(hostname)
 
 
 def _default_stt_models(base_url: str) -> List[str]:

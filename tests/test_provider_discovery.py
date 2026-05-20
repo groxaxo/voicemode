@@ -41,6 +41,18 @@ class TestDetectProviderType:
         # the generic "local" provider type (regression check).
         assert detect_provider_type("http://127.0.0.1:9999/v1") == "local"
 
+    def test_configured_lan_tts_port_is_local_tts(self, monkeypatch):
+        monkeypatch.setattr("voice_mode.config.LOCAL_TTS_PORT", 12437)
+        monkeypatch.setattr("voice_mode.config.LOCAL_TTS_SERVICE_DIR", "/home/op/neutts")
+
+        assert detect_provider_type("http://100.85.200.51:12437/v1") == "kokoro"
+
+    def test_configured_lan_stt_port_is_parakeet(self, monkeypatch):
+        monkeypatch.setattr("voice_mode.config.LOCAL_STT_PORT", 5092)
+        monkeypatch.setattr("voice_mode.config.STT_MODEL", "parakeet-tdt-0.6b-v3")
+
+        assert detect_provider_type("http://100.85.200.51:5092/v1") == "parakeet"
+
 
 class TestIsLocalProvider:
     """is_local_provider must treat mlx-audio as local (VM-1106 AC item 6)."""
@@ -59,6 +71,8 @@ class TestIsLocalProvider:
             "http://127.0.0.1:8880/v1",
             "http://localhost:2022/v1",
             "http://127.0.0.1:9999/v1",
+            "http://100.85.200.51:12437/v1",
+            "http://192.168.1.100:12437/v1",
         ],
     )
     def test_existing_local_providers_unchanged(self, url):
