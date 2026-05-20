@@ -13,16 +13,17 @@ from typing import Any
 SUPPORTED_INTEGRATIONS = ("codex", "opencode", "qwen", "gemini")
 
 VOICEMODE_ENV = {
-    "VOICEMODE_TTS_BASE_URLS": "http://127.0.0.1:8880/v1",
+    "VOICEMODE_TTS_BASE_URLS": "http://100.85.200.51:6655/v1",
     "VOICEMODE_STT_BASE_URLS": "http://127.0.0.1:5092/v1",
-    "VOICEMODE_TTS_MODELS": "tts-1,tts-1-hd",
+    "VOICEMODE_TTS_MODELS": "omnivoice",
+    "VOICEMODE_TTS_MODEL": "omnivoice",
     "VOICEMODE_TTS_AUDIO_FORMAT": "mp3",
     "VOICEMODE_STT_MODELS": "parakeet-tdt-0.6b-v3",
     "VOICEMODE_STT_MODEL": "parakeet-tdt-0.6b-v3",
-    "VOICEMODE_VOICES": "F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy",
-    "VOICEMODE_DEFAULT_LOCAL_VOICE": "F1",
-    "VOICEMODE_LOCAL_TTS_PORT": "8880",
-    "VOICEMODE_LOCAL_TTS_DIR": str(Path.home() / "supertonic-express"),
+    "VOICEMODE_VOICES": "shimmer,onyx,echo,alloy,fable,nova,british_man,british_woman,mergy",
+    "VOICEMODE_DEFAULT_LOCAL_VOICE": "shimmer",
+    "VOICEMODE_LOCAL_TTS_PORT": "6655",
+    "VOICEMODE_LOCAL_TTS_DIR": str(Path.home() / "OmniVoice-benchmark"),
     "VOICEMODE_LOCAL_STT_PORT": "5092",
     "VOICEMODE_PREFER_LOCAL": "true",
     "VOICEMODE_ALWAYS_TRY_LOCAL": "true",

@@ -35,8 +35,8 @@ curl -s http://127.0.0.1:5092/v1/audio/transcriptions \
 For a complete local stack, run Parakeet with Supertonic Express:
 
 ```bash
-VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1
+VOICEMODE_TTS_BASE_URLS=http://100.85.200.51:6655/v1
 VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1
 VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3
-VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy
+VOICEMODE_VOICES=shimmer,onyx,echo,alloy,fable,nova,british_man,british_woman,mergy
 ```

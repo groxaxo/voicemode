@@ -28,16 +28,17 @@ Qwen Code also supports adding MCP servers from the CLI:
 qwen mcp add voicemode voicemode \
   -s user \
   -t stdio \
-  -e VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1 \
+  -e VOICEMODE_TTS_BASE_URLS=http://100.85.200.51:6655/v1 \
   -e VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1 \
-  -e VOICEMODE_TTS_MODELS=tts-1,tts-1-hd \
+  -e VOICEMODE_TTS_MODELS=omnivoice \
+  -e VOICEMODE_TTS_MODEL=omnivoice \
   -e VOICEMODE_TTS_AUDIO_FORMAT=mp3 \
   -e VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3 \
   -e VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3 \
-  -e VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy \
-  -e VOICEMODE_DEFAULT_LOCAL_VOICE=F1 \
-  -e VOICEMODE_LOCAL_TTS_PORT=8880 \
-  -e VOICEMODE_LOCAL_TTS_DIR=$HOME/supertonic-express \
+  -e VOICEMODE_VOICES=shimmer,onyx,echo,alloy,fable,nova,british_man,british_woman,mergy \
+  -e VOICEMODE_DEFAULT_LOCAL_VOICE=shimmer \
+  -e VOICEMODE_LOCAL_TTS_PORT=6655 \
+  -e VOICEMODE_LOCAL_TTS_DIR=$HOME/OmniVoice-benchmark \
   -e VOICEMODE_LOCAL_STT_PORT=5092 \
   -e VOICEMODE_PREFER_LOCAL=true \
   -e VOICEMODE_ALWAYS_TRY_LOCAL=true
@@ -57,6 +58,6 @@ voicemode status
 If the server appears but voice is not working, verify the local endpoints:
 
 ```bash
-curl http://127.0.0.1:8880/health
+curl http://100.85.200.51:6655/health
 curl http://127.0.0.1:5092/health
 ```
