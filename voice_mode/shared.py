@@ -9,6 +9,10 @@ from pathlib import Path
 from typing import Dict, Optional
 
 import httpx
+
+from .audio_env import ensure_audio_session_env
+ensure_audio_session_env()
+
 import sounddevice as sd
 
 # Import all configuration from config.py

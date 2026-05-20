@@ -10,6 +10,10 @@ from pathlib import Path
 from datetime import datetime
 
 import numpy as np
+
+from voice_mode.audio_env import ensure_audio_session_env
+ensure_audio_session_env()
+
 import sounddevice as sd
 from scipy.io.wavfile import write
 from pydub import AudioSegment

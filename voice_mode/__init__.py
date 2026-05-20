@@ -7,6 +7,9 @@ This package provides MCP servers for voice interactions through multiple transp
 - Configurable OpenAI-compatible STT/TTS services
 """
 
+from .audio_env import ensure_audio_session_env
+ensure_audio_session_env()
+
 from .version import __version__
 
 # DJ module - background music playback for voice sessions

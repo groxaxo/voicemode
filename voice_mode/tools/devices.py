@@ -2,6 +2,10 @@
 
 import logging
 from typing import Optional
+
+from voice_mode.audio_env import ensure_audio_session_env
+ensure_audio_session_env()
+
 import sounddevice as sd
 
 from voice_mode.server import mcp
