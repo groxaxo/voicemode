@@ -1257,6 +1257,13 @@ KEY PARAMETERS:
   - false: If another agent is speaking, return status immediately
   - true: Wait until the other agent finishes, then speak
 
+VOICE SESSION LOOP:
+  When using this tool for an ongoing voice conversation, call converse again
+  after handling each "Voice response:" result so the user can keep talking.
+  Do not treat "No speech detected" as a stop request; briefly prompt again or
+  listen again. Stop only when the user explicitly asks to stop, exit, quit,
+  cancel, or end the voice conversation.
+
 TIMING PARAMETERS (usually leave at defaults):
   Silence detection handles most cases automatically. Only override these if
   silence detection is disabled or the user reports being cut off.

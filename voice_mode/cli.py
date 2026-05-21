@@ -7,6 +7,7 @@ import os
 import warnings
 import subprocess
 import shutil
+import unicodedata
 import click
 from pathlib import Path
 
@@ -29,6 +30,73 @@ from voice_mode.config import (
     SERVE_TOKEN,
     SERVE_TRANSPORT,
 )
+
+
+VOICE_CONVERSATION_STOP_PHRASES = {
+    "exit",
+    "quit",
+    "goodbye",
+    "bye",
+    "stop",
+    "cancel",
+    "end",
+    "stop conversation",
+    "stop the conversation",
+    "stop voice conversation",
+    "end conversation",
+    "end the conversation",
+    "end voice conversation",
+    "cancel conversation",
+    "cancel the conversation",
+    "cancel voice conversation",
+    "leave conversation",
+    "leave the conversation",
+    "adios",
+    "salir",
+    "detener",
+    "detente",
+    "terminar",
+    "termina",
+    "cancelar",
+    "cancela",
+    "parar",
+    "para",
+    "salir de la conversacion",
+    "deten la conversacion",
+    "detener la conversacion",
+    "termina la conversacion",
+    "terminar la conversacion",
+    "cancela la conversacion",
+    "cancelar la conversacion",
+    "para la conversacion",
+    "parar la conversacion",
+}
+
+
+def _normalize_voice_command(text: str) -> str:
+    """Normalize a transcribed voice command for exact command matching."""
+    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
+    punctuation = ".,!?;:()[]{}\"'"
+    table = str.maketrans({char: " " for char in punctuation})
+    return " ".join(text.lower().translate(table).split())
+
+
+def _extract_voice_response(result: str | None) -> str | None:
+    """Extract the transcribed user response from a converse result."""
+    if not result or "Voice response:" not in result:
+        return None
+    return result.split("Voice response:", 1)[1].split("|", 1)[0].strip()
+
+
+def _is_no_speech_result(result: str | None) -> bool:
+    """Return True when converse completed with silence rather than a command."""
+    return bool(result and result.strip().lower().startswith("no speech detected"))
+
+
+def _is_conversation_stop_request(text: str) -> bool:
+    """Return True only for explicit user requests to stop voice conversation."""
+    normalized = _normalize_voice_command(text)
+    return normalized in VOICE_CONVERSATION_STOP_PHRASES
 
 
 # Suppress known deprecation warnings for better user experience
@@ -1855,8 +1923,23 @@ def converse(message, wait, duration, min_duration, voice, tts_provider,
                     skip_tts=skip_tts
                 )
                 
-                if result and "Voice response:" in result:
-                    click.echo(f"You: {result.split('Voice response:')[1].split('|')[0].strip()}")
+                user_text = _extract_voice_response(result)
+                if user_text:
+                    click.echo(f"You: {user_text}")
+                    if _is_conversation_stop_request(user_text):
+                        await converse_fn.fn(
+                            message="Goodbye!",
+                            wait_for_response=False,
+                            voice=voice,
+                            tts_provider=tts_provider,
+                            tts_model=tts_model,
+                            audio_format=audio_format,
+                            speed=speed,
+                            skip_tts=skip_tts
+                        )
+                        return
+                elif _is_no_speech_result(result):
+                    click.echo("No speech detected; still listening.")
                 
                 # Continue conversation
                 while True:
@@ -1878,12 +1961,12 @@ def converse(message, wait, duration, min_duration, voice, tts_provider,
                         skip_tts=skip_tts
                     )
                     
-                    if result and "Voice response:" in result:
-                        user_text = result.split('Voice response:')[1].split('|')[0].strip()
+                    user_text = _extract_voice_response(result)
+                    if user_text:
                         click.echo(f"You: {user_text}")
                         
                         # Check for exit commands
-                        if user_text.lower() in ['exit', 'quit', 'goodbye', 'bye']:
+                        if _is_conversation_stop_request(user_text):
                             await converse_fn.fn(
                                 message="Goodbye!",
                                 wait_for_response=False,
@@ -1895,6 +1978,8 @@ def converse(message, wait, duration, min_duration, voice, tts_provider,
                                 skip_tts=skip_tts
                             )
                             break
+                    elif _is_no_speech_result(result):
+                        click.echo("No speech detected; still listening.")
             else:
                 # Single conversation
                 result = await converse_fn.fn(
