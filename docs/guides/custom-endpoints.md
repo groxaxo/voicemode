@@ -3,7 +3,7 @@
 VoiceMode accepts comma-separated endpoint chains for TTS and STT.
 
 ```bash
-VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1
+VOICEMODE_TTS_BASE_URLS=http://100.85.200.51:6655/v1
 VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1
 VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3
 ```
@@ -14,11 +14,11 @@ Common local endpoints:
 
 | Service | URL | Purpose |
 | --- | --- | --- |
-| Supertonic Express | `http://127.0.0.1:8880/v1` | TTS |
+| Supertonic Express | `http://100.85.200.51:6655/v1` | TTS |
 | Parakeet TDT | `http://127.0.0.1:5092/v1` | STT |
 
-Supertonic voices are `F1`-`F5` and `M1`-`M5`. Set them with:
+Supertonic default voices include `shimmer, onyx, echo, alloy...` and can be set with:
 
 ```bash
-VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy
-```
+VOICEMODE_VOICES=shimmer,onyx,echo,alloy,fable,nova,british_man,british_woman,mergy
+``` 

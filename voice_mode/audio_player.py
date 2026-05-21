@@ -10,6 +10,10 @@ import threading
 from typing import Optional
 
 import numpy as np
+
+from .audio_env import ensure_audio_session_env
+ensure_audio_session_env()
+
 import sounddevice as sd
 
 logger = logging.getLogger("voicemode.audio_player")

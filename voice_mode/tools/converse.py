@@ -10,6 +10,10 @@ from pathlib import Path
 from datetime import datetime
 
 import numpy as np
+
+from voice_mode.audio_env import ensure_audio_session_env
+ensure_audio_session_env()
+
 import sounddevice as sd
 from scipy.io.wavfile import write
 from pydub import AudioSegment
@@ -440,9 +444,9 @@ async def get_tts_config(provider: Optional[str] = None, voice: Optional[str] = 
     # Map provider names to base URLs
     provider_urls = {
         'openai': 'https://api.openai.com/v1',
-        'supertonic-express': 'http://127.0.0.1:8880/v1',
-        'supertonic': 'http://127.0.0.1:8880/v1',
-        'kokoro': 'http://127.0.0.1:8880/v1'
+        'supertonic-express': 'http://100.85.200.51:6655/v1',
+        'supertonic': 'http://100.85.200.51:6655/v1',
+        'kokoro': 'http://100.85.200.51:6655/v1'
     }
 
     # Convert provider name to URL if it's a known provider
@@ -473,8 +477,8 @@ async def get_stt_config(provider: Optional[str] = None):
 
     # Map provider names to base URLs
     provider_urls = {
-        'parakeet': 'http://127.0.0.1:5092/v1',
-        'parakeet-tdt': 'http://127.0.0.1:5092/v1',
+        'parakeet': 'http://100.85.200.51:5092/v1',
+        'parakeet-tdt': 'http://100.85.200.51:5092/v1',
         'whisper-local': 'http://127.0.0.1:2022/v1',
         'openai-whisper': 'https://api.openai.com/v1'
     }
@@ -1252,6 +1256,13 @@ KEY PARAMETERS:
 • wait_for_conch (bool, default: false): Multi-agent coordination
   - false: If another agent is speaking, return status immediately
   - true: Wait until the other agent finishes, then speak
+
+VOICE SESSION LOOP:
+  When using this tool for an ongoing voice conversation, call converse again
+  after handling each "Voice response:" result so the user can keep talking.
+  Do not treat "No speech detected" as a stop request; briefly prompt again or
+  listen again. Stop only when the user explicitly asks to stop, exit, quit,
+  cancel, or end the voice conversation.
 
 TIMING PARAMETERS (usually leave at defaults):
   Silence detection handles most cases automatically. Only override these if

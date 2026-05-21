@@ -27,16 +27,17 @@ Gemini CLI supports MCP management from the command line:
 ```bash
 gemini mcp add voicemode voicemode \
   --scope user \
-  --env VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1 \
+  --env VOICEMODE_TTS_BASE_URLS=http://100.85.200.51:6655/v1 \
   --env VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1 \
-  --env VOICEMODE_TTS_MODELS=tts-1,tts-1-hd \
+  --env VOICEMODE_TTS_MODELS=omnivoice \
+  --env VOICEMODE_TTS_MODEL=omnivoice \
   --env VOICEMODE_TTS_AUDIO_FORMAT=mp3 \
   --env VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3 \
   --env VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3 \
-  --env VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy \
-  --env VOICEMODE_DEFAULT_LOCAL_VOICE=F1 \
-  --env VOICEMODE_LOCAL_TTS_PORT=8880 \
-  --env VOICEMODE_LOCAL_TTS_DIR=$HOME/supertonic-express \
+  --env VOICEMODE_VOICES=shimmer,onyx,echo,alloy,fable,nova,british_man,british_woman,mergy \
+  --env VOICEMODE_DEFAULT_LOCAL_VOICE=shimmer \
+  --env VOICEMODE_LOCAL_TTS_PORT=6655 \
+  --env VOICEMODE_LOCAL_TTS_DIR=$HOME/OmniVoice-benchmark \
   --env VOICEMODE_LOCAL_STT_PORT=5092 \
   --env VOICEMODE_PREFER_LOCAL=true \
   --env VOICEMODE_ALWAYS_TRY_LOCAL=true
@@ -56,6 +57,6 @@ voicemode status
 If Gemini CLI can see the server but speech fails, check:
 
 ```bash
-curl http://127.0.0.1:8880/health
+curl http://100.85.200.51:6655/health
 curl http://127.0.0.1:5092/health
 ```

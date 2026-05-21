@@ -142,10 +142,10 @@ def load_voicemode_env():
 #############
 
 # Comma-separated list of TTS endpoints
-# VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1
+# VOICEMODE_TTS_BASE_URLS=http://100.85.200.51:6655/v1
 
 # Comma-separated list of STT endpoints
-# VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1
+# VOICEMODE_STT_BASE_URLS=http://100.85.200.51:5092/v1
 # VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3
 
 # STT prompt for vocabulary biasing - helps local STT recognize names and technical terms
@@ -154,10 +154,10 @@ def load_voicemode_env():
 # VOICEMODE_STT_PROMPT=
 
 # Comma-separated list of preferred voices
-# VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy
+# VOICEMODE_VOICES=shimmer,onyx,echo,alloy,fable,nova,british_man,british_woman,mergy
 
 # Comma-separated list of preferred models
-# VOICEMODE_TTS_MODELS=tts-1,tts-1-hd
+# VOICEMODE_TTS_MODELS=omnivoice
 
 # Prefer local providers over cloud (true/false)
 # VOICEMODE_PREFER_LOCAL=true
@@ -359,8 +359,8 @@ TTS \\bAPI\\b A P I # API as individual letters
 # HTTP Serve Configuration
 #############
 
-# Host/IP address to bind the server to (default: 127.0.0.1)
-# VOICEMODE_SERVE_HOST=127.0.0.1
+# Host/IP address to bind the server to (default: 100.85.200.51)
+# VOICEMODE_SERVE_HOST=100.85.200.51
 
 # Port to bind the server to (default: 8765)
 # VOICEMODE_SERVE_PORT=8765
@@ -571,10 +571,10 @@ def parse_comma_list(env_var: str, fallback: str) -> list:
     return [item.strip() for item in value.split(",") if item.strip()]
 
 # New provider endpoint lists configuration
-TTS_BASE_URLS = parse_comma_list("VOICEMODE_TTS_BASE_URLS", "http://127.0.0.1:8880/v1")
-STT_BASE_URLS = parse_comma_list("VOICEMODE_STT_BASE_URLS", "http://127.0.0.1:5092/v1")
-TTS_VOICES = parse_comma_list("VOICEMODE_VOICES", "F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy")
-TTS_MODELS = parse_comma_list("VOICEMODE_TTS_MODELS", "tts-1,tts-1-hd")
+TTS_BASE_URLS = parse_comma_list("VOICEMODE_TTS_BASE_URLS", "http://100.85.200.51:6655/v1")
+STT_BASE_URLS = parse_comma_list("VOICEMODE_STT_BASE_URLS", "http://100.85.200.51:5092/v1")
+TTS_VOICES = parse_comma_list("VOICEMODE_VOICES", "shimmer,onyx,echo,alloy,fable,nova,british_man,british_woman,mergy")
+TTS_MODELS = parse_comma_list("VOICEMODE_TTS_MODELS", "omnivoice")
 STT_MODEL = os.getenv("VOICEMODE_STT_MODEL", "parakeet-tdt-0.6b-v3")
 STT_MODELS = parse_comma_list("VOICEMODE_STT_MODELS", "parakeet-tdt-0.6b-v3")
 
@@ -630,10 +630,10 @@ def reload_configuration():
     
     # Update global configuration variables
     global TTS_VOICES, TTS_MODELS, TTS_BASE_URLS, STT_BASE_URLS, STT_MODEL, STT_MODELS
-    TTS_BASE_URLS = parse_comma_list("VOICEMODE_TTS_BASE_URLS", "http://127.0.0.1:8880/v1")
-    STT_BASE_URLS = parse_comma_list("VOICEMODE_STT_BASE_URLS", "http://127.0.0.1:5092/v1")
-    TTS_VOICES = parse_comma_list("VOICEMODE_VOICES", "F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy")
-    TTS_MODELS = parse_comma_list("VOICEMODE_TTS_MODELS", "tts-1,tts-1-hd")
+    TTS_BASE_URLS = parse_comma_list("VOICEMODE_TTS_BASE_URLS", "http://100.85.200.51:6655/v1")
+    STT_BASE_URLS = parse_comma_list("VOICEMODE_STT_BASE_URLS", "http://100.85.200.51:5092/v1")
+    TTS_VOICES = parse_comma_list("VOICEMODE_VOICES", "shimmer,onyx,echo,alloy,fable,nova,british_man,british_woman,mergy")
+    TTS_MODELS = parse_comma_list("VOICEMODE_TTS_MODELS", "omnivoice")
     STT_MODEL = os.getenv("VOICEMODE_STT_MODEL", "parakeet-tdt-0.6b-v3")
     STT_MODELS = parse_comma_list("VOICEMODE_STT_MODELS", "parakeet-tdt-0.6b-v3")
 
@@ -1400,8 +1400,8 @@ def get_format_export_params(format: str) -> dict:
 
 # ==================== SERVE COMMAND CONFIGURATION ====================
 
-# Host/IP address to bind the server to (default: 127.0.0.1)
-SERVE_HOST = os.getenv("VOICEMODE_SERVE_HOST", "127.0.0.1")
+# Host/IP address to bind the server to (default: 100.85.200.51)
+SERVE_HOST = os.getenv("VOICEMODE_SERVE_HOST", "100.85.200.51")
 
 # Port to bind the server to (default: 8765)
 SERVE_PORT = int(os.getenv("VOICEMODE_SERVE_PORT", "8765"))

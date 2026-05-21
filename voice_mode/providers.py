@@ -285,11 +285,11 @@ async def is_provider_available(provider_id: str, timeout: float = 2.0) -> bool:
     
     # Map provider IDs to base URLs. Legacy IDs stay for compatibility.
     provider_map = {
-        "supertonic-express": "http://127.0.0.1:8880/v1",
-        "supertonic": "http://127.0.0.1:8880/v1",
-        "kokoro": "http://127.0.0.1:8880/v1",
-        "parakeet": "http://127.0.0.1:5092/v1",
-        "parakeet-tdt": "http://127.0.0.1:5092/v1",
+        "supertonic-express": "http://100.85.200.51:6655/v1",
+        "supertonic": "http://100.85.200.51:6655/v1",
+        "kokoro": "http://100.85.200.51:6655/v1",
+        "parakeet": "http://100.85.200.51:5092/v1",
+        "parakeet-tdt": "http://100.85.200.51:5092/v1",
         "openai": "https://api.openai.com/v1",
         "whisper-local": "http://127.0.0.1:2022/v1",
         "openai-whisper": "https://api.openai.com/v1"
@@ -315,7 +315,7 @@ def get_provider_by_voice(voice: str) -> Optional[Dict[str, Any]]:
             "id": "supertonic-express",
             "name": "Supertonic Express",
             "type": "tts",
-            "base_url": "http://127.0.0.1:8880/v1",
+            "base_url": "http://100.85.200.51:6655/v1",
             "voices": ["F1", "F2", "F3", "F4", "F5", "M1", "M2", "M3", "M4", "M5"]
         }
 
@@ -325,7 +325,7 @@ def get_provider_by_voice(voice: str) -> Optional[Dict[str, Any]]:
             "id": "kokoro",
             "name": "Legacy Kokoro TTS",
             "type": "tts",
-            "base_url": "http://127.0.0.1:8880/v1",
+            "base_url": "http://100.85.200.51:6655/v1",
             "voices": ["af_sky", "af_sarah", "am_adam", "af_river", "am_michael"]
         }
     

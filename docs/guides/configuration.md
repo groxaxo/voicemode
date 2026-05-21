@@ -15,7 +15,7 @@ export VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1
 export VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1
 export VOICEMODE_STT_MODEL=parakeet-tdt-0.6b-v3
 export VOICEMODE_STT_MODELS=parakeet-tdt-0.6b-v3
-export VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy
+export VOICEMODE_VOICES=shimmer,onyx,echo,alloy,fable,nova,british_man,british_woman,mergy
 ```
 
 ### Hybrid Setup (Recommended)
@@ -45,7 +45,7 @@ VoiceMode automatically creates `~/.voicemode/voicemode.env` on first run with b
 # ~/.voicemode/voicemode.env example
 export VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1
 export VOICEMODE_STT_BASE_URLS=http://127.0.0.1:5092/v1
-export VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy
+export VOICEMODE_VOICES=shimmer,onyx,echo,alloy,fable,nova,british_man,british_woman,mergy
 export VOICEMODE_DEBUG=false
 ```
 
@@ -92,16 +92,16 @@ VOICEMODE_TTS_BASE_URLS=http://127.0.0.1:8880/v1
 
 # Voice preferences (comma-separated)
 # OpenAI: alloy, echo, fable, onyx, nova, shimmer
-# Supertonic Express: F1-F5, M1-M5
-VOICEMODE_VOICES=F1,F2,F3,F4,F5,M1,M2,M3,M4,M5,alloy
+# Supertonic/OmniVoice: shimmer, onyx, echo, alloy, fable, nova
+VOICEMODE_VOICES=shimmer,onyx,echo,alloy,fable,nova,british_man,british_woman,mergy
 
 # TTS Models (comma-separated)
 # OpenAI: tts-1, tts-1-hd
-VOICEMODE_TTS_MODELS=tts-1,tts-1-hd
+VOICEMODE_TTS_MODELS=omnivoice
 
 # Default TTS voice and model
-VOICEMODE_TTS_VOICE=nova
-VOICEMODE_TTS_MODEL=tts-1-hd
+VOICEMODE_TTS_VOICE=shimmer
+VOICEMODE_TTS_MODEL=omnivoice
 
 # Speech speed (0.25 to 4.0)
 VOICEMODE_TTS_SPEED=1.0
@@ -242,7 +242,7 @@ voicemode service status voicemode
 # Supertonic Express TTS
 VOICEMODE_LOCAL_TTS_PORT=8880
 VOICEMODE_LOCAL_TTS_DIR=/home/op/supertonic-express
-VOICEMODE_DEFAULT_LOCAL_VOICE=F1
+VOICEMODE_DEFAULT_LOCAL_VOICE=shimmer
 
 # Parakeet STT
 VOICEMODE_LOCAL_STT_PORT=5092
@@ -329,7 +329,7 @@ export VOICEMODE_VOICES=F1
 ```bash
 # Best quality with OpenAI
 export OPENAI_API_KEY=sk-...
-export VOICEMODE_TTS_MODEL=tts-1-hd
+export VOICEMODE_TTS_MODEL=omnivoice
 export VOICEMODE_VOICES=nova,alloy
 ```
 

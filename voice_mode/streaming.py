@@ -16,6 +16,9 @@ from dataclasses import dataclass
 from pathlib import Path
 import numpy as np
 
+from .audio_env import ensure_audio_session_env
+ensure_audio_session_env()
+
 import sounddevice as sd
 from pydub import AudioSegment
 
